@@ -11,12 +11,12 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.AlphaAnimation;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.github.mrengineer13.snackbar.SnackBar;
@@ -31,7 +31,7 @@ import ua.tsisar.pavel.nazk.search.SearchFilters;
 import ua.tsisar.pavel.nazk.adapter.RecyclerAdapter;
 import ua.tsisar.pavel.nazk.dto.AnswerDTO;
 import ua.tsisar.pavel.nazk.recycler.RecyclerItemClickListener;
-import ua.tsisar.pavel.nazk.search.SearchFiltersListener;
+import ua.tsisar.pavel.nazk.search.listener.SearchFiltersListener;
 
 public class MainActivity extends AppCompatActivity implements SearchFiltersListener, SearchFiltersView.Listener{
 
@@ -55,6 +55,8 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersList
 
     private LinearLayout searchFiltersLinearLayout;
     private RecyclerAdapter recyclerAdapter;
+
+    private ProgressBar progressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,6 +85,7 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersList
         );
 
         searchFiltersLinearLayout = (LinearLayout) findViewById(R.id.search_filters_LinearLayout);
+        progressBar = (ProgressBar) findViewById(R.id.progressBar);
     }
 
     @Override
@@ -158,7 +161,8 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersList
     }
 
     private void searchDeclarations(){
-       compositeDisposable.add(App.getApi().searchDeclarations(
+        progressBar.setVisibility(View.VISIBLE);
+        compositeDisposable.add(App.getApi().searchDeclarations(
                searchFilters.getQuery(),
                searchFilters.getDeclarationYear(),
                searchFilters.getDeclarationType(),
@@ -176,6 +180,7 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersList
     }
 
     private void onSearchDeclarationsSuccess(AnswerDTO answer){
+        progressBar.setVisibility(View.GONE);
         if(answer.getPage() == null){
             searchResult.setText(getString(R.string.search_null));
         }else {
@@ -188,6 +193,7 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersList
     }
 
     private void onFailure(Throwable throwable){
+        progressBar.setVisibility(View.GONE);
         new SnackBar.Builder(this)
                 .withMessage(throwable.getMessage())
                 .withStyle(SnackBar.Style.ALERT)
