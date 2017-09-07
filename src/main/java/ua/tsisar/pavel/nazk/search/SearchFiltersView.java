@@ -21,19 +21,25 @@ public class SearchFiltersView extends LinearLayout implements View.OnClickListe
 
     public SearchFiltersView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
-        this.listener = (Listener) context;
+        if (context instanceof Listener) {
+            this.listener = (Listener) context;
+        }
         initView();
     }
 
     public SearchFiltersView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        this.listener = (Listener) context;
+        if (context instanceof Listener) {
+            this.listener = (Listener) context;
+        }
         initView();
     }
 
     public SearchFiltersView(Context context) {
         super(context);
-        this.listener = (Listener) context;
+        if (context instanceof Listener) {
+            this.listener = (Listener) context;
+        }
         initView();
     }
 

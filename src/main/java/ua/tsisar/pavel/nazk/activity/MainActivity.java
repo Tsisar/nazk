@@ -3,7 +3,6 @@ package ua.tsisar.pavel.nazk.activity;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -25,6 +24,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
 import ua.tsisar.pavel.nazk.App;
+import ua.tsisar.pavel.nazk.OpenDialog;
 import ua.tsisar.pavel.nazk.R;
 import ua.tsisar.pavel.nazk.search.SearchFiltersView;
 import ua.tsisar.pavel.nazk.search.SearchFilters;
@@ -45,6 +45,12 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersList
     private static final String EXTRA_DECLARATION_YEAR = "DeclarationYear";
     private static final String EXTRA_DECLARATION_TYPE = "DeclarationType";
     private static final String EXTRA_DOCUMENT_TYPE = "DocumentType";
+
+    private static final String LINK_PDF = "LinkPDF";
+    private static final String LINK_HTML = "LinkHTML";
+
+    private static final String URL = "https://public.nazk.gov.ua/declaration/";
+
 
     private CompositeDisposable compositeDisposable;
     private AlphaAnimation clickAnimation;
@@ -79,8 +85,15 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersList
         recyclerView.addOnItemTouchListener(
                 new RecyclerItemClickListener(this, (View view, int position) -> {
                     view.startAnimation(clickAnimation);
-                    Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(recyclerAdapter.getItemDTO(position).getLinkPDF()));
-                    startActivity(intent);
+                    //Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(recyclerAdapter.getItemDTO(position).getLinkPDF()));
+                    //startActivity(intent);
+                    OpenDialog dialog = new OpenDialog();
+                    Bundle arguments = new Bundle();
+                    arguments.putString(LINK_PDF, recyclerAdapter.getItemDTO(position).getLinkPDF());
+                    arguments.putString(LINK_HTML, URL + recyclerAdapter.getItemDTO(position).getId());
+                    dialog.setArguments(arguments);
+
+                    dialog.show(getSupportFragmentManager(), "openDialog");
                 })
         );
 

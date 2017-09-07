@@ -17,15 +17,22 @@ repositories {
 }
 
 android {
+    signingConfigs {
+        config {
+            keyAlias 'Tsisar'
+            keyPassword 'fkg7h4f3v6'
+            storeFile file('/home/pavel/android_key/my_key.jks')
+            storePassword 'fkg7h4f3v6'
+        }
+    }
     compileSdkVersion 25
     buildToolsVersion "25.0.2"
-
     defaultConfig {
         applicationId "ua.tsisar.pavel.nazk"
         minSdkVersion 17
         targetSdkVersion 25
-        versionCode 1
-        versionName "1.0"
+        versionCode 2
+        versionName '1.1'
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
@@ -40,18 +47,15 @@ android {
         targetCompatibility 1.8
         sourceCompatibility 1.8
     }
+    productFlavors {
+    }
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile fileTree(include: ['*.jar'], dir: 'libs')
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
-
-
-
-
-
     compile 'com.android.support:appcompat-v7:25.3.1'
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
     compile 'com.android.support:design:25.3.1'

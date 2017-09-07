@@ -13,6 +13,7 @@
     <string name="declaration_type">Тип декларації: %1$s</string>
     <string name="document_type">Тип документу: %1$s</string>
     <string name="find">Шукати</string>
+    <string name="cancel">Скасувати</string>
 
     <string-array name="declaration_type_array">
         <item>Всі</item>
