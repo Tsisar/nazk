@@ -24,7 +24,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
 import ua.tsisar.pavel.nazk.App;
-import ua.tsisar.pavel.nazk.OpenDialog;
+import ua.tsisar.pavel.nazk.dialog.OpenDialog;
 import ua.tsisar.pavel.nazk.R;
 import ua.tsisar.pavel.nazk.search.SearchFiltersView;
 import ua.tsisar.pavel.nazk.search.SearchFilters;
@@ -269,13 +269,20 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersList
 
     @Override
     public void removeView(SearchFiltersView view) {
+        int viewType = view.getItemType();
+
         searchFiltersLinearLayout.removeView(view);
-        if (view.getItemType() == ITEM_TYPE_DECLARATION_YEAR) {
-            searchFilters.setDeclarationYear(0);
-        } else if (view.getItemType() == ITEM_TYPE_DECLARATION_TYPE) {
-            searchFilters.setDeclarationType(SearchFilters.DECLARATION_ALL);
-        } else if (view.getItemType() == ITEM_TYPE_DOCUMENT_TYPE) {
-            searchFilters.setDocumentType(SearchFilters.DOCUMENT_ALL);
+
+        switch (viewType){
+            case ITEM_TYPE_DECLARATION_YEAR:
+                searchFilters.setDeclarationYear(0);
+                break;
+            case ITEM_TYPE_DECLARATION_TYPE:
+                searchFilters.setDeclarationType(SearchFilters.DECLARATION_ALL);
+                break;
+            case ITEM_TYPE_DOCUMENT_TYPE:
+                searchFilters.setDocumentType(SearchFilters.DOCUMENT_ALL);
+                break;
         }
         searchFilters.update();
     }

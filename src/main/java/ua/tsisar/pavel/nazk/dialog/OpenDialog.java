@@ -1,4 +1,4 @@
-package ua.tsisar.pavel.nazk;
+package ua.tsisar.pavel.nazk.dialog;
 
 
 import android.app.Dialog;
@@ -13,6 +13,8 @@ import android.support.v7.app.AlertDialog;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
+
+import ua.tsisar.pavel.nazk.R;
 
 
 public class OpenDialog extends DialogFragment {
