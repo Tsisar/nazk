@@ -85,8 +85,6 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersList
         recyclerView.addOnItemTouchListener(
                 new RecyclerItemClickListener(this, (View view, int position) -> {
                     view.startAnimation(clickAnimation);
-                    //Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(recyclerAdapter.getItemDTO(position).getLinkPDF()));
-                    //startActivity(intent);
                     OpenDialog dialog = new OpenDialog();
                     Bundle arguments = new Bundle();
                     arguments.putString(LINK_PDF, recyclerAdapter.getItemDTO(position).getLinkPDF());
@@ -234,6 +232,7 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersList
                             .setItemType(ITEM_TYPE_DECLARATION_YEAR));
         }
     }
+
 
     private void drawDeclarationType() {
         if(searchFilters.getDeclarationType() != SearchFilters.DECLARATION_ALL){
