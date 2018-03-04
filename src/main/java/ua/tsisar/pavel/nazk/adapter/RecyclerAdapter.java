@@ -33,9 +33,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.itemVi
     public itemViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 
         View view = inflater.inflate(R.layout.row_item_list, parent, false);
-        itemViewHolder holder = new itemViewHolder(view);
-
-        return holder;
+        return new itemViewHolder(view);
     }
 
     @Override
@@ -70,25 +68,25 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.itemVi
         private itemViewHolder(View itemView) {
             super(itemView);
 
-            lastname = (TextView) itemView.findViewById(R.id.lastname_textView);
-            firstname = (TextView) itemView.findViewById(R.id.firstname_textView);
-//            position = (TextView) itemView.findViewById(R.id.position_textView);
-            placeOfWork = (TextView) itemView.findViewById(R.id.placeOfWork_textView);
+            lastname = itemView.findViewById(R.id.lastname_textView);
+            firstname = itemView.findViewById(R.id.firstname_textView);
+//            position = itemView.findViewById(R.id.position_textView);
+            placeOfWork = itemView.findViewById(R.id.placeOfWork_textView);
         }
 
-        public void setLastname(String string){
+        void setLastname(String string){
             lastname.setText(string);
         }
 
-        public void setFirstname(String string){
+        void setFirstname(String string){
             firstname.setText(string);
         }
 
-//        public void setPosition(String string){
+//        void setPosition(String string){
 //            position.setText(string);
 //        }
 
-        public void setPlaceOfWork(String string){
+        void setPlaceOfWork(String string){
             placeOfWork.setText(string);
         }
     }

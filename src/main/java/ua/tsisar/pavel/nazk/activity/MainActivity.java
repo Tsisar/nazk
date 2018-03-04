@@ -71,15 +71,15 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersList
 
         compositeDisposable = new CompositeDisposable();
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         clickAnimation = new AlphaAnimation(1F, 0.2F);
 
-        searchResult = (TextView) findViewById(R.id.search_result_textView);
+        searchResult = findViewById(R.id.search_result_textView);
         searchResult.setText(getString(R.string.edr_info));
 
-        recyclerView = (RecyclerView) findViewById(R.id.item_recyclerView);
+        recyclerView = findViewById(R.id.item_recyclerView);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.addOnItemTouchListener(
@@ -95,8 +95,8 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersList
                 })
         );
 
-        searchFiltersLinearLayout = (LinearLayout) findViewById(R.id.search_filters_LinearLayout);
-        progressBar = (ProgressBar) findViewById(R.id.progressBar);
+        searchFiltersLinearLayout = findViewById(R.id.search_filters_LinearLayout);
+        progressBar = findViewById(R.id.progressBar);
     }
 
     @Override

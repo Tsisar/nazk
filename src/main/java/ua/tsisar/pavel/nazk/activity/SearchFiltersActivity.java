@@ -1,7 +1,6 @@
 package ua.tsisar.pavel.nazk.activity;
 
 import android.content.Intent;
-import android.support.annotation.StringDef;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -10,7 +9,6 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
-import android.widget.TextView;
 
 import ua.tsisar.pavel.nazk.R;
 import ua.tsisar.pavel.nazk.search.SearchFilters;
@@ -45,13 +43,13 @@ public class SearchFiltersActivity extends AppCompatActivity {
         initDeclarationTypeSpinner();
         initDocumentTypeSpinner();
 
-        EditText queryEditText = (EditText) findViewById(R.id.query_EditText);
+        EditText queryEditText = findViewById(R.id.query_EditText);
         queryEditText.setText(String.valueOf(query));
 
-        EditText declarationYearEditText = (EditText) findViewById(R.id.year_EditText);
+        EditText declarationYearEditText = findViewById(R.id.year_EditText);
         declarationYearEditText.setText(declarationYear == 0?"":String.valueOf(declarationYear));
 
-        Button find = (Button) findViewById(R.id.find_Button);
+        Button find = findViewById(R.id.find_Button);
         find.setOnClickListener((View v) -> {
                 String query = queryEditText.getText().toString();
                 String year = declarationYearEditText.getText().toString();
@@ -67,7 +65,7 @@ public class SearchFiltersActivity extends AppCompatActivity {
     }
 
     private void initDeclarationTypeSpinner(){
-        Spinner declarationTypeSpinner = (Spinner) findViewById(R.id.declaration_type_spinner);
+        Spinner declarationTypeSpinner = findViewById(R.id.declaration_type_spinner);
         ArrayAdapter<String> declarationTypeAdapter = new ArrayAdapter<>(this,
                 android.R.layout.simple_spinner_item,
                 getResources().getStringArray(R.array.declaration_type_array));
@@ -87,7 +85,7 @@ public class SearchFiltersActivity extends AppCompatActivity {
     }
 
     private void initDocumentTypeSpinner(){
-        Spinner documentTypeSpinner = (Spinner) findViewById(R.id.document_type_spinner);
+        Spinner documentTypeSpinner = findViewById(R.id.document_type_spinner);
         ArrayAdapter<String> documentTypeAdapter = new ArrayAdapter<>(this,
                 android.R.layout.simple_spinner_item,
                 getResources().getStringArray(R.array.document_type_array));
