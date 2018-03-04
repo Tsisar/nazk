@@ -3,6 +3,7 @@ package ua.tsisar.pavel.nazk.activity;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -15,7 +16,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.AlphaAnimation;
 import android.widget.LinearLayout;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.github.mrengineer13.snackbar.SnackBar;
@@ -33,7 +33,7 @@ import ua.tsisar.pavel.nazk.dto.AnswerDTO;
 import ua.tsisar.pavel.nazk.recycler.RecyclerItemClickListener;
 import ua.tsisar.pavel.nazk.search.listener.SearchFiltersListener;
 
-public class MainActivity extends AppCompatActivity implements SearchFiltersListener, SearchFiltersView.Listener{
+public class MainActivity extends AppCompatActivity implements SearchFiltersListener, SearchFiltersView.Listener, SwipeRefreshLayout.OnRefreshListener{
 
     private static final int ITEM_TYPE_DECLARATION_YEAR = 0;
     private static final int ITEM_TYPE_DECLARATION_TYPE = 1;
@@ -62,7 +62,7 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersList
     private LinearLayout searchFiltersLinearLayout;
     private RecyclerAdapter recyclerAdapter;
 
-    private ProgressBar progressBar;
+    private SwipeRefreshLayout swipeRefreshLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -95,8 +95,10 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersList
                 })
         );
 
+        swipeRefreshLayout = findViewById(R.id.refresh);
+        swipeRefreshLayout.setOnRefreshListener(this);
+
         searchFiltersLinearLayout = findViewById(R.id.search_filters_LinearLayout);
-        progressBar = findViewById(R.id.progressBar);
     }
 
     @Override
@@ -142,15 +144,15 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersList
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                searchFilters
-                        .setQuery(query)
-                        .update();
-                return false;
+                searchView.clearFocus();
+                searchFilters.update();
+                return true;
             }
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                return false;
+                searchFilters.setQuery(newText);
+                return true;
             }
         });
         return true;
@@ -172,7 +174,7 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersList
     }
 
     private void searchDeclarations(){
-        progressBar.setVisibility(View.VISIBLE);
+        swipeRefreshLayout.setRefreshing(true);
         compositeDisposable.add(App.getApi().searchDeclarations(
                searchFilters.getQuery(),
                searchFilters.getDeclarationYear(),
@@ -191,7 +193,8 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersList
     }
 
     private void onSearchDeclarationsSuccess(AnswerDTO answer){
-        progressBar.setVisibility(View.GONE);
+        swipeRefreshLayout.setRefreshing(false);
+        showMessage(String.format(getString(R.string.refresh_finished), answer.getPage().getTotalItems()));
         if(answer.getPage() == null){
             searchResult.setText(getString(R.string.search_null));
         }else {
@@ -204,11 +207,8 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersList
     }
 
     private void onFailure(Throwable throwable){
-        progressBar.setVisibility(View.GONE);
-        new SnackBar.Builder(this)
-                .withMessage(throwable.getMessage())
-                .withStyle(SnackBar.Style.ALERT)
-                .show();
+        swipeRefreshLayout.setRefreshing(false);
+        showMessage(throwable.getMessage());
     }
 
     @Override
@@ -283,6 +283,19 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersList
                 searchFilters.setDocumentType(SearchFilters.DOCUMENT_ALL);
                 break;
         }
+        searchFilters.update();
+    }
+
+    private void showMessage(String message){
+        new SnackBar.Builder(this)
+                .withMessage(message)
+                .withStyle(SnackBar.Style.ALERT)
+                .show();
+    }
+
+    @Override
+    public void onRefresh() {
+        showMessage(getString(R.string.refresh_started));
         searchFilters.update();
     }
 }

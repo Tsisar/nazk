@@ -14,6 +14,8 @@
     <string name="document_type">Тип документу: %1$s</string>
     <string name="find">Шукати</string>
     <string name="cancel">Скасувати</string>
+    <string name="refresh_finished">Знайдено %1$d документів</string>
+    <string name="refresh_started">Оновлення</string>
 
     <string-array name="declaration_type_array">
         <item>Всі</item>
