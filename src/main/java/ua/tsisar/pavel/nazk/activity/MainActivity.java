@@ -3,6 +3,7 @@ package ua.tsisar.pavel.nazk.activity;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -20,6 +21,7 @@ import android.widget.TextView;
 
 import com.github.mrengineer13.snackbar.SnackBar;
 
+
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
@@ -33,11 +35,13 @@ import ua.tsisar.pavel.nazk.dto.AnswerDTO;
 import ua.tsisar.pavel.nazk.recycler.RecyclerItemClickListener;
 import ua.tsisar.pavel.nazk.search.listener.SearchFiltersListener;
 
-public class MainActivity extends AppCompatActivity implements SearchFiltersListener, SearchFiltersView.Listener, SwipeRefreshLayout.OnRefreshListener{
+public class MainActivity extends AppCompatActivity implements
+        SearchFiltersListener, SearchFiltersView.Listener, SwipeRefreshLayout.OnRefreshListener{
 
     private static final int ITEM_TYPE_DECLARATION_YEAR = 0;
     private static final int ITEM_TYPE_DECLARATION_TYPE = 1;
     private static final int ITEM_TYPE_DOCUMENT_TYPE = 2;
+    private static final int ITEM_TYPE_DATE_START_END = 3;
 
     private static final int REQUEST_CODE_FILTERS = 1;
 
@@ -45,6 +49,8 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersList
     private static final String EXTRA_DECLARATION_YEAR = "DeclarationYear";
     private static final String EXTRA_DECLARATION_TYPE = "DeclarationType";
     private static final String EXTRA_DOCUMENT_TYPE = "DocumentType";
+    private static final String EXTRA_DT_START = "dtStart";
+    private static final String EXTRA_DT_END = "dtEnd";
 
     private static final String LINK_PDF = "LinkPDF";
     private static final String LINK_HTML = "LinkHTML";
@@ -116,16 +122,31 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersList
                     int declarationYear = data.getIntExtra(EXTRA_DECLARATION_YEAR, 0);
                     int declarationType = data.getIntExtra(EXTRA_DECLARATION_TYPE, SearchFilters.DECLARATION_ALL);
                     int documentType = data.getIntExtra(EXTRA_DOCUMENT_TYPE, SearchFilters.DOCUMENT_ALL);
+                    String dtStart = data.getStringExtra(EXTRA_DT_START);
+                    String dtEnd = data.getStringExtra(EXTRA_DT_END);
 
-                    searchFilters
-                            .setQuery(query)
-                            .setDeclarationYear(declarationYear)
-                            .setDeclarationType(declarationType)
-                            .setDocumentType(documentType)
-                            .update();
+                    searchFilters.setQuery(query)
+                                 .setDeclarationYear(declarationYear)
+                                 .setDeclarationType(declarationType)
+                                 .setDocumentType(documentType)
+                                 .setDtStart(dtStart)
+                                 .setDtEnd(dtEnd)
+                                 .update();
                     break;
             }
         }
+    }
+
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        searchFilters.save(outState);
+    }
+
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        searchFilters.restore(savedInstanceState);
+        if(!searchFilters.isNull())
+            searchFilters.update();
     }
 
     @Override
@@ -167,6 +188,8 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersList
                 intent.putExtra(EXTRA_DECLARATION_YEAR, searchFilters.getDeclarationYear());
                 intent.putExtra(EXTRA_DECLARATION_TYPE, searchFilters.getDeclarationType());
                 intent.putExtra(EXTRA_DOCUMENT_TYPE, searchFilters.getDocumentType());
+                intent.putExtra(EXTRA_DT_START, searchFilters.getDtStart());
+                intent.putExtra(EXTRA_DT_END, searchFilters.getDtEnd());
                 startActivityForResult(intent, REQUEST_CODE_FILTERS);
                 break;
         }
@@ -179,7 +202,9 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersList
                searchFilters.getQuery(),
                searchFilters.getDeclarationYear(),
                searchFilters.getDeclarationType(),
-               searchFilters.getDocumentType())
+               searchFilters.getDocumentType(),
+               searchFilters.getDtStart(),
+               searchFilters.getDtEnd())
                .subscribeOn(Schedulers.io())
                .observeOn(AndroidSchedulers.mainThread())
                .subscribe(this::onSearchDeclarationsSuccess,
@@ -193,17 +218,22 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersList
     }
 
     private void onSearchDeclarationsSuccess(AnswerDTO answer){
-        swipeRefreshLayout.setRefreshing(false);
-        showMessage(String.format(getString(R.string.refresh_finished), answer.getPage().getTotalItems()));
-        if(answer.getPage() == null){
-            searchResult.setText(getString(R.string.search_null));
-        }else {
-            searchResult.setText(String.format(
-                    getString(R.string.search_result),
-                    answer.getPage().getTotalItems()));
+        try {
+            swipeRefreshLayout.setRefreshing(false);
+            showMessage(String.format(getString(R.string.refresh_finished), answer.getPage().getTotalItems()));
+            if (answer.getPage() == null) {
+                searchResult.setText(getString(R.string.search_null));
+            } else {
+                searchResult.setText(String.format(
+                        getString(R.string.search_result),
+                        answer.getPage().getTotalItems()));
+            }
+            recyclerAdapter = new RecyclerAdapter(this, answer.getItems());
+            recyclerView.setAdapter(recyclerAdapter);
+        }catch (Exception e){
+            e.printStackTrace();
+            showMessage(e.getMessage());
         }
-        recyclerAdapter = new RecyclerAdapter(this, answer.getItems());
-        recyclerView.setAdapter(recyclerAdapter);
     }
 
     private void onFailure(Throwable throwable){
@@ -216,54 +246,37 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersList
         searchDeclarations();
         searchFiltersLinearLayout.removeAllViews();
 
-        drawDeclarationYear();
-        drawDeclarationType();
-        drawDocumentType();
-    }
-
-    private void drawDeclarationYear(){
         if(searchFilters.getDeclarationYear() != 0){
-            searchFiltersLinearLayout.addView(
-                    new SearchFiltersView(this)
-                            .setItemName(
-                                    String.format(
-                                            getString(R.string.declaration_year),
-                                            searchFilters.getDeclarationYear()))
-                            .setItemType(ITEM_TYPE_DECLARATION_YEAR));
+            drawFilters(String.format(getString(R.string.declaration_year),
+                    searchFilters.getDeclarationYear()), ITEM_TYPE_DECLARATION_YEAR);
         }
-    }
-
-
-    private void drawDeclarationType() {
         if(searchFilters.getDeclarationType() != SearchFilters.DECLARATION_ALL){
-            searchFiltersLinearLayout.addView(
-                    new SearchFiltersView(this)
-                            .setItemName(
-                                    String.format(
-                                            getString(R.string.declaration_type),
-                                            getResources()
-                                                    .obtainTypedArray(R.array.declaration_type_array)
-                                                    .getString(searchFilters.getDeclarationType())
-                                    )
-                            )
-                            .setItemType(ITEM_TYPE_DECLARATION_TYPE));
+            drawFilters(String.format(getString(R.string.declaration_type),
+                    getResources().obtainTypedArray(R.array.declaration_type_array).
+                            getString(searchFilters.getDeclarationType())),
+                    ITEM_TYPE_DECLARATION_TYPE);
+        }
+        if(searchFilters.getDocumentType() != SearchFilters.DOCUMENT_ALL) {
+            drawFilters(String.format(getString(R.string.document_type),
+                    getResources().obtainTypedArray(R.array.document_type_array).
+                            getString(searchFilters.getDocumentType())),
+                    ITEM_TYPE_DOCUMENT_TYPE);
+        }
+        if(searchFilters.getDtStart().length() != 0 || searchFilters.getDtEnd().length() != 0) {
+            String dtStart = searchFilters.getDtStart();
+            String dtEnd = searchFilters.getDtEnd();
+            drawFilters(String.format(getString(R.string.date_start_end_full),
+                    dtStart.length()!=0?getString(R.string.dt_start):"", dtStart,
+                            dtEnd.length()!=0?getString(R.string.dt_end):"", dtEnd),
+                    ITEM_TYPE_DATE_START_END);
         }
     }
 
-    private void drawDocumentType() {
-        if(searchFilters.getDocumentType() != SearchFilters.DOCUMENT_ALL){
-            searchFiltersLinearLayout.addView(
-                    new SearchFiltersView(this)
-                            .setItemName(
-                                    String.format(
-                                            getString(R.string.document_type),
-                                            getResources()
-                                                    .obtainTypedArray(R.array.document_type_array)
-                                                    .getString(searchFilters.getDocumentType())
-                                    )
-                            )
-                            .setItemType(ITEM_TYPE_DOCUMENT_TYPE));
-        }
+    private void drawFilters(String itemName, int itemType){
+        searchFiltersLinearLayout.addView(
+                new SearchFiltersView(this)
+                        .setItemName(itemName)
+                        .setItemType(itemType));
     }
 
     @Override
@@ -281,6 +294,10 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersList
                 break;
             case ITEM_TYPE_DOCUMENT_TYPE:
                 searchFilters.setDocumentType(SearchFilters.DOCUMENT_ALL);
+                break;
+            case ITEM_TYPE_DATE_START_END:
+                searchFilters.setDtStart("");
+                searchFilters.setDtEnd("");
                 break;
         }
         searchFilters.update();

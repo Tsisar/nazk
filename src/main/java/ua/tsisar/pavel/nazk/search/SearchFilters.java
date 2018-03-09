@@ -1,5 +1,6 @@
 package ua.tsisar.pavel.nazk.search;
 
+import android.os.Bundle;
 import android.support.annotation.IntDef;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -7,6 +8,12 @@ import java.lang.annotation.RetentionPolicy;
 import ua.tsisar.pavel.nazk.search.listener.SearchFiltersListener;
 
 public class SearchFilters {
+    private static final String EXTRA_QUERY = "query";
+    private static final String EXTRA_DECLARATION_YEAR = "DeclarationYear";
+    private static final String EXTRA_DECLARATION_TYPE = "DeclarationType";
+    private static final String EXTRA_DOCUMENT_TYPE = "DocumentType";
+    private static final String EXTRA_DT_START = "dtStart";
+    private static final String EXTRA_DT_END = "dtEnd";
 
     @IntDef({DECLARATION_ALL, DECLARATION_ANNUAL, DECLARATION_BEFORE_DISMISSAL, DECLARATION_AFTER_DISMISSAL, DECLARATION_CANDIDATES})
     @Retention(RetentionPolicy.SOURCE)
@@ -32,6 +39,8 @@ public class SearchFilters {
     private int declarationYear = 0;
     private int declarationType = 0;
     private int documentType = 0;
+    private String dtStart = "";
+    private String dtEnd = "";
 
     private SearchFiltersListener listener;
 
@@ -75,7 +84,53 @@ public class SearchFilters {
         return documentType;
     }
 
+    public String getDtStart() {
+        return dtStart;
+    }
+
+    public SearchFilters setDtStart(String dtStart) {
+        this.dtStart = dtStart;
+        return this;
+    }
+
+    public String getDtEnd() {
+        return dtEnd;
+    }
+
+    public SearchFilters setDtEnd(String dtEnd) {
+        this.dtEnd = dtEnd;
+        return this;
+    }
+
+    public boolean isNull(){
+        return query.length() == 0 &&
+                declarationYear == 0 &&
+                declarationType == 0 &&
+                documentType == 0 &&
+                dtStart.length() == 0 &&
+                dtEnd.length() == 0;
+    }
+
     public void update(){
         listener.onUpdateSearchFilters();
+    }
+
+    public void save(Bundle outState){
+        outState.putString(EXTRA_QUERY, query);
+        outState.putInt(EXTRA_DECLARATION_YEAR, declarationYear);
+        outState.putInt(EXTRA_DECLARATION_TYPE, declarationType);
+        outState.putInt(EXTRA_DOCUMENT_TYPE, documentType);
+        outState.putString(EXTRA_DT_START, dtStart);
+        outState.putString(EXTRA_DT_END, dtEnd);
+    }
+
+    public SearchFilters restore(Bundle savedInstanceState){
+        query = savedInstanceState.getString(EXTRA_QUERY, "");
+        declarationYear = savedInstanceState.getInt(EXTRA_DECLARATION_YEAR, 0);
+        declarationType = savedInstanceState.getInt(EXTRA_DECLARATION_TYPE, 0);
+        documentType = savedInstanceState.getInt(EXTRA_DOCUMENT_TYPE, 0);
+        dtStart = savedInstanceState.getString(EXTRA_DT_START, "");
+        dtEnd = savedInstanceState.getString(EXTRA_DT_END, "");
+        return this;
     }
 }

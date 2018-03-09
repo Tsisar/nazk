@@ -16,6 +16,12 @@
     <string name="cancel">Скасувати</string>
     <string name="refresh_finished">Знайдено %1$d документів</string>
     <string name="refresh_started">Оновлення</string>
+    <string name="date_start_end">Період публікації</string>
+    <string name="date_start_end_full">Період публікації: %1$s %2$s %3$s %4$s</string>
+    <string name="dt_start">з</string>
+    <string name="dt_end">по</string>
+    <string name="date_format">%1$04d-%2$02d-%3$02d</string>
+    <string name="split">-</string>
 
     <string-array name="declaration_type_array">
         <item>Всі</item>
