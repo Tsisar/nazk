@@ -12,6 +12,7 @@ import android.widget.EditText;
 import android.widget.Spinner;
 
 import java.util.Calendar;
+import java.util.Date;
 import java.util.TimeZone;
 
 import ua.tsisar.pavel.nazk.R;
@@ -61,6 +62,8 @@ public class SearchFiltersActivity extends AppCompatActivity{
 
         Button find = findViewById(R.id.find_Button);
         find.setOnClickListener((View v) -> {
+                Date date = new Date(null);
+
                 String query = queryEditText.getText().toString();
                 String year = declarationYearEditText.getText().toString();
                 Intent out = new Intent();
@@ -68,8 +71,11 @@ public class SearchFiltersActivity extends AppCompatActivity{
                 out.putExtra(EXTRA_DECLARATION_YEAR, year.length() == 0?0:Integer.valueOf(year));
                 out.putExtra(EXTRA_DECLARATION_TYPE, declarationType);
                 out.putExtra(EXTRA_DOCUMENT_TYPE, documentType);
-                out.putExtra(EXTRA_DT_START, dtStart);
-                out.putExtra(EXTRA_DT_END, dtEnd);
+                out.putExtra(EXTRA_DT_START, dtStart.length() == 0 && dtEnd.length() != 0 ?
+                        "2000-01-01" : dtStart);
+                out.putExtra(EXTRA_DT_END, dtEnd.length() == 0 && dtStart.length() != 0 ?
+                        String.format(getString(R.string.date_format),
+                                date.getYear(), date.getMonth()+1, date.getDay()) : dtEnd);
                 setResult(RESULT_OK, out);
                 finish();
             }
@@ -188,16 +194,16 @@ public class SearchFiltersActivity extends AppCompatActivity{
         private int day;
 
         Date(String dateStartEnd){
-            if(dateStartEnd.length() != 0){
-                String[] splitArray = dateStartEnd.split(getString(R.string.split));
-                this.year = Integer.parseInt(splitArray[0]);
-                this.month = Integer.parseInt(splitArray[1])-1;
-                this.day = Integer.parseInt(splitArray[2]);
-            }else{
+            if(dateStartEnd == null || dateStartEnd.length() == 0){
                 Calendar calendar = Calendar.getInstance(TimeZone.getDefault());
                 this.year = calendar.get(Calendar.YEAR);
                 this.month = calendar.get(Calendar.MONTH);
                 this.day = calendar.get(Calendar.DAY_OF_MONTH);
+            }else{
+                String[] splitArray = dateStartEnd.split(getString(R.string.split));
+                this.year = Integer.parseInt(splitArray[0]);
+                this.month = Integer.parseInt(splitArray[1])-1;
+                this.day = Integer.parseInt(splitArray[2]);
             }
         }
 

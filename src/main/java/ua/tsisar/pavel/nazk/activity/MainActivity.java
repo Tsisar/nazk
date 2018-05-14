@@ -3,7 +3,6 @@ package ua.tsisar.pavel.nazk.activity;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -17,6 +16,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.AlphaAnimation;
 import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.github.mrengineer13.snackbar.SnackBar;
@@ -70,6 +70,10 @@ public class MainActivity extends AppCompatActivity implements
 
     private SwipeRefreshLayout swipeRefreshLayout;
 
+    private ScrollView scrollView;
+
+    //private SnackBar snackBar;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -81,6 +85,8 @@ public class MainActivity extends AppCompatActivity implements
         setSupportActionBar(toolbar);
 
         clickAnimation = new AlphaAnimation(1F, 0.2F);
+
+        scrollView = findViewById(R.id.faq_scrollView);
 
         searchResult = findViewById(R.id.search_result_textView);
         searchResult.setText(getString(R.string.edr_info));
@@ -199,16 +205,28 @@ public class MainActivity extends AppCompatActivity implements
     private void searchDeclarations(){
         swipeRefreshLayout.setRefreshing(true);
         compositeDisposable.add(App.getApi().searchDeclarations(
-               searchFilters.getQuery(),
-               searchFilters.getDeclarationYear(),
-               searchFilters.getDeclarationType(),
-               searchFilters.getDocumentType(),
-               searchFilters.getDtStart(),
-               searchFilters.getDtEnd())
+               nullable(searchFilters.getQuery()),
+               nullable(searchFilters.getDeclarationYear()),
+               nullable(searchFilters.getDeclarationType()),
+               nullable(searchFilters.getDocumentType()),
+               nullable(searchFilters.getDtStart()),
+               nullable(searchFilters.getDtEnd()))
                .subscribeOn(Schedulers.io())
                .observeOn(AndroidSchedulers.mainThread())
                .subscribe(this::onSearchDeclarationsSuccess,
                           this::onFailure));
+    }
+
+    private String nullable(int i){
+        if(i == 0)
+            return null;
+        return Integer.toString(i);
+    }
+
+    private String nullable(String s){
+        if(s.length() == 0)
+            return null;
+        return s;
     }
 
     private void dispose() {
@@ -220,13 +238,14 @@ public class MainActivity extends AppCompatActivity implements
     private void onSearchDeclarationsSuccess(AnswerDTO answer){
         try {
             swipeRefreshLayout.setRefreshing(false);
-            showMessage(String.format(getString(R.string.refresh_finished), answer.getPage().getTotalItems()));
+
             if (answer.getPage() == null) {
                 searchResult.setText(getString(R.string.search_null));
+                showMessage(String.format(getString(R.string.refresh_finished), 0));
             } else {
-                searchResult.setText(String.format(
-                        getString(R.string.search_result),
-                        answer.getPage().getTotalItems()));
+                int totalItems = answer.getPage().getTotalItems();
+                searchResult.setText(String.format(getString(R.string.search_result), totalItems));
+                showMessage(String.format(getString(R.string.refresh_finished), totalItems));
             }
             recyclerAdapter = new RecyclerAdapter(this, answer.getItems());
             recyclerView.setAdapter(recyclerAdapter);
@@ -243,6 +262,7 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void onUpdateSearchFilters() {
+        scrollView.setVisibility(View.GONE);
         searchDeclarations();
         searchFiltersLinearLayout.removeAllViews();
 
@@ -304,7 +324,11 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void showMessage(String message){
-        new SnackBar.Builder(this)
+        //if(snackBar != null)
+        //    snackBar.clear();
+
+        //snackBar =
+                new SnackBar.Builder(this)
                 .withMessage(message)
                 .withStyle(SnackBar.Style.ALERT)
                 .show();
