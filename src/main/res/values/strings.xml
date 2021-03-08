@@ -1,9 +1,12 @@
 <resources>
     <string name="app_name">ЄДРД</string>
+    <string name="action_filters">Фільтри</string>
+    <string name="action_search_go">Пошук</string>
+    <string name="query_hint">пошуковий запит</string>
+
     <string name="action_settings">Фільтр</string>
     <string name="edr_info">ЄДИНИЙ ДЕРЖАВНИЙ РЕЄСТР ДЕКЛАРАЦІЙ
         \n осіб, уповноважених на виконання функцій держави або місцевого самоврядування</string>
-    <string name="query_hint">Пошуковий запит</string>
     <string name="search_null">НІЧОГО НЕ ЗНАЙДЕНО</string>
     <string name="search_result">РЕЗУЛЬТАТИ ПОШУКУ (%1$d)</string>
     <string name="declaration_year_hint">Рік</string>

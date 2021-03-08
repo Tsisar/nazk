@@ -1,0 +1,19 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:yourapp="http://schemas.android.com/apk/res-auto"
+    tools:context="ua.com.tsisar.nazk.activity.MainActivity">
+
+    <item
+        android:id="@+id/action_search"
+        android:title="@string/action_search_go"
+        android:orderInCategory="100"
+        android:icon="@drawable/ic_search"
+        yourapp:showAsAction="always|collapseActionView"
+        yourapp:actionViewClass="androidx.appcompat.widget.SearchView" />
+    <item
+        android:id="@+id/action_settings"
+        android:orderInCategory="100"
+        android:title="@string/action_filters"
+        app:showAsAction="never" />
+</menu>
