@@ -2,6 +2,9 @@ package ua.com.tsisar.nazk.activity;
 
 import android.app.DatePickerDialog;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.InputFilter;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -63,10 +66,6 @@ public class SearchFiltersActivity extends AppCompatActivity{
         queryEditText = findViewById(R.id.query_EditText);
         queryEditText.setText(String.valueOf(App.getFilters().getQuery()));
 
-        int year = App.getFilters().getDeclarationYear();
-        declarationYearEditText = findViewById(R.id.year_EditText);
-        declarationYearEditText.setText(year==0?"":String.valueOf(year));
-
         String startDate = App.getFilters().getStartDate();
         btnStart = findViewById(R.id.start_date_Button);
         if(startDate.length() != 0)
@@ -76,6 +75,42 @@ public class SearchFiltersActivity extends AppCompatActivity{
         btnEnd = findViewById(R.id.end_date_Button);
         if(endDate.length() != 0)
             btnEnd.setText(endDate);
+
+        int year = App.getFilters().getDeclarationYear();
+        declarationYearEditText = findViewById(R.id.year_EditText);
+        declarationYearEditText.setText(year==0?"":String.valueOf(year));
+        declarationYearEditText.setFilters(new InputFilter[]{new InputFilter.LengthFilter(4)});
+        declarationYearEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                int length = editable.toString().length();
+                if(length != 0) {
+                    int a = Integer.parseInt("2015".substring(0, length));
+                    int b = Integer.parseInt(editable.toString());
+                    int c = Integer.parseInt(Integer.toString(new Date().getYear()).substring(0, length));
+
+                    if(a <= b && b <= c){
+                        Log.e(TAG, "OK");
+                    }else{
+                        Log.e(TAG, "Apply filter");
+                        editable.delete(length-1, length);
+                    }
+                }
+            }
+        });
+        declarationYearEditText.setOnFocusChangeListener((view, hasFocus) -> {
+            if(!hasFocus && Integer.parseInt(declarationYearEditText.getText().toString()) < 2015){
+                declarationYearEditText.setText("2015");
+            }
+        });
     }
 
     private Spinner initSpinner(int viewId, int arrayId, int selection){
@@ -133,14 +168,17 @@ public class SearchFiltersActivity extends AppCompatActivity{
     }
 
     private String getDate(){
-        Date date = new Date(null);
+        Date date = new Date();
         return String.format(getString(R.string.date_format), date.getYear(), date.getMonth()+1, date.getDay());
     }
+
+
 
     private class Date {
         private final int year;
         private final int month;
         private final int day;
+
 
         Date(String dateStartEnd){
             if(dateStartEnd == null || dateStartEnd.length() == 0){
@@ -154,6 +192,13 @@ public class SearchFiltersActivity extends AppCompatActivity{
                 this.month = Integer.parseInt(splitArray[1])-1;
                 this.day = Integer.parseInt(splitArray[2]);
             }
+        }
+
+        Date(){
+            Calendar calendar = Calendar.getInstance(TimeZone.getDefault());
+            this.year = calendar.get(Calendar.YEAR);
+            this.month = calendar.get(Calendar.MONTH);
+            this.day = calendar.get(Calendar.DAY_OF_MONTH);
         }
 
         int getYear(){
