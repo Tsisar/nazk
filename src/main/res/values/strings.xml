@@ -4,4 +4,57 @@
     <string name="action_search_go">Пошук</string>
     <string name="query_hint">пошуковий запит</string>
 
+    <string name="action_settings">Фільтр</string>
+    <string name="edr_info">ЄДИНИЙ ДЕРЖАВНИЙ РЕЄСТР ДЕКЛАРАЦІЙ
+        \n осіб, уповноважених на виконання функцій держави або місцевого самоврядування</string>
+    <string name="search_null">НІЧОГО НЕ ЗНАЙДЕНО</string>
+    <string name="search_result">РЕЗУЛЬТАТИ ПОШУКУ (%1$d)</string>
+    <string name="declaration_year_hint">Рік</string>
+    <string name="declaration_type_hint">Тип декларації</string>
+    <string name="document_type_hint">Тип документу</string>
+    <string name="declaration_year">Рік: %1$d</string>
+    <string name="declaration_type">Тип декларації: %1$s</string>
+    <string name="document_type">Тип документу: %1$s</string>
+    <string name="find">Шукати</string>
+    <string name="cancel">Скасувати</string>
+    <string name="refresh_finished">Знайдено %1$d документів</string>
+    <string name="refresh_started">Оновлення</string>
+    <string name="date_start_end">Період публікації</string>
+    <string name="date_start_end_full">Період публікації: %1$s %2$s %3$s %4$s</string>
+    <string name="dt_start">з</string>
+    <string name="dt_end">по</string>
+    <string name="date_format">%1$04d-%2$02d-%3$02d</string>
+    <string name="split">-</string>
+    <string name="faq">\nЯк знайти декларацію?
+        \n
+        \nДля того щоб знайти декларацію в меню «пошук» необхідно ввести «прізвище», «прізвище,
+        ім’я», або «прізвище, ім’я, по батькові» декларанта. Дані потрібно вводити українською мовою,
+        повністю, наприклад: «Порошенко» а не «Порошен».
+        \n
+        \n
+        \nЯк встановити додаткові фільтри?
+        \n
+        \nДодаткові фільтри можна встановити в меню «Фільтр».
+        \n
+        \n
+        \nЯ не находжу жодної декларації, що мені робити?
+        \n
+        \nСпробуйте повторити спробу через деякий час.
+</string>
+
+    <string-array name="declaration_type_array">
+        <item>Всі</item>
+        <item>Щорічна</item>
+        <item>Перед звільненням</item>
+        <item>Після звільнення</item>
+        <item>Кандидата на посаду</item>
+    </string-array>
+
+    <string-array name="document_type_array">
+        <item>Всі</item>
+        <item>Декларація</item>
+        <item>Повідомлення про суттєві зміни в майновому стані</item>
+        <item>Виправлена декларація</item>
+        <item>Виправлене повідомлення про суттєві зміни в майновому стані</item>
+    </string-array>
 </resources>

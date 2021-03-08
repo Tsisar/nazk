@@ -8,17 +8,10 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 import ua.com.tsisar.nazk.search.listener.SearchFiltersListener;
+import ua.com.tsisar.nazk.search.constants.SearchFiltersConstants;
+
 
 public class SearchFilters {
-    private static final String EXTRA_QUERY = "query";
-    private static final String EXTRA_USER_DECLARANT_ID = "userDeclarantId";
-    private static final String EXTRA_DOCUMENT_TYPE = "documentType";
-    private static final String EXTRA_DECLARATION_TYPE = "declarationType";
-    private static final String EXTRA_DECLARATION_YEAR = "declarationYear";
-    private static final String EXTRA_START_DATE = "startDate";
-    private static final String EXTRA_END_DATE = "endDate";
-    private static final String EXTRA_PAGE = "page";
-
     @IntDef({DECLARATION_ALL, DECLARATION_ANNUAL, DECLARATION_BEFORE_DISMISSAL, DECLARATION_AFTER_DISMISSAL, DECLARATION_CANDIDATES})
     @Retention(RetentionPolicy.SOURCE)
     public @interface Declaration {}
@@ -142,25 +135,25 @@ public class SearchFilters {
     }
 
     public void save(Bundle outState){
-        outState.putString(EXTRA_QUERY, query);
-        outState.putInt(EXTRA_USER_DECLARANT_ID, userDeclarantId);
-        outState.putInt(EXTRA_DOCUMENT_TYPE, documentType);
-        outState.putInt(EXTRA_DECLARATION_TYPE, declarationType);
-        outState.putInt(EXTRA_DECLARATION_YEAR, declarationYear);
-        outState.putString(EXTRA_START_DATE, startDate);
-        outState.putString(EXTRA_END_DATE, endDate);
-        outState.putInt(EXTRA_PAGE, page);
+        outState.putString(SearchFiltersConstants.EXTRA_QUERY, query);
+        outState.putInt(SearchFiltersConstants.EXTRA_USER_DECLARANT_ID, userDeclarantId);
+        outState.putInt(SearchFiltersConstants.EXTRA_DOCUMENT_TYPE, documentType);
+        outState.putInt(SearchFiltersConstants.EXTRA_DECLARATION_TYPE, declarationType);
+        outState.putInt(SearchFiltersConstants.EXTRA_DECLARATION_YEAR, declarationYear);
+        outState.putString(SearchFiltersConstants.EXTRA_START_DATE, startDate);
+        outState.putString(SearchFiltersConstants.EXTRA_END_DATE, endDate);
+        outState.putInt(SearchFiltersConstants.EXTRA_PAGE, page);
     }
 
     public SearchFilters restore(Bundle savedInstanceState){
-        query = savedInstanceState.getString(EXTRA_QUERY, "");
-        userDeclarantId = savedInstanceState.getInt(EXTRA_USER_DECLARANT_ID, 0);
-        documentType = savedInstanceState.getInt(EXTRA_DOCUMENT_TYPE, 0);
-        declarationType = savedInstanceState.getInt(EXTRA_DECLARATION_TYPE, 0);
-        declarationYear = savedInstanceState.getInt(EXTRA_DECLARATION_YEAR, 0);
-        startDate = savedInstanceState.getString(EXTRA_START_DATE, "");
-        endDate = savedInstanceState.getString(EXTRA_END_DATE, "");
-        page = savedInstanceState.getInt(EXTRA_PAGE, 0);
+        query = savedInstanceState.getString(SearchFiltersConstants.EXTRA_QUERY, "");
+        userDeclarantId = savedInstanceState.getInt(SearchFiltersConstants.EXTRA_USER_DECLARANT_ID, 0);
+        documentType = savedInstanceState.getInt(SearchFiltersConstants.EXTRA_DOCUMENT_TYPE, 0);
+        declarationType = savedInstanceState.getInt(SearchFiltersConstants.EXTRA_DECLARATION_TYPE, 0);
+        declarationYear = savedInstanceState.getInt(SearchFiltersConstants.EXTRA_DECLARATION_YEAR, 0);
+        startDate = savedInstanceState.getString(SearchFiltersConstants.EXTRA_START_DATE, "");
+        endDate = savedInstanceState.getString(SearchFiltersConstants.EXTRA_END_DATE, "");
+        page = savedInstanceState.getInt(SearchFiltersConstants.EXTRA_PAGE, 0);
         return this;
     }
 }

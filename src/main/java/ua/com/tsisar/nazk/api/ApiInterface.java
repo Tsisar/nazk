@@ -5,6 +5,7 @@ import retrofit2.http.GET;
 import retrofit2.http.Headers;
 import retrofit2.http.Query;
 import ua.com.tsisar.nazk.dto.AnswerDTO;
+import ua.com.tsisar.nazk.search.constants.SearchFiltersConstants;
 
 /**
  query – поле "Пошуковий запит", текстове, від 3 до 255 символів. При невідповідності довжини
@@ -43,12 +44,12 @@ public interface ApiInterface {
 
     @Headers("Content-Type: application/json")
     @GET("list")
-    Single<AnswerDTO> searchDeclarations(@Query("query") String query,
-                                         @Query("user_declarant_id") String userDeclarantId,
-                                         @Query("document_type") String documentType,
-                                         @Query("declaration_type") String declarationType,
-                                         @Query("declaration_year") String declarationYear,
-                                         @Query("start_date") String startDate,
-                                         @Query("end_date") String endDate,
-                                         @Query("page") String Page);
+    Single<AnswerDTO> searchDeclarations(@Query(SearchFiltersConstants.EXTRA_QUERY) String query,
+                                         @Query(SearchFiltersConstants.EXTRA_USER_DECLARANT_ID) String userDeclarantId,
+                                         @Query(SearchFiltersConstants.EXTRA_DOCUMENT_TYPE) String documentType,
+                                         @Query(SearchFiltersConstants.EXTRA_DECLARATION_TYPE) String declarationType,
+                                         @Query(SearchFiltersConstants.EXTRA_DECLARATION_YEAR) String declarationYear,
+                                         @Query(SearchFiltersConstants.EXTRA_START_DATE) String startDate,
+                                         @Query(SearchFiltersConstants.EXTRA_END_DATE) String endDate,
+                                         @Query(SearchFiltersConstants.EXTRA_PAGE) String Page);
 }

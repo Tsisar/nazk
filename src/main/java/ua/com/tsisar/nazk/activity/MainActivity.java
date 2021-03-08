@@ -2,6 +2,7 @@ package ua.com.tsisar.nazk.activity;
 
 import android.app.SearchManager;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -21,11 +22,14 @@ import ua.com.tsisar.nazk.R;
 import ua.com.tsisar.nazk.dto.AnswerDTO;
 import ua.com.tsisar.nazk.search.SearchFilters;
 import ua.com.tsisar.nazk.search.listener.SearchFiltersListener;
+import ua.com.tsisar.nazk.search.constants.SearchFiltersConstants;
 
 public class MainActivity extends AppCompatActivity implements
         SearchFiltersListener{
 
     private static final String TAG = "MyLog";
+    private static final int REQUEST_CODE_FILTERS = 1;
+
     private CompositeDisposable compositeDisposable;
 
     private SearchFilters searchFilters = new SearchFilters(this);
@@ -93,6 +97,16 @@ public class MainActivity extends AppCompatActivity implements
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            Intent intent = new Intent(this, SearchFiltersActivity.class);
+            intent.putExtra(SearchFiltersConstants.EXTRA_QUERY, searchFilters.getQuery());
+            intent.putExtra(SearchFiltersConstants.EXTRA_USER_DECLARANT_ID, searchFilters.getUserDeclarantId());
+            intent.putExtra(SearchFiltersConstants.EXTRA_DOCUMENT_TYPE, searchFilters.getDocumentType());
+            intent.putExtra(SearchFiltersConstants.EXTRA_DECLARATION_TYPE, searchFilters.getDeclarationType());
+            intent.putExtra(SearchFiltersConstants.EXTRA_DECLARATION_YEAR, searchFilters.getDeclarationYear());
+            intent.putExtra(SearchFiltersConstants.EXTRA_START_DATE, searchFilters.getStartDate());
+            intent.putExtra(SearchFiltersConstants.EXTRA_END_DATE, searchFilters.getEndDate());
+            intent.putExtra(SearchFiltersConstants.EXTRA_PAGE, searchFilters.getPage());
+            startActivityForResult(intent, REQUEST_CODE_FILTERS);
             return true;
         }
 
