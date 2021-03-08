@@ -20,19 +20,15 @@ import io.reactivex.schedulers.Schedulers;
 import ua.com.tsisar.nazk.App;
 import ua.com.tsisar.nazk.R;
 import ua.com.tsisar.nazk.dto.AnswerDTO;
-import ua.com.tsisar.nazk.search.SearchFilters;
-import ua.com.tsisar.nazk.search.listener.SearchFiltersListener;
-import ua.com.tsisar.nazk.search.constants.SearchFiltersConstants;
 
-public class MainActivity extends AppCompatActivity implements
-        SearchFiltersListener{
+public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MyLog";
     private static final int REQUEST_CODE_FILTERS = 1;
 
-    private CompositeDisposable compositeDisposable;
+    private SearchView searchView;
 
-    private SearchFilters searchFilters = new SearchFilters(this);
+    private CompositeDisposable compositeDisposable;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,7 +47,7 @@ public class MainActivity extends AppCompatActivity implements
         getMenuInflater().inflate(R.menu.menu_main, menu);
 
         MenuItem searchItem = menu.findItem(R.id.action_search);
-        SearchView searchView = (SearchView) searchItem.getActionView();
+        searchView = (SearchView) searchItem.getActionView();
         searchView.setQueryHint(getString(R.string.query_hint));
 
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
@@ -63,13 +59,13 @@ public class MainActivity extends AppCompatActivity implements
             @Override
             public boolean onQueryTextSubmit(String query) {
                 searchView.clearFocus();
-                searchFilters.update();
+                searchDeclarations();
                 return true;
             }
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                searchFilters.setQuery(newText);
+                App.getFilters().setQuery(newText);
                 return true;
             }
         });
@@ -79,33 +75,18 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        dispose();
-    }
-
-    private void dispose() {
         if (compositeDisposable != null && !compositeDisposable.isDisposed()) {
             compositeDisposable.dispose();
         }
     }
 
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             Intent intent = new Intent(this, SearchFiltersActivity.class);
-            intent.putExtra(SearchFiltersConstants.EXTRA_QUERY, searchFilters.getQuery());
-            intent.putExtra(SearchFiltersConstants.EXTRA_USER_DECLARANT_ID, searchFilters.getUserDeclarantId());
-            intent.putExtra(SearchFiltersConstants.EXTRA_DOCUMENT_TYPE, searchFilters.getDocumentType());
-            intent.putExtra(SearchFiltersConstants.EXTRA_DECLARATION_TYPE, searchFilters.getDeclarationType());
-            intent.putExtra(SearchFiltersConstants.EXTRA_DECLARATION_YEAR, searchFilters.getDeclarationYear());
-            intent.putExtra(SearchFiltersConstants.EXTRA_START_DATE, searchFilters.getStartDate());
-            intent.putExtra(SearchFiltersConstants.EXTRA_END_DATE, searchFilters.getEndDate());
-            intent.putExtra(SearchFiltersConstants.EXTRA_PAGE, searchFilters.getPage());
             startActivityForResult(intent, REQUEST_CODE_FILTERS);
             return true;
         }
@@ -113,12 +94,12 @@ public class MainActivity extends AppCompatActivity implements
         return super.onOptionsItemSelected(item);
     }
 
-
+/*
     @Override
     public void onUpdateSearchFilters() {
 //        scrollView.setVisibility(View.GONE);
         searchDeclarations();
-/*        searchFiltersLinearLayout.removeAllViews();
+        searchFiltersLinearLayout.removeAllViews();
 
         if(searchFilters.getDeclarationYear() != 0){
             drawFilters(String.format(getString(R.string.declaration_year),
@@ -145,20 +126,20 @@ public class MainActivity extends AppCompatActivity implements
                     ITEM_TYPE_DATE_START_END);
         }
 
- */
-    }
 
+    }
+*/
     private void searchDeclarations(){
 //        swipeRefreshLayout.setRefreshing(true);
         compositeDisposable.add(App.getApi().searchDeclarations(
-                nullable(searchFilters.getQuery()),
-                nullable(searchFilters.getUserDeclarantId()),
-                nullable(searchFilters.getDocumentType()),
-                nullable(searchFilters.getDeclarationType()),
-                nullable(searchFilters.getDeclarationYear()),
-                nullable(searchFilters.getStartDate()),
-                nullable(searchFilters.getEndDate()),
-                nullable(searchFilters.getPage()))
+                nullable(App.getFilters().getQuery()),
+                nullable(App.getFilters().getUserDeclarantId()),
+                nullable(App.getFilters().getDocumentType()),
+                nullable(App.getFilters().getDeclarationType()),
+                nullable(App.getFilters().getDeclarationYear()),
+                nullable(App.getFilters().getStartDate()),
+                nullable(App.getFilters().getEndDate()),
+                nullable(App.getFilters().getPage()))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(this::onSearchDeclarationsSuccess,

@@ -1,14 +1,9 @@
 package ua.com.tsisar.nazk.search;
 
-import android.os.Bundle;
-
 import androidx.annotation.IntDef;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
-
-import ua.com.tsisar.nazk.search.listener.SearchFiltersListener;
-import ua.com.tsisar.nazk.search.constants.SearchFiltersConstants;
 
 
 public class SearchFilters {
@@ -41,11 +36,6 @@ public class SearchFilters {
     private String endDate = "";
     private int page = 0;
 
-    private SearchFiltersListener listener;
-
-    public SearchFilters(SearchFiltersListener listener){
-        this.listener = listener;
-    }
 
     public SearchFilters setQuery(String query) {
         this.query = query;
@@ -128,32 +118,5 @@ public class SearchFilters {
                 startDate.length() == 0 &&
                 endDate.length() == 0 &&
                 page == 0;
-    }
-
-    public void update(){
-        listener.onUpdateSearchFilters();
-    }
-
-    public void save(Bundle outState){
-        outState.putString(SearchFiltersConstants.EXTRA_QUERY, query);
-        outState.putInt(SearchFiltersConstants.EXTRA_USER_DECLARANT_ID, userDeclarantId);
-        outState.putInt(SearchFiltersConstants.EXTRA_DOCUMENT_TYPE, documentType);
-        outState.putInt(SearchFiltersConstants.EXTRA_DECLARATION_TYPE, declarationType);
-        outState.putInt(SearchFiltersConstants.EXTRA_DECLARATION_YEAR, declarationYear);
-        outState.putString(SearchFiltersConstants.EXTRA_START_DATE, startDate);
-        outState.putString(SearchFiltersConstants.EXTRA_END_DATE, endDate);
-        outState.putInt(SearchFiltersConstants.EXTRA_PAGE, page);
-    }
-
-    public SearchFilters restore(Bundle savedInstanceState){
-        query = savedInstanceState.getString(SearchFiltersConstants.EXTRA_QUERY, "");
-        userDeclarantId = savedInstanceState.getInt(SearchFiltersConstants.EXTRA_USER_DECLARANT_ID, 0);
-        documentType = savedInstanceState.getInt(SearchFiltersConstants.EXTRA_DOCUMENT_TYPE, 0);
-        declarationType = savedInstanceState.getInt(SearchFiltersConstants.EXTRA_DECLARATION_TYPE, 0);
-        declarationYear = savedInstanceState.getInt(SearchFiltersConstants.EXTRA_DECLARATION_YEAR, 0);
-        startDate = savedInstanceState.getString(SearchFiltersConstants.EXTRA_START_DATE, "");
-        endDate = savedInstanceState.getString(SearchFiltersConstants.EXTRA_END_DATE, "");
-        page = savedInstanceState.getInt(SearchFiltersConstants.EXTRA_PAGE, 0);
-        return this;
     }
 }

@@ -54,10 +54,10 @@
                 android:layout_marginStart="4dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/declaration_type_hint" />
+                android:text="@string/document_type_hint" />
 
             <Spinner
-                android:id="@+id/declaration_type_spinner"
+                android:id="@+id/document_type_spinner"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 
@@ -67,10 +67,10 @@
                 android:layout_marginStart="4dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/document_type_hint" />
+                android:text="@string/declaration_type_hint" />
 
             <Spinner
-                android:id="@+id/document_type_spinner"
+                android:id="@+id/declaration_type_spinner"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 
@@ -95,6 +95,7 @@
                     android:background="@color/colorPrimary"
                     android:textColor="@color/colorWhite"
                     android:text="@string/dt_start"
+                    android:onClick="setStartDate"
                     style="?android:textAppearanceSmall"/>
 
                 <TextView
@@ -112,6 +113,7 @@
                     android:background="@color/colorPrimary"
                     android:textColor="@color/colorWhite"
                     android:text="@string/dt_end"
+                    android:onClick="setEndDate"
                     style="?android:textAppearanceSmall"/>
 
             </LinearLayout>
@@ -127,6 +129,7 @@
         android:background="@color/colorPrimary"
         android:textColor="@color/colorWhite"
         android:text="@string/find"
+        android:onClick="onFindClick"
         style="?android:textAppearanceSmall"
         android:layout_alignParentBottom="true"
         android:layout_alignParentStart="true"/>
