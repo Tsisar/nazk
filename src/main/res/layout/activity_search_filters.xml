@@ -1,50 +1,66 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
+<androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_marginEnd="@dimen/activity_horizontal_margin"
-    android:layout_marginStart="@dimen/activity_horizontal_margin"
-    android:layout_marginTop="@dimen/activity_vertical_margin"
-    android:layout_marginBottom="@dimen/activity_vertical_margin"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-
+    android:layout_marginStart="@dimen/activity_horizontal_margin"
+    android:layout_marginTop="@dimen/activity_vertical_margin"
+    android:layout_marginEnd="@dimen/activity_horizontal_margin"
+    android:layout_marginBottom="@dimen/activity_vertical_margin"
     tools:context=".activity.SearchFiltersActivity">
+
+    <Button
+        android:id="@+id/button_find"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentBottom="true"
+        android:text="@string/button_find"
+        android:onClick="onFindClick"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentStart="true">
+        app:layout_constraintBottom_toTopOf="@+id/button_find"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:orientation="vertical" >
 
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="match_parent">
 
-                <EditText
-                    android:id="@+id/query_EditText"
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/edit_text_query"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="@string/query_hint"
-                    android:maxLines="1" />
-
+                    android:hint="@string/hint_query"
+                    android:maxLines="1"
+                    android:singleLine="true"/>
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="match_parent">
 
-                <EditText
-                    android:id="@+id/year_EditText"
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/edit_text_year"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="@string/declaration_year_hint"
-                    android:inputType="number" />
+                    android:hint="@string/hint_year"
+                    android:maxLines="1"
+                    android:singleLine="true"
+                    android:inputType="number"
+                    android:digits="0123456789"/>
 
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -54,10 +70,23 @@
                 android:layout_marginStart="4dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/document_type_hint" />
+                android:text="@string/hint_document_type" />
 
             <Spinner
-                android:id="@+id/document_type_spinner"
+                android:id="@+id/spinner_document_type"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+
+            <TextView
+                android:layout_marginTop="@dimen/activity_horizontal_margin"
+                style="?android:textAppearanceSmall"
+                android:layout_marginStart="4dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/hint_declaration_type" />
+
+            <Spinner
+                android:id="@+id/spinner_declaration_type"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 
@@ -67,20 +96,7 @@
                 android:layout_marginStart="4dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/declaration_type_hint" />
-
-            <Spinner
-                android:id="@+id/declaration_type_spinner"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-
-            <TextView
-                android:layout_marginTop="@dimen/activity_horizontal_margin"
-                style="?android:textAppearanceSmall"
-                android:layout_marginStart="4dp"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/date_start_end" />
+                android:text="@string/hint_period" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -88,50 +104,28 @@
                 android:orientation="horizontal">
 
                 <Button
-                    android:id="@+id/start_date_Button"
+                    android:id="@+id/button_start_date"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_margin="@dimen/activity_horizontal_margin"
-                    android:background="@color/colorPrimary"
-                    android:textColor="@color/colorWhite"
-                    android:text="@string/dt_start"
-                    android:onClick="setStartDate"
-                    style="?android:textAppearanceSmall"/>
+                    android:text="@string/button_start"
+                    android:onClick="setStartDate"/>
 
                 <TextView
                     android:layout_marginTop="@dimen/activity_horizontal_margin"
-                    android:layout_marginStart="4dp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="-" />
+                    android:text="@string/split" />
 
                 <Button
-                    android:id="@+id/end_date_Button"
+                    android:id="@+id/button_end_date"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_margin="@dimen/activity_horizontal_margin"
-                    android:background="@color/colorPrimary"
-                    android:textColor="@color/colorWhite"
-                    android:text="@string/dt_end"
-                    android:onClick="setEndDate"
-                    style="?android:textAppearanceSmall"/>
-
+                    android:text="@string/button_end"
+                    android:onClick="setEndDate"/>
             </LinearLayout>
-
-
         </LinearLayout>
     </ScrollView>
 
-    <Button
-        android:id="@+id/find_Button"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/colorPrimary"
-        android:textColor="@color/colorWhite"
-        android:text="@string/find"
-        android:onClick="onFindClick"
-        style="?android:textAppearanceSmall"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentStart="true"/>
-
-</RelativeLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

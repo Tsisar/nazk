@@ -5,8 +5,16 @@ import androidx.annotation.IntDef;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
-
 public class SearchFilters {
+    public static final String EXTRA_QUERY = "query";
+    public static final String EXTRA_USER_DECLARANT_ID = "user_declarant_id";
+    public static final String EXTRA_DOCUMENT_TYPE = "document_type";
+    public static final String EXTRA_DECLARATION_TYPE = "declaration_type";
+    public static final String EXTRA_DECLARATION_YEAR = "declaration_year";
+    public static final String EXTRA_DT_START = "start_date";
+    public static final String EXTRA_DT_END = "end_date";
+    public static final String EXTRA_PAGE = "page";
+
     @IntDef({DECLARATION_ALL, DECLARATION_ANNUAL, DECLARATION_BEFORE_DISMISSAL, DECLARATION_AFTER_DISMISSAL, DECLARATION_CANDIDATES})
     @Retention(RetentionPolicy.SOURCE)
     public @interface Declaration {}
@@ -36,6 +44,17 @@ public class SearchFilters {
     private String endDate = "";
     private int page = 0;
 
+    public SearchFilters(String query, int userDeclarantId, int documentType, int declarationType,
+                         int declarationYear, String startDate, String endDate, int page) {
+        this.query = query;
+        this.userDeclarantId = userDeclarantId;
+        this.documentType = documentType;
+        this.declarationType = declarationType;
+        this.declarationYear = declarationYear;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.page = page;
+    }
 
     public SearchFilters setQuery(String query) {
         this.query = query;
