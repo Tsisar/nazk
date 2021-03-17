@@ -26,6 +26,9 @@ public class SearchFiltersActivity extends AppCompatActivity {
     private EditText editTextQuery;
     private EditText editTextYear;
 
+    private Button buttonStartDate;
+    private Button buttonEndDate;
+
     private String query = "";
     private int documentType = 0;
     private int declarationType = 0;
@@ -45,6 +48,16 @@ public class SearchFiltersActivity extends AppCompatActivity {
 
         initSpinnerDocumentType();
         initSpinnerDeclarationType();
+
+        buttonStartDate = findViewById(R.id.button_start_date);
+        if(!startDate.isNull()){
+            buttonStartDate.setText(startDate.toStringReverse());
+        }
+
+        buttonEndDate = findViewById(R.id.button_end_date);
+        if(!endDate.isNull()){
+            buttonEndDate.setText(endDate.toStringReverse());
+        }
     }
 
     private void getExtra(){
@@ -104,7 +117,7 @@ public class SearchFiltersActivity extends AppCompatActivity {
     }
 
     private void initSpinnerDocumentType(){
-        Spinner spinner = (Spinner) findViewById(R.id.spinner_document_type);
+        Spinner spinner = findViewById(R.id.spinner_document_type);
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
                 android.R.layout.simple_spinner_item,
                 getResources().getStringArray(R.array.array_document_type));
@@ -124,7 +137,7 @@ public class SearchFiltersActivity extends AppCompatActivity {
     }
 
     private void initSpinnerDeclarationType(){
-        Spinner spinner = (Spinner) findViewById(R.id.spinner_declaration_type);
+        Spinner spinner = findViewById(R.id.spinner_declaration_type);
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
                 android.R.layout.simple_spinner_item,
                 getResources().getStringArray(R.array.array_declaration_type));
@@ -149,10 +162,7 @@ public class SearchFiltersActivity extends AppCompatActivity {
         DatePickerDialog datePickerDialog =
                 new DatePickerDialog(this, (datePicker, year, month, day) ->{
                     startDate.setDate(year, month, day);
-                   // btnStart.setText(startDate);
-                    if (view instanceof Button){
-                        ((Button) view).setText(startDate.toStringReverse());
-                    }
+                    buttonStartDate.setText(startDate.toStringReverse());
                 }, date.getYear(), date.getMonth(), date.getDay());
         datePickerDialog.show();
     }
@@ -163,9 +173,7 @@ public class SearchFiltersActivity extends AppCompatActivity {
         DatePickerDialog datePickerDialog =
                 new DatePickerDialog(this, (datePicker, year, month, day) ->{
                     endDate.setDate(year, month, day);
-                    if (view instanceof Button){
-                        ((Button) view).setText(endDate.toStringReverse());
-                    }
+                    buttonEndDate.setText(endDate.toStringReverse());
                 }, date.getYear(), date.getMonth(), date.getDay());
         datePickerDialog.show();
     }

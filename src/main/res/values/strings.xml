@@ -12,6 +12,7 @@
     <string name="button_start">з</string>
     <string name="button_end">по</string>
     <string name="date_format">%1$04d-%2$02d-%3$02d</string>
+    <string name="refresh_finished">Знайдено %1$d документів</string>
 
     <string-array name="array_declaration_type">
         <item>Всі</item>
