@@ -29,12 +29,18 @@ public class SearchFiltersActivity extends AppCompatActivity {
     private Button buttonStartDate;
     private Button buttonEndDate;
 
-    private String query = "";
-    private int documentType = 0;
-    private int declarationType = 0;
-    private String declarationYear = "";
+    private SearchFilters searchFilters;
+
     private Date startDate;
     private Date endDate;
+
+    public static Integer tryParse(String string) {
+        try {
+            return Integer.parseInt(string);
+        } catch (NumberFormatException e) {
+            return 0;
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,22 +68,31 @@ public class SearchFiltersActivity extends AppCompatActivity {
 
     private void getExtra(){
         Intent intent = getIntent();
-        query = intent.getStringExtra(SearchFilters.EXTRA_QUERY);
-        declarationYear = intent.getStringExtra(SearchFilters.EXTRA_DECLARATION_YEAR);
-        declarationType = intent.getIntExtra(SearchFilters.EXTRA_DECLARATION_TYPE, SearchFilters.DECLARATION_ALL);
-        documentType = intent.getIntExtra(SearchFilters.EXTRA_DOCUMENT_TYPE, SearchFilters.DOCUMENT_ALL);
         startDate = new Date().setDate(intent.getStringExtra(SearchFilters.EXTRA_DT_START));
         endDate = new Date().setDate(intent.getStringExtra(SearchFilters.EXTRA_DT_END));
+
+        searchFilters = new SearchFilters(
+        intent.getStringExtra(SearchFilters.EXTRA_QUERY),
+        intent.getIntExtra(SearchFilters.EXTRA_USER_DECLARANT_ID, 0),
+        intent.getIntExtra(SearchFilters.EXTRA_DOCUMENT_TYPE, SearchFilters.DOCUMENT_ALL),
+        intent.getIntExtra(SearchFilters.EXTRA_DECLARATION_TYPE, SearchFilters.DECLARATION_ALL),
+        intent.getIntExtra(SearchFilters.EXTRA_DECLARATION_YEAR, 0),
+        startDate.toString(),
+        endDate.toString(),
+        intent.getIntExtra(SearchFilters.EXTRA_PAGE, 0)
+        );
     }
 
     private void initEditTextQuery(){
         editTextQuery = findViewById(R.id.edit_text_query);
-        editTextQuery.setText(query);
+        editTextQuery.setText(searchFilters.getQuery());
     }
 
     private void initEditTextYear(){
         editTextYear = findViewById(R.id.edit_text_year);
-        editTextYear.setText(declarationYear);
+        if(searchFilters.getDeclarationYear() > 0) {
+            editTextYear.setText(String.valueOf(searchFilters.getDeclarationYear()));
+        }
         editTextYear.setFilters(new InputFilter[]{new InputFilter.LengthFilter(4)});
         editTextYear.addTextChangedListener(new TextWatcher() {
             @Override
@@ -92,9 +107,9 @@ public class SearchFiltersActivity extends AppCompatActivity {
             public void afterTextChanged(Editable editable) {
                 int length = editable.toString().length();
                 if(length != 0) {
-                    int a = Integer.parseInt("2015".substring(0, length));
-                    int b = Integer.parseInt(editable.toString());
-                    int c = Integer.parseInt(Integer.toString(new Date().setCurrentDate().getYear()).substring(0, length));
+                    int a = tryParse("2015".substring(0, length));
+                    int b = tryParse(editable.toString());
+                    int c = tryParse(String.valueOf(new Date().setCurrentDate().getYear()).substring(0, length));
 
                     if(a > b || b > c){
                         editable.delete(length-1, length);
@@ -110,7 +125,7 @@ public class SearchFiltersActivity extends AppCompatActivity {
     }
 
     private void checkEditTextYear(){
-        if(!editTextYear.getText().toString().isEmpty() && Integer.parseInt(editTextYear.getText().toString()) < 2015){
+        if(!editTextYear.getText().toString().isEmpty() && tryParse(editTextYear.getText().toString()) < 2015){
             String actualYear = Integer.toString(new Date().setCurrentDate().getYear());
             editTextYear.setText(actualYear);
         }
@@ -123,15 +138,15 @@ public class SearchFiltersActivity extends AppCompatActivity {
                 getResources().getStringArray(R.array.array_document_type));
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter);
-        spinner.setSelection(documentType);
+        spinner.setSelection(searchFilters.getDocumentType());
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                documentType = position;
+                searchFilters.setDocumentType(position);
             }
             @Override
             public void onNothingSelected(AdapterView<?> arg0) {
-                documentType = SearchFilters.DOCUMENT_ALL;
+                searchFilters.setDocumentType(SearchFilters.DOCUMENT_ALL);
             }
         });
     }
@@ -143,15 +158,15 @@ public class SearchFiltersActivity extends AppCompatActivity {
                 getResources().getStringArray(R.array.array_declaration_type));
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter);
-        spinner.setSelection(declarationType);
+        spinner.setSelection(searchFilters.getDeclarationType());
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                declarationType = position;
+                searchFilters.setDeclarationType(position);
             }
             @Override
             public void onNothingSelected(AdapterView<?> arg0) {
-                declarationType = SearchFilters.DECLARATION_ALL;
+                searchFilters.setDeclarationType(SearchFilters.DECLARATION_ALL);
             }
         });
     }
@@ -179,12 +194,13 @@ public class SearchFiltersActivity extends AppCompatActivity {
     }
 
     public void onFindClick(View view) {
-        query = editTextQuery.getText().toString();
         checkEditTextYear();
-        declarationYear = editTextYear.getText().toString();
+
+        searchFilters.setQuery(editTextQuery.getText().toString());
+        searchFilters.setDeclarationYear(tryParse(editTextYear.getText().toString()));
 
         if(startDate.isNull() && !endDate.isNull())
-            startDate.setDate("2010-01-01");
+            startDate.setDate("2016-08-01");
         if(!startDate.isNull() && endDate.isNull())
             endDate.setCurrentDate();
 
@@ -199,21 +215,24 @@ public class SearchFiltersActivity extends AppCompatActivity {
             endDate.setCurrentDate();
         }
 
-        Log.i(TAG, "query: " + query);
-        Log.i(TAG, "documentType: " + documentType);
-        Log.i(TAG, "declarationType: " + declarationType);
-        Log.i(TAG, "declarationYear: " + declarationYear);
+        Log.i(TAG, "query: " + searchFilters.getQuery());
+        Log.i(TAG, "userDeclarantId: " + searchFilters.getUserDeclarantId());
+        Log.i(TAG, "documentType: " + searchFilters.getDocumentType());
+        Log.i(TAG, "declarationType: " + searchFilters.getDeclarationType());
+        Log.i(TAG, "declarationYear: " + searchFilters.getDeclarationYear());
         Log.i(TAG, "startDate: " + startDate);
         Log.i(TAG, "endDate: " + endDate);
-
+        Log.i(TAG, "page: " + searchFilters.getPage());
 
         Intent intent = new Intent();
-        intent.putExtra(SearchFilters.EXTRA_QUERY, query);
-        intent.putExtra(SearchFilters.EXTRA_DOCUMENT_TYPE, documentType);
-        intent.putExtra(SearchFilters.EXTRA_DECLARATION_TYPE, declarationType);
-        intent.putExtra(SearchFilters.EXTRA_DECLARATION_YEAR, declarationYear);
-        intent.putExtra(SearchFilters.EXTRA_DT_START, startDate.toString());
-        intent.putExtra(SearchFilters.EXTRA_DT_END, startDate.toString());
+//        intent.putExtra(SearchFilters.EXTRA_QUERY, searchFilters.getQuery());
+//        intent.putExtra(SearchFilters.EXTRA_USER_DECLARANT_ID, searchFilters.getUserDeclarantId());
+//        intent.putExtra(SearchFilters.EXTRA_DOCUMENT_TYPE, searchFilters.getDocumentType());
+//        intent.putExtra(SearchFilters.EXTRA_DECLARATION_TYPE, searchFilters.getDeclarationType());
+//        intent.putExtra(SearchFilters.EXTRA_DECLARATION_YEAR, searchFilters.getDeclarationYear());
+//        intent.putExtra(SearchFilters.EXTRA_DT_START, startDate.toString());
+//        intent.putExtra(SearchFilters.EXTRA_DT_END, endDate.toString());
+//        intent.putExtra(SearchFilters.EXTRA_PAGE, searchFilters.getPage());
         setResult(RESULT_OK, intent);
         finish();
     }

@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
 
@@ -28,6 +29,22 @@ public class MainActivity extends AppCompatActivity {
     private SearchView searchView;
 
     private CompositeDisposable compositeDisposable;
+
+    @Nullable
+    private static Integer nullify(int i){
+        if(i == 0) {
+            return null;
+        }
+        return (i);
+    }
+
+    @Nullable
+    private static String nullify(String s){
+        if(s.isEmpty()) {
+            return null;
+        }
+        return s;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,7 +97,7 @@ public class MainActivity extends AppCompatActivity {
             intent.putExtra(SearchFilters.EXTRA_QUERY, "Порошенко");
             intent.putExtra(SearchFilters.EXTRA_DOCUMENT_TYPE, 1);
             intent.putExtra(SearchFilters.EXTRA_DECLARATION_TYPE, 2);
-            intent.putExtra(SearchFilters.EXTRA_DECLARATION_YEAR, "2020");
+            intent.putExtra(SearchFilters.EXTRA_DECLARATION_YEAR, 2020);
             intent.putExtra(SearchFilters.EXTRA_DT_START, "2020-01-01");
             intent.putExtra(SearchFilters.EXTRA_DT_END, "2021-01-01");
             startActivityForResult(intent, REQUEST_CODE_FILTERS);
@@ -94,26 +111,36 @@ public class MainActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == RESULT_OK && requestCode == REQUEST_CODE_FILTERS) {
             String query = data.getStringExtra(SearchFilters.EXTRA_QUERY);
+            int userDeclarantId = data.getIntExtra(SearchFilters.EXTRA_USER_DECLARANT_ID, 0);
             int documentType = data.getIntExtra(SearchFilters.EXTRA_DOCUMENT_TYPE, SearchFilters.DOCUMENT_ALL);
             int declarationType = data.getIntExtra(SearchFilters.EXTRA_DECLARATION_TYPE, SearchFilters.DECLARATION_ALL);
-            String declarationYear = data.getStringExtra(SearchFilters.EXTRA_DECLARATION_YEAR);
+            int declarationYear = data.getIntExtra(SearchFilters.EXTRA_DECLARATION_YEAR, 0);
             String startDate = data.getStringExtra(SearchFilters.EXTRA_DT_START);
             String endDate = data.getStringExtra(SearchFilters.EXTRA_DT_END);
+            int page = data.getIntExtra(SearchFilters.EXTRA_PAGE, 0);
 
             Log.i(TAG, "query: " + query);
+            Log.i(TAG, "userDeclarantId: " + userDeclarantId);
             Log.i(TAG, "documentType: " + documentType);
             Log.i(TAG, "declarationType: " + declarationType);
             Log.i(TAG, "declarationYear: " + declarationYear);
             Log.i(TAG, "startDate: " + startDate);
             Log.i(TAG, "endDate: " + endDate);
+            Log.i(TAG, "page: " + page);
 
-//            assert query != null;
-            if(query.length() > 0) {
+            if(query != null && !query.isEmpty()) {
                 searchView.post(() -> searchView.setQuery(query, false));
             }
 
-            compositeDisposable.add(App.getApi().searchDeclarations(query, null,
-                    documentType, declarationType, declarationYear, startDate, endDate, null)
+            compositeDisposable.add(App.getApi().searchDeclarations(
+                    query,
+                    userDeclarantId,
+                    documentType,
+                    declarationType,
+                    declarationYear,
+                    startDate,
+                    endDate,
+                    page)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(this::onSearchDeclarationsSuccess, this::onFailure));
@@ -137,6 +164,7 @@ public class MainActivity extends AppCompatActivity {
 //                int totalItems = answer.getPage().getTotalItems();
 //                searchResult.setText(String.format(getString(R.string.search_result), totalItems));
             }
+            Log.e(TAG, "Items: " + answer.getData());
 //            recyclerAdapter = new RecyclerAdapter(this, answer.getItems());
 //            recyclerView.setAdapter(recyclerAdapter);
         }catch (Exception e){
