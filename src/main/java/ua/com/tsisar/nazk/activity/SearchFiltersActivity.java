@@ -11,6 +11,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.Spinner;
 
@@ -56,20 +57,20 @@ public class SearchFiltersActivity extends AppCompatActivity {
         initSpinnerDeclarationType();
 
         buttonStartDate = findViewById(R.id.button_start_date);
-        if(!startDate.isNull()){
-            buttonStartDate.setText(startDate.toStringReverse());
+        if(!startDate.isClear()){
+            buttonStartDate.setText(startDate.toString());
         }
 
         buttonEndDate = findViewById(R.id.button_end_date);
-        if(!endDate.isNull()){
-            buttonEndDate.setText(endDate.toStringReverse());
+        if(!endDate.isClear()){
+            buttonEndDate.setText(endDate.toString());
         }
     }
 
     private void getExtra(){
         Intent intent = getIntent();
-        startDate = new Date().setDate(intent.getStringExtra(SearchFilters.EXTRA_DT_START));
-        endDate = new Date().setDate(intent.getStringExtra(SearchFilters.EXTRA_DT_END));
+        startDate = new Date().set(intent.getStringExtra(SearchFilters.EXTRA_DT_START));
+        endDate = new Date().set(intent.getStringExtra(SearchFilters.EXTRA_DT_END));
 
         searchFilters = new SearchFilters(
         intent.getStringExtra(SearchFilters.EXTRA_QUERY),
@@ -109,7 +110,7 @@ public class SearchFiltersActivity extends AppCompatActivity {
                 if(length != 0) {
                     int a = tryParse("2015".substring(0, length));
                     int b = tryParse(editable.toString());
-                    int c = tryParse(String.valueOf(new Date().setCurrentDate().getYear()).substring(0, length));
+                    int c = tryParse(String.valueOf(new Date().now().getYear()).substring(0, length));
 
                     if(a > b || b > c){
                         editable.delete(length-1, length);
@@ -126,7 +127,7 @@ public class SearchFiltersActivity extends AppCompatActivity {
 
     private void checkEditTextYear(){
         if(!editTextYear.getText().toString().isEmpty() && tryParse(editTextYear.getText().toString()) < 2015){
-            String actualYear = Integer.toString(new Date().setCurrentDate().getYear());
+            String actualYear = Integer.toString(new Date().now().getYear());
             editTextYear.setText(actualYear);
         }
     }
@@ -172,23 +173,26 @@ public class SearchFiltersActivity extends AppCompatActivity {
     }
 
     public void setStartDate(View view){
-        Date date = startDate.isNull() ? new Date().setCurrentDate() : new Date().setDate(startDate);
+        Date date = startDate.isClear() ? new Date().now() : new Date().set(startDate);
 
         DatePickerDialog datePickerDialog =
                 new DatePickerDialog(this, (datePicker, year, month, day) ->{
-                    startDate.setDate(year, month, day);
-                    buttonStartDate.setText(startDate.toStringReverse());
+                    startDate.set(year, month, day);
+                    buttonStartDate.setText(startDate.toString());
                 }, date.getYear(), date.getMonth(), date.getDay());
         datePickerDialog.show();
     }
 
     public void setEndDate(View view){
-        Date date = endDate.isNull() ? new Date().setCurrentDate() : new Date().setDate(endDate);
+        Date date = endDate.isClear() ? new Date().now() : new Date().set(endDate);
 
         DatePickerDialog datePickerDialog =
-                new DatePickerDialog(this, (datePicker, year, month, day) ->{
-                    endDate.setDate(year, month, day);
-                    buttonEndDate.setText(endDate.toStringReverse());
+                new DatePickerDialog(this, new DatePickerDialog.OnDateSetListener() {
+                    @Override
+                    public void onDateSet(DatePicker datePicker, int year, int month, int day) {
+                        endDate.set(year, month, day);
+                        buttonEndDate.setText(endDate.toString());
+                    }
                 }, date.getYear(), date.getMonth(), date.getDay());
         datePickerDialog.show();
     }
@@ -199,20 +203,20 @@ public class SearchFiltersActivity extends AppCompatActivity {
         searchFilters.setQuery(editTextQuery.getText().toString());
         searchFilters.setDeclarationYear(tryParse(editTextYear.getText().toString()));
 
-        if(startDate.isNull() && !endDate.isNull())
-            startDate.setDate("2016-08-01");
-        if(!startDate.isNull() && endDate.isNull())
-            endDate.setCurrentDate();
+        if(startDate.isClear() && !endDate.isClear())
+            startDate.set("2016-08-01");
+        if(!startDate.isClear() && endDate.isClear())
+            endDate.now();
 
         //if startDate > endDate reverse it
         if(startDate.compareTo(endDate) > 0){
-            Date tmp = new Date().setDate(endDate);
-            endDate.setDate(startDate);
-            startDate.setDate(tmp);
+            Date tmp = new Date().set(endDate);
+            endDate.set(startDate);
+            startDate.set(tmp);
         }
 
-        if(endDate.compareTo(new Date().setCurrentDate()) > 0){
-            endDate.setCurrentDate();
+        if(endDate.compareTo(new Date().now()) > 0){
+            endDate.now();
         }
 
         Log.i(TAG, "query: " + searchFilters.getQuery());

@@ -1,121 +1,97 @@
 package ua.com.tsisar.nazk.util;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.TimeZone;
+import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
 public class Date implements Comparable<Date>{
-    private static final String TAG = "MyLog";
+    //private static final String DATE_FORMAT = "yyyy-MM-dd";
+    private static final String DATE_FORMAT = "dd.MM.yyyy - hh:mm";
 
-    private static final String SPLIT = "-";
-    private static final String DATE_FORMAT = "%1$04d-%2$02d-%3$02d";
-    private static final String DATE_FORMAT_REVERSE = "%3$02d.%2$02d.%1$04d";
-
-    private int year;
-    private int month;
-    private int day;
-
-    public Date(int year, int month, int day) {
-        this.year = year;
-        this.month = month;
-        this.day = day;
-    }
+    private Calendar calendar;
 
     public Date() {
+        calendar = Calendar.getInstance();
+        calendar.clear();
     }
 
-    public void setYear(int year){
-        this.year = year;
+    private Calendar getCalendar(){
+        return calendar;
     }
 
     public int getYear() {
-        return year;
-    }
-
-    public void setMonth(int month) {
-        this.month = month;
+        return calendar.get(Calendar.YEAR);
     }
 
     public int getMonth() {
-        return month;
-    }
-
-    public void setDay(int day) {
-        this.day = day;
+        return calendar.get(Calendar.MONTH);
     }
 
     public int getDay() {
-        return day;
+        return calendar.get(Calendar.DAY_OF_MONTH);
     }
 
-    public Date setCurrentDate(){
-        Calendar calendar = Calendar.getInstance(TimeZone.getDefault());
-        this.year = calendar.get(Calendar.YEAR);
-        this.month = calendar.get(Calendar.MONTH);
-        this.day = calendar.get(Calendar.DAY_OF_MONTH);
+    public Date now(){
+        calendar = Calendar.getInstance();
         return this;
     }
 
-    public Date setDate(String date){
-        if(date != null && date.length() != 0){
-            String[] splitArray = date.split(SPLIT);
-            this.year = Integer.parseInt(splitArray[0]);
-            this.month = Integer.parseInt(splitArray[1])-1;
-            this.day = Integer.parseInt(splitArray[2]);
-//        }else{
-//            setCurrentDate();
+    public Date set(String date){
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(DATE_FORMAT, Locale.getDefault());
+        try {
+            calendar.clear();
+            calendar.setTime(simpleDateFormat.parse(date));
+        } catch (ParseException e) {
+            e.printStackTrace();
         }
+
         return this;
     }
 
-    public Date setDate(int year, int month, int day) {
-        this.year = year;
-        this.month = month;
-        this.day = day;
+    public Date set(int year, int month, int day) {
+        calendar.clear();
+        calendar.set(year, month, day);
         return this;
     }
 
-    public Date setDate(Date d) {
-        this.year = d.getYear();
-        this.month = d.getMonth();
-        this.day = d.getDay();
+    public Date set(Date d) {
+        calendar.clear();
+        calendar.set(d.getYear(), d.getMonth(), d.getDay());
+        return this;
+    }
+
+    public Date set(long time) {
+        java.util.Date d = new java.util.Date();
+        d.setTime(TimeUnit.SECONDS.toMillis(time));
+        calendar.clear();
+        calendar.setTime(d);
         return this;
     }
 
     @Override
     public String toString() {
-        if(!isNull()){
-            return String.format(DATE_FORMAT, year, month+1, day);
-        }
-        return "";
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(DATE_FORMAT, Locale.getDefault());
+        return simpleDateFormat.format(calendar.getTime());
     }
 
-    public String toStringReverse() {
-        if(!isNull()){
-            return String.format(DATE_FORMAT_REVERSE, year, month+1, day);
-        }
-        return "";
+    public Date clear(){
+        calendar.clear();
+        return this;
     }
 
-    public boolean isNull(){
-        return year == 0 && month == 0 && day == 0;
+    public boolean isClear(){
+        return getYear() == 1970 && getMonth() == 0 && getDay() == 1;
     }
 
     @Override
-    public int compareTo(Date o) {
-        if(year > o.getYear()){
-            return 1;
-        }else if (year < o.getYear()){
-            return -1;
-        }else if(month > o.getMonth()){
-            return 1;
-        }else if (month < o.getMonth()){
-            return -1;
-        }else if(day > o.getDay()){
-            return 1;
-        }else if(day < o.getDay()){
-            return -1;
-        }
-        return 0;
+    public int compareTo(Date d) {
+        return calendar.compareTo(d.getCalendar());
     }
 
+    public long toLong(){
+        long duration = calendar.getTimeInMillis() + calendar.get(Calendar.ZONE_OFFSET);
+        return TimeUnit.MILLISECONDS.toSeconds(duration);
+    }
 }

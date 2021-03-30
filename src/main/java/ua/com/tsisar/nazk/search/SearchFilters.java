@@ -46,7 +46,7 @@ public class SearchFilters {
     private String endDate;
     private int page;
 
-    public SearchFilters(String query, int userDeclarantId,@Document int documentType,
+    public SearchFilters(String query, int userDeclarantId, @Document int documentType,
                          @Declaration int declarationType, int declarationYear, String startDate,
                          String endDate, int page) {
         this.query = query;

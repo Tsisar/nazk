@@ -21,6 +21,8 @@ import ua.com.tsisar.nazk.App;
 import ua.com.tsisar.nazk.R;
 import ua.com.tsisar.nazk.dto.AnswerDTO;
 import ua.com.tsisar.nazk.search.SearchFilters;
+import ua.com.tsisar.nazk.util.Date;
+import ua.com.tsisar.nazk.util.DateEx;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MyLog";
@@ -51,8 +53,47 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        int year = 2016;
+        int month = 8 - 1;
+        int day = 1;
+        DateEx ex = new DateEx();
+        Date d = new Date();
+
+        Log.i(TAG, "DEXT: " + ex.toString());
+        Log.i(TAG, "DATE: " + d.toString());
+        Log.i(TAG, "______________toLong_____________________");
+        Log.i(TAG, "ETAL: " + "1470009600");
+        Log.i(TAG, "DEXT: " + ex.set(year, month, day).toLong());
+        Log.i(TAG, "DATE: " + d.set(year, month, day).toLong());
+        Log.i(TAG, "______________toString_____________________");
+        Log.i(TAG, "ETAL: 0" + day + ".0" + (month+1) + "." + year);
+        Log.i(TAG, "DEXT: " + ex.toString());
+        Log.i(TAG, "DATE: " + d.toString());
+        Log.i(TAG, "_____________set long______________________");
+        Log.i(TAG, "DEXT: " + ex.set(1470009600).toString());
+        Log.i(TAG, "DATE: " + d.set(1470009600).toString());
+        Log.i(TAG, "________________clear___________________");
+        Log.i(TAG, "DEXT: " + ex.clear().toString());
+        Log.i(TAG, "DATE: " + d.clear().toString());
+        Log.i(TAG, "_________________isClear__________________");
+        Log.i(TAG, "DEXT: " + ex.isClear());
+        Log.i(TAG, "DATE: " + d.isClear());
+        Log.i(TAG, "_______________now____________________");
+        Log.i(TAG, "DEXT: " + ex.now().toString());
+        Log.i(TAG, "DATE: " + d.now().toString());
+
+//        d.setCurrentDate();
+//        Log.i(TAG, "Date: " + d.toString());
+//        Log.i(TAG, "Date toInt: " + d.toSeconds());
+//        d.setDate("2016-08-01");
+//        Log.i(TAG, "Date: " + d.toString());
+//        Log.i(TAG, "Date toInt (1470009600): " + d.toSeconds());
+//        Log.i(TAG, "----------------------------------");
+
         compositeDisposable = new CompositeDisposable();
     }
+
+
 
     @Override
     protected void onDestroy() {
@@ -119,14 +160,14 @@ public class MainActivity extends AppCompatActivity {
             String endDate = data.getStringExtra(SearchFilters.EXTRA_DT_END);
             int page = data.getIntExtra(SearchFilters.EXTRA_PAGE, 0);
 
-            Log.i(TAG, "query: " + query);
-            Log.i(TAG, "userDeclarantId: " + userDeclarantId);
-            Log.i(TAG, "documentType: " + documentType);
-            Log.i(TAG, "declarationType: " + declarationType);
-            Log.i(TAG, "declarationYear: " + declarationYear);
-            Log.i(TAG, "startDate: " + startDate);
-            Log.i(TAG, "endDate: " + endDate);
-            Log.i(TAG, "page: " + page);
+//            Log.i(TAG, "query: " + query);
+//            Log.i(TAG, "userDeclarantId: " + userDeclarantId);
+//            Log.i(TAG, "documentType: " + documentType);
+//            Log.i(TAG, "declarationType: " + declarationType);
+//            Log.i(TAG, "declarationYear: " + declarationYear);
+//            Log.i(TAG, "startDate: " + startDate);
+//            Log.i(TAG, "endDate: " + endDate);
+//            Log.i(TAG, "page: " + page);
 
             if(query != null && !query.isEmpty()) {
                 searchView.post(() -> searchView.setQuery(query, false));
