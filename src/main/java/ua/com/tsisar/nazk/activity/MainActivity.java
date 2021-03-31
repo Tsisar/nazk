@@ -8,7 +8,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
 
@@ -19,10 +18,7 @@ import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
 import ua.com.tsisar.nazk.App;
 import ua.com.tsisar.nazk.R;
-import ua.com.tsisar.nazk.dto.AnswerDTO;
-import ua.com.tsisar.nazk.search.SearchFilters;
-import ua.com.tsisar.nazk.util.Date;
-import ua.com.tsisar.nazk.util.DateEx;
+import ua.com.tsisar.nazk.dto.Answer;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MyLog";
@@ -32,64 +28,28 @@ public class MainActivity extends AppCompatActivity {
 
     private CompositeDisposable compositeDisposable;
 
-    @Nullable
-    private static Integer nullify(int i){
-        if(i == 0) {
-            return null;
-        }
-        return (i);
+//    @Nullable
+//    private static Long nullify(long l){
+//        return l == 0 ? null : l;
+//    }
+//
+//    @Nullable
+//    private static Integer nullify(int i){
+//        return i == 0 ? null : i;
+//    }
+
+    private static String nullify(String s){
+        return s.isEmpty() ? null : s;
     }
 
-    @Nullable
-    private static String nullify(String s){
-        if(s.isEmpty()) {
-            return null;
-        }
-        return s;
+    private <V extends Number> V nullify(V  value){
+        return value.intValue() == 0 ? null : value;
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        int year = 2016;
-        int month = 8 - 1;
-        int day = 1;
-        DateEx ex = new DateEx();
-        Date d = new Date();
-
-        Log.i(TAG, "DEXT: " + ex.toString());
-        Log.i(TAG, "DATE: " + d.toString());
-        Log.i(TAG, "______________toLong_____________________");
-        Log.i(TAG, "ETAL: " + "1470009600");
-        Log.i(TAG, "DEXT: " + ex.set(year, month, day).toLong());
-        Log.i(TAG, "DATE: " + d.set(year, month, day).toLong());
-        Log.i(TAG, "______________toString_____________________");
-        Log.i(TAG, "ETAL: 0" + day + ".0" + (month+1) + "." + year);
-        Log.i(TAG, "DEXT: " + ex.toString());
-        Log.i(TAG, "DATE: " + d.toString());
-        Log.i(TAG, "_____________set long______________________");
-        Log.i(TAG, "DEXT: " + ex.set(1470009600).toString());
-        Log.i(TAG, "DATE: " + d.set(1470009600).toString());
-        Log.i(TAG, "________________clear___________________");
-        Log.i(TAG, "DEXT: " + ex.clear().toString());
-        Log.i(TAG, "DATE: " + d.clear().toString());
-        Log.i(TAG, "_________________isClear__________________");
-        Log.i(TAG, "DEXT: " + ex.isClear());
-        Log.i(TAG, "DATE: " + d.isClear());
-        Log.i(TAG, "_______________now____________________");
-        Log.i(TAG, "DEXT: " + ex.now().toString());
-        Log.i(TAG, "DATE: " + d.now().toString());
-
-//        d.setCurrentDate();
-//        Log.i(TAG, "Date: " + d.toString());
-//        Log.i(TAG, "Date toInt: " + d.toSeconds());
-//        d.setDate("2016-08-01");
-//        Log.i(TAG, "Date: " + d.toString());
-//        Log.i(TAG, "Date toInt (1470009600): " + d.toSeconds());
-//        Log.i(TAG, "----------------------------------");
-
         compositeDisposable = new CompositeDisposable();
     }
 
@@ -135,12 +95,6 @@ public class MainActivity extends AppCompatActivity {
         int id = item.getItemId();
         if (id == R.id.action_settings) {
             Intent intent = new Intent(this, SearchFiltersActivity.class);
-            intent.putExtra(SearchFilters.EXTRA_QUERY, "Порошенко");
-            intent.putExtra(SearchFilters.EXTRA_DOCUMENT_TYPE, 1);
-            intent.putExtra(SearchFilters.EXTRA_DECLARATION_TYPE, 2);
-            intent.putExtra(SearchFilters.EXTRA_DECLARATION_YEAR, 2020);
-            intent.putExtra(SearchFilters.EXTRA_DT_START, "2020-01-01");
-            intent.putExtra(SearchFilters.EXTRA_DT_END, "2021-01-01");
             startActivityForResult(intent, REQUEST_CODE_FILTERS);
             return true;
         }
@@ -151,44 +105,26 @@ public class MainActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == RESULT_OK && requestCode == REQUEST_CODE_FILTERS) {
-            String query = data.getStringExtra(SearchFilters.EXTRA_QUERY);
-            int userDeclarantId = data.getIntExtra(SearchFilters.EXTRA_USER_DECLARANT_ID, 0);
-            int documentType = data.getIntExtra(SearchFilters.EXTRA_DOCUMENT_TYPE, SearchFilters.DOCUMENT_ALL);
-            int declarationType = data.getIntExtra(SearchFilters.EXTRA_DECLARATION_TYPE, SearchFilters.DECLARATION_ALL);
-            int declarationYear = data.getIntExtra(SearchFilters.EXTRA_DECLARATION_YEAR, 0);
-            String startDate = data.getStringExtra(SearchFilters.EXTRA_DT_START);
-            String endDate = data.getStringExtra(SearchFilters.EXTRA_DT_END);
-            int page = data.getIntExtra(SearchFilters.EXTRA_PAGE, 0);
 
-//            Log.i(TAG, "query: " + query);
-//            Log.i(TAG, "userDeclarantId: " + userDeclarantId);
-//            Log.i(TAG, "documentType: " + documentType);
-//            Log.i(TAG, "declarationType: " + declarationType);
-//            Log.i(TAG, "declarationYear: " + declarationYear);
-//            Log.i(TAG, "startDate: " + startDate);
-//            Log.i(TAG, "endDate: " + endDate);
-//            Log.i(TAG, "page: " + page);
+            Log.i(TAG, "query: " + App.getFilters().getQuery());
+            Log.i(TAG, "userDeclarantId: " + App.getFilters().getUserDeclarantId());
+            Log.i(TAG, "documentType: " + App.getFilters().getDocumentType());
+            Log.i(TAG, "declarationType: " + App.getFilters().getDeclarationType());
+            Log.i(TAG, "declarationYear: " + App.getFilters().getDeclarationYear());
+            Log.i(TAG, "startDate: " + App.getFilters().getStartDate().toString());
+            Log.i(TAG, "endDate: " + App.getFilters().getEndDate().toString());
+            Log.i(TAG, "page: " + App.getFilters().getPage());
 
-            if(query != null && !query.isEmpty()) {
-                searchView.post(() -> searchView.setQuery(query, false));
+            if(App.getFilters().getQuery() != null && !App.getFilters().getQuery().isEmpty()) {
+                searchView.post(() -> searchView.setQuery(App.getFilters().getQuery(), false));
             }
 
-            compositeDisposable.add(App.getApi().searchDeclarations(
-                    query,
-                    userDeclarantId,
-                    documentType,
-                    declarationType,
-                    declarationYear,
-                    startDate,
-                    endDate,
-                    page)
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(this::onSearchDeclarationsSuccess, this::onFailure));
+            //TODO тимчасово
+            searchDeclarations();
         }
     }
 
-    private void onSearchDeclarationsSuccess(AnswerDTO answer) {
+    private void onSearchDeclarationsSuccess(Answer answer) {
         try {
 //            swipeRefreshLayout.setRefreshing(false);
             if (answer.getCount() == 0) {
@@ -216,22 +152,22 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void onFailure(Throwable throwable) {
+        showMessage(throwable.getMessage());
     }
 
     private void searchDeclarations(){
-//        compositeDisposable.add(App.getApi().searchDeclarations(
-//                nullable(App.getFilters().getQuery()),
-//                nullable(App.getFilters().getUserDeclarantId()),
-//                nullable(App.getFilters().getDocumentType()),
-//                nullable(App.getFilters().getDeclarationType()),
-//                nullable(App.getFilters().getDeclarationYear()),
-//                nullable(App.getFilters().getStartDate()),
-//                nullable(App.getFilters().getEndDate()),
-//                nullable(App.getFilters().getPage()))
-//                .subscribeOn(Schedulers.io())
-//                .observeOn(AndroidSchedulers.mainThread())
-//                .subscribe(this::onSearchDeclarationsSuccess,
-//                        this::onFailure));
+        compositeDisposable.add(App.getApi().searchDeclarations(
+                nullify(App.getFilters().getQuery()),
+                nullify(App.getFilters().getUserDeclarantId()),
+                nullify(App.getFilters().getDocumentType()),
+                nullify(App.getFilters().getDeclarationType()),
+                nullify(App.getFilters().getDeclarationYear()),
+                nullify(App.getFilters().getStartDate().toLong()),
+                nullify(App.getFilters().getEndDate().toLong()),
+                nullify(App.getFilters().getPage()))
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(this::onSearchDeclarationsSuccess, this::onFailure));
     }
 
     private void showMessage(String message){

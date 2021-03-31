@@ -1,22 +1,12 @@
 package ua.com.tsisar.nazk.search;
 
 import androidx.annotation.IntDef;
-
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
+import ua.com.tsisar.nazk.util.Date;
+
 public class SearchFilters {
-    private static final String TAG = "MyLog";
-
-    public static final String EXTRA_QUERY = "query";
-    public static final String EXTRA_USER_DECLARANT_ID = "user_declarant_id";
-    public static final String EXTRA_DOCUMENT_TYPE = "document_type";
-    public static final String EXTRA_DECLARATION_TYPE = "declaration_type";
-    public static final String EXTRA_DECLARATION_YEAR = "declaration_year";
-    public static final String EXTRA_DT_START = "start_date";
-    public static final String EXTRA_DT_END = "end_date";
-    public static final String EXTRA_PAGE = "page";
-
     @IntDef({DOCUMENT_ALL, DOCUMENT_DECLARATION, DOCUMENT_REPORT, DOCUMENT_NEW_DECLARATION, DOCUMENT_NEW_REPORT})
     @Retention(RetentionPolicy.SOURCE)
     public @interface Document {}
@@ -42,13 +32,18 @@ public class SearchFilters {
     private int documentType;
     private int declarationType;
     private int declarationYear;
-    private String startDate;
-    private String endDate;
+    private Date startDate;
+    private Date endDate;
     private int page;
 
-    public SearchFilters(String query, int userDeclarantId, @Document int documentType,
-                         @Declaration int declarationType, int declarationYear, String startDate,
-                         String endDate, int page) {
+    public SearchFilters() {
+        this.startDate = new Date();
+        this.endDate = new Date();
+    }
+
+    public SearchFilters set(String query, int userDeclarantId, @Document int documentType,
+                         @Declaration int declarationType, int declarationYear, Date startDate,
+                         Date endDate, int page) {
         this.query = query;
         this.userDeclarantId = userDeclarantId;
         this.documentType = documentType;
@@ -57,70 +52,70 @@ public class SearchFilters {
         this.startDate = startDate;
         this.endDate = endDate;
         this.page = page;
-
-    }
-
-    public String getQuery() {
-        return query;
+        return this;
     }
 
     public void setQuery(String query) {
         this.query = query;
     }
 
-    public int getUserDeclarantId() {
-        return userDeclarantId;
-    }
-
     public void setUserDeclarantId(int userDeclarantId) {
         this.userDeclarantId = userDeclarantId;
-    }
-
-    public int getDocumentType() {
-        return documentType;
     }
 
     public void setDocumentType(@Document int documentType) {
         this.documentType = documentType;
     }
 
-    public int getDeclarationType() {
-        return declarationType;
-    }
-
     public void setDeclarationType(@Declaration int declarationType) {
         this.declarationType = declarationType;
-    }
-
-    public int getDeclarationYear() {
-        return declarationYear;
     }
 
     public void setDeclarationYear(int declarationYear) {
         this.declarationYear = declarationYear;
     }
 
-    public String getStartDate() {
-        return startDate;
-    }
-
-    public void setStartDate(String startDate) {
+    public void setStartDate(Date startDate) {
         this.startDate = startDate;
     }
 
-    public String getEndDate() {
-        return endDate;
-    }
-
-    public void setEndDate(String endDate) {
+    public void setEndDate(Date endDate) {
         this.endDate = endDate;
-    }
-
-    public int getPage() {
-        return page;
     }
 
     public void setPage(int page) {
         this.page = page;
+    }
+
+    public String getQuery() {
+        return query;
+    }
+
+    public int getUserDeclarantId() {
+        return userDeclarantId;
+    }
+
+    public int getDocumentType() {
+        return documentType;
+    }
+
+    public int getDeclarationType() {
+        return declarationType;
+    }
+
+    public int getDeclarationYear() {
+        return declarationYear;
+    }
+
+    public Date getStartDate() {
+        return startDate;
+    }
+
+    public Date getEndDate() {
+        return endDate;
+    }
+
+    public int getPage() {
+        return page;
     }
 }

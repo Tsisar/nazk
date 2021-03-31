@@ -3,11 +3,11 @@ package ua.com.tsisar.nazk.dto;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class ItemDTO {
+public class Item {
 
     @SerializedName("data")
     @Expose
-    private ItemDataDTO data;
+    private ItemData data;
     @SerializedName("declaration_type")
     @Expose
     private Integer declarationType;
@@ -24,11 +24,11 @@ public class ItemDTO {
     @Expose
     private String date;
 
-    public ItemDataDTO getData() {
+    public ItemData getData() {
         return data;
     }
 
-    public void setData(ItemDataDTO data) {
+    public void setData(ItemData data) {
         this.data = data;
     }
 

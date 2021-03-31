@@ -5,11 +5,11 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
 
-public class AnswerDTO {
+public class Answer {
 
     @SerializedName("data")
     @Expose
-    private List<ItemDTO> data = null;
+    private List<Item> data = null;
     @SerializedName("count")
     @Expose
     private Integer count;
@@ -17,11 +17,11 @@ public class AnswerDTO {
     @Expose
     private String notice;
 
-    public List<ItemDTO> getData() {
+    public List<Item> getData() {
         return data;
     }
 
-    public void setData(List<ItemDTO> data) {
+    public void setData(List<Item> data) {
         this.data = data;
     }
 

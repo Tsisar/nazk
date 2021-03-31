@@ -3,7 +3,7 @@ package ua.com.tsisar.nazk.dto;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class Step1DataDTO {
+public class Step1Data {
 
     @SerializedName("lastname")
     @Expose

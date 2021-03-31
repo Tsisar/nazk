@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.InputFilter;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -14,9 +13,13 @@ import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import java.util.Calendar;
+
+import ua.com.tsisar.nazk.App;
 import ua.com.tsisar.nazk.R;
 import ua.com.tsisar.nazk.search.SearchFilters;
 import ua.com.tsisar.nazk.util.Date;
@@ -30,7 +33,7 @@ public class SearchFiltersActivity extends AppCompatActivity {
     private Button buttonStartDate;
     private Button buttonEndDate;
 
-    private SearchFilters searchFilters;
+//    private SearchFilters searchFilters;
 
     private Date startDate;
     private Date endDate;
@@ -48,7 +51,8 @@ public class SearchFiltersActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search_filters);
 
-        getExtra();
+        startDate = new Date();
+        endDate = new Date();
 
         initEditTextQuery();
         initEditTextYear();
@@ -67,32 +71,15 @@ public class SearchFiltersActivity extends AppCompatActivity {
         }
     }
 
-    private void getExtra(){
-        Intent intent = getIntent();
-        startDate = new Date().set(intent.getStringExtra(SearchFilters.EXTRA_DT_START));
-        endDate = new Date().set(intent.getStringExtra(SearchFilters.EXTRA_DT_END));
-
-        searchFilters = new SearchFilters(
-        intent.getStringExtra(SearchFilters.EXTRA_QUERY),
-        intent.getIntExtra(SearchFilters.EXTRA_USER_DECLARANT_ID, 0),
-        intent.getIntExtra(SearchFilters.EXTRA_DOCUMENT_TYPE, SearchFilters.DOCUMENT_ALL),
-        intent.getIntExtra(SearchFilters.EXTRA_DECLARATION_TYPE, SearchFilters.DECLARATION_ALL),
-        intent.getIntExtra(SearchFilters.EXTRA_DECLARATION_YEAR, 0),
-        startDate.toString(),
-        endDate.toString(),
-        intent.getIntExtra(SearchFilters.EXTRA_PAGE, 0)
-        );
-    }
-
     private void initEditTextQuery(){
         editTextQuery = findViewById(R.id.edit_text_query);
-        editTextQuery.setText(searchFilters.getQuery());
+        editTextQuery.setText(App.getFilters().getQuery());
     }
 
     private void initEditTextYear(){
         editTextYear = findViewById(R.id.edit_text_year);
-        if(searchFilters.getDeclarationYear() > 0) {
-            editTextYear.setText(String.valueOf(searchFilters.getDeclarationYear()));
+        if(App.getFilters().getDeclarationYear() > 0) {
+            editTextYear.setText(String.valueOf(App.getFilters().getDeclarationYear()));
         }
         editTextYear.setFilters(new InputFilter[]{new InputFilter.LengthFilter(4)});
         editTextYear.addTextChangedListener(new TextWatcher() {
@@ -108,12 +95,14 @@ public class SearchFiltersActivity extends AppCompatActivity {
             public void afterTextChanged(Editable editable) {
                 int length = editable.toString().length();
                 if(length != 0) {
+                    Integer year = new Date().now().getYear();
                     int a = tryParse("2015".substring(0, length));
                     int b = tryParse(editable.toString());
-                    int c = tryParse(String.valueOf(new Date().now().getYear()).substring(0, length));
+                    int c = tryParse(year.toString().substring(0, length));
 
                     if(a > b || b > c){
                         editable.delete(length-1, length);
+                        Toast.makeText(getApplicationContext(),"2015 - " + year, Toast.LENGTH_SHORT).show();
                     }
                 }
             }
@@ -127,84 +116,88 @@ public class SearchFiltersActivity extends AppCompatActivity {
 
     private void checkEditTextYear(){
         if(!editTextYear.getText().toString().isEmpty() && tryParse(editTextYear.getText().toString()) < 2015){
-            String actualYear = Integer.toString(new Date().now().getYear());
+            String actualYear = new Date().now().getYear().toString();
             editTextYear.setText(actualYear);
         }
     }
 
     private void initSpinnerDocumentType(){
-        Spinner spinner = findViewById(R.id.spinner_document_type);
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
-                android.R.layout.simple_spinner_item,
-                getResources().getStringArray(R.array.array_document_type));
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinner.setAdapter(adapter);
-        spinner.setSelection(searchFilters.getDocumentType());
+        Spinner spinner = initSpinner(R.id.spinner_document_type, R.array.array_document_type);
+        spinner.setSelection(App.getFilters().getDocumentType());
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                searchFilters.setDocumentType(position);
+                App.getFilters().setDocumentType(position);
             }
             @Override
             public void onNothingSelected(AdapterView<?> arg0) {
-                searchFilters.setDocumentType(SearchFilters.DOCUMENT_ALL);
+                App.getFilters().setDocumentType(SearchFilters.DOCUMENT_ALL);
             }
         });
     }
 
     private void initSpinnerDeclarationType(){
-        Spinner spinner = findViewById(R.id.spinner_declaration_type);
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
-                android.R.layout.simple_spinner_item,
-                getResources().getStringArray(R.array.array_declaration_type));
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinner.setAdapter(adapter);
-        spinner.setSelection(searchFilters.getDeclarationType());
+        Spinner spinner = initSpinner(R.id.spinner_declaration_type, R.array.array_declaration_type);
+        spinner.setSelection(App.getFilters().getDeclarationType());
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                searchFilters.setDeclarationType(position);
+                App.getFilters().setDeclarationType(position);
             }
             @Override
             public void onNothingSelected(AdapterView<?> arg0) {
-                searchFilters.setDeclarationType(SearchFilters.DECLARATION_ALL);
+                App.getFilters().setDeclarationType(SearchFilters.DECLARATION_ALL);
             }
         });
     }
 
+    private Spinner initSpinner(int viewId, int arrayId){
+        Spinner spinner = findViewById(viewId);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
+                android.R.layout.simple_spinner_item,
+                getResources().getStringArray(arrayId));
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(adapter);
+        return spinner;
+    }
+
+    //TODO Період публікації зробити двома діалогами в любому випадку відкривати спочатку "З" потім "ПО". В разі не встановлення дати в якомусь діалозі - дату залишати пустою.
+    // dialog.getDatePicker().setMaxDate(new Date().getTime());
     public void setStartDate(View view){
         Date date = startDate.isClear() ? new Date().now() : new Date().set(startDate);
 
-        DatePickerDialog datePickerDialog =
-                new DatePickerDialog(this, (datePicker, year, month, day) ->{
-                    startDate.set(year, month, day);
-                    buttonStartDate.setText(startDate.toString());
-                }, date.getYear(), date.getMonth(), date.getDay());
-        datePickerDialog.show();
+        DatePickerDialog dialog = new DatePickerDialog(this, (datePicker, year, month, day) -> {
+            buttonStartDate.setText(startDate.set(year, month, day).toString());
+        }, date.getYear(), date.getMonth(), date.getDay());
+        // 01.08.2016
+        //dialog.getDatePicker().setMinDate(Calendar.getInstance().getTimeInMillis());
+        // date now;
+        dialog.getDatePicker().setMaxDate(Calendar.getInstance().getTimeInMillis());
+        dialog.show();
     }
 
     public void setEndDate(View view){
         Date date = endDate.isClear() ? new Date().now() : new Date().set(endDate);
-
-        DatePickerDialog datePickerDialog =
-                new DatePickerDialog(this, new DatePickerDialog.OnDateSetListener() {
-                    @Override
-                    public void onDateSet(DatePicker datePicker, int year, int month, int day) {
-                        endDate.set(year, month, day);
-                        buttonEndDate.setText(endDate.toString());
-                    }
-                }, date.getYear(), date.getMonth(), date.getDay());
-        datePickerDialog.show();
+        DatePickerDialog dialog = new DatePickerDialog(this, new DatePickerDialog.OnDateSetListener() {
+            @Override
+            public void onDateSet(DatePicker datePicker, int year, int month, int day) {
+                buttonEndDate.setText(endDate.set(year, month, day).toString());
+            }
+        }, date.getYear(), date.getMonth(), date.getDay());
+        // setStartDate.toLong
+        //dialog.getDatePicker().setMinDate(Calendar.getInstance().getTimeInMillis());
+        dialog.getDatePicker().setMaxDate(Calendar.getInstance().getTimeInMillis());
+        dialog.show();
     }
 
     public void onFindClick(View view) {
         checkEditTextYear();
 
-        searchFilters.setQuery(editTextQuery.getText().toString());
-        searchFilters.setDeclarationYear(tryParse(editTextYear.getText().toString()));
+        App.getFilters().setQuery(editTextQuery.getText().toString());
+        App.getFilters().setDeclarationYear(tryParse(editTextYear.getText().toString()));
 
         if(startDate.isClear() && !endDate.isClear())
-            startDate.set("2016-08-01");
+            startDate.set(2016,7,1);
         if(!startDate.isClear() && endDate.isClear())
             endDate.now();
 
@@ -219,24 +212,19 @@ public class SearchFiltersActivity extends AppCompatActivity {
             endDate.now();
         }
 
-        Log.i(TAG, "query: " + searchFilters.getQuery());
-        Log.i(TAG, "userDeclarantId: " + searchFilters.getUserDeclarantId());
-        Log.i(TAG, "documentType: " + searchFilters.getDocumentType());
-        Log.i(TAG, "declarationType: " + searchFilters.getDeclarationType());
-        Log.i(TAG, "declarationYear: " + searchFilters.getDeclarationYear());
-        Log.i(TAG, "startDate: " + startDate);
-        Log.i(TAG, "endDate: " + endDate);
-        Log.i(TAG, "page: " + searchFilters.getPage());
+        App.getFilters().setStartDate(startDate);
+        App.getFilters().setEndDate(endDate);
+
+//        Log.i(TAG, "query: " + App.getFilters().getQuery());
+//        Log.i(TAG, "userDeclarantId: " + App.getFilters().getUserDeclarantId());
+//        Log.i(TAG, "documentType: " + App.getFilters().getDocumentType());
+//        Log.i(TAG, "declarationType: " + App.getFilters().getDeclarationType());
+//        Log.i(TAG, "declarationYear: " + App.getFilters().getDeclarationYear());
+//        Log.i(TAG, "startDate: " + App.getFilters().getStartDate().toString());
+//        Log.i(TAG, "endDate: " + App.getFilters().getEndDate().toString());
+//        Log.i(TAG, "page: " + App.getFilters().getPage());
 
         Intent intent = new Intent();
-//        intent.putExtra(SearchFilters.EXTRA_QUERY, searchFilters.getQuery());
-//        intent.putExtra(SearchFilters.EXTRA_USER_DECLARANT_ID, searchFilters.getUserDeclarantId());
-//        intent.putExtra(SearchFilters.EXTRA_DOCUMENT_TYPE, searchFilters.getDocumentType());
-//        intent.putExtra(SearchFilters.EXTRA_DECLARATION_TYPE, searchFilters.getDeclarationType());
-//        intent.putExtra(SearchFilters.EXTRA_DECLARATION_YEAR, searchFilters.getDeclarationYear());
-//        intent.putExtra(SearchFilters.EXTRA_DT_START, startDate.toString());
-//        intent.putExtra(SearchFilters.EXTRA_DT_END, endDate.toString());
-//        intent.putExtra(SearchFilters.EXTRA_PAGE, searchFilters.getPage());
         setResult(RESULT_OK, intent);
         finish();
     }
