@@ -72,4 +72,25 @@ public class Item {
         this.date = date;
     }
 
+    //testing
+
+    public String getLastname() {
+        return data.getStep1().getData().getLastname();
+    }
+
+    public String getFirstname() {
+        return data.getStep1().getData().getFirstname();
+    }
+
+    public String getMiddlename() {
+        return data.getStep1().getData().getMiddlename();
+    }
+
+    public String getWorkPost() {
+        return data.getStep1().getData().getWorkPost();
+    }
+
+    public String getWorkPlace() {
+        return data.getStep1().getData().getWorkPlace();
+    }
 }

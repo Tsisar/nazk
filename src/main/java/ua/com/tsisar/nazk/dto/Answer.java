@@ -16,6 +16,9 @@ public class Answer {
     @SerializedName("notice")
     @Expose
     private String notice;
+    @SerializedName("error")
+    @Expose
+    private Integer error;
 
     public List<Item> getData() {
         return data;
@@ -41,4 +44,11 @@ public class Answer {
         this.notice = notice;
     }
 
+    public Integer getError() {
+        return error;
+    }
+
+    public void setError(Integer error) {
+        this.error = error;
+    }
 }

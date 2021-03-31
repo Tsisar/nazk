@@ -11,14 +11,18 @@ import android.view.MenuItem;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
 
-import java.util.Objects;
+import java.util.List;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 import ua.com.tsisar.nazk.App;
 import ua.com.tsisar.nazk.R;
+import ua.com.tsisar.nazk.api.JsonError;
 import ua.com.tsisar.nazk.dto.Answer;
+import ua.com.tsisar.nazk.dto.Item;
+import ua.com.tsisar.nazk.util.Date;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MyLog";
@@ -40,6 +44,10 @@ public class MainActivity extends AppCompatActivity {
 
     private static String nullify(String s){
         return s.isEmpty() ? null : s;
+    }
+
+    private static Long nullify(Date d){
+        return d.isClear() ? null : d.toLong();
     }
 
     private <V extends Number> V nullify(V  value){
@@ -78,12 +86,15 @@ public class MainActivity extends AppCompatActivity {
             public boolean onQueryTextSubmit(String query) {
                 searchView.clearFocus();
                 Log.i(TAG, "onQueryTextSubmit: " + query);
+                App.getFilters().setQuery(query);
+                searchDeclarations();
                 return true;
             }
 
             @Override
             public boolean onQueryTextChange(String newText) {
                 Log.i(TAG, "onQueryTextChange: " + newText);
+                App.getFilters().setQuery(newText);
                 return true;
             }
         });
@@ -141,18 +152,27 @@ public class MainActivity extends AppCompatActivity {
 //                int totalItems = answer.getPage().getTotalItems();
 //                searchResult.setText(String.format(getString(R.string.search_result), totalItems));
             }
-            Log.e(TAG, "Items: " + answer.getData());
+            //Log.e(TAG, "Items: " + answer.getData());
+            List<Item> items = answer.getData();
+            for(Item item : items){
+                Log.v(TAG, "Item: " + item.getLastname() + " "
+                        + item.getFirstname() + " "
+                        + item.getMiddlename() + " - "
+                        + item.getWorkPost() + " - "
+                        + item.getWorkPlace() + " - "
+                        + item.getId());
+            }
 //            recyclerAdapter = new RecyclerAdapter(this, answer.getItems());
 //            recyclerView.setAdapter(recyclerAdapter);
         }catch (Exception e){
             e.printStackTrace();
-            showMessage(e.getMessage());
-            Log.e(TAG, Objects.requireNonNull(e.getMessage()));
+            showMessage("onSearchDeclarationsSuccess Exception: " + e.getMessage());
+            showMessage("Error: " + JsonError.get(answer.getError()).getMessage());
         }
     }
 
     private void onFailure(Throwable throwable) {
-        showMessage(throwable.getMessage());
+        showMessage("onFailure: " + throwable.getMessage());
     }
 
     private void searchDeclarations(){
@@ -162,12 +182,22 @@ public class MainActivity extends AppCompatActivity {
                 nullify(App.getFilters().getDocumentType()),
                 nullify(App.getFilters().getDeclarationType()),
                 nullify(App.getFilters().getDeclarationYear()),
-                nullify(App.getFilters().getStartDate().toLong()),
-                nullify(App.getFilters().getEndDate().toLong()),
+                nullify(App.getFilters().getStartDate()),
+                nullify(App.getFilters().getEndDate()),
                 nullify(App.getFilters().getPage()))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(this::onSearchDeclarationsSuccess, this::onFailure));
+                .subscribe(new Consumer<Answer>() {
+                    @Override
+                    public void accept(Answer answer) throws Exception {
+                        MainActivity.this.onSearchDeclarationsSuccess(answer);
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Exception {
+                        MainActivity.this.onFailure(throwable);
+                    }
+                }));
     }
 
     private void showMessage(String message){

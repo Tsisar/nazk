@@ -3,6 +3,7 @@ package ua.com.tsisar.nazk.util;
 import android.annotation.SuppressLint;
 
 import java.util.Calendar;
+import java.util.concurrent.TimeUnit;
 
 public class Date implements Comparable <Date>{
     private static final String DATE_FORMAT = "%1$02d.%2$02d.%3$04d";
@@ -56,8 +57,17 @@ public class Date implements Comparable <Date>{
         return 0;
     }
 
-    public Long toLong(){
-        return 0L;
+    public Long toLong() {
+        long res = 0;
+        for(int y = 1970; y < year; y++){
+            res += Year.forYear(y).getDays();
+        }
+        for(int m = 0; m < month; m++){
+            res += Year.forYear(year).forMonth(m).getDays();
+        }
+        res += day - 1;
+
+        return TimeUnit.SECONDS.convert(res, TimeUnit.DAYS);
     }
 
     @Override

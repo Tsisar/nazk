@@ -173,6 +173,7 @@ public class SearchFiltersActivity extends AppCompatActivity {
         //dialog.getDatePicker().setMinDate(Calendar.getInstance().getTimeInMillis());
         // date now;
         dialog.getDatePicker().setMaxDate(Calendar.getInstance().getTimeInMillis());
+        dialog.setTitle("setStartDate");
         dialog.show();
     }
 
