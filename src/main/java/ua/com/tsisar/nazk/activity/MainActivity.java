@@ -7,9 +7,15 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.LinearLayout;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
+import androidx.appcompat.widget.Toolbar;
+
+import com.google.android.material.appbar.AppBarLayout;
+import com.google.android.material.appbar.CollapsingToolbarLayout;
 
 import java.util.List;
 
@@ -19,18 +25,21 @@ import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 import ua.com.tsisar.nazk.App;
 import ua.com.tsisar.nazk.R;
+import ua.com.tsisar.nazk.SearchFiltersView;
 import ua.com.tsisar.nazk.api.JsonError;
 import ua.com.tsisar.nazk.dto.Answer;
 import ua.com.tsisar.nazk.dto.Item;
 import ua.com.tsisar.nazk.util.Date;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements SearchFiltersView.Listener{
     private static final String TAG = "MyLog";
 
     private static final int REQUEST_CODE_FILTERS = 1;
     private SearchView searchView;
 
     private CompositeDisposable compositeDisposable;
+
+    LinearLayout linearLayout;
 
 //    @Nullable
 //    private static Long nullify(long l){
@@ -59,6 +68,33 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         compositeDisposable = new CompositeDisposable();
+
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+        CollapsingToolbarLayout toolBarLayout = findViewById(R.id.toolbar_layout);
+        toolBarLayout.setTitle(getTitle());
+
+        linearLayout = findViewById(R.id.linear_layout_search_filters);
+        drawFilters("Якась декларація", 1);
+        drawFilters("Якийьь тип", 2);
+        drawFilters("2021", 3);
+        drawFilters("Пошуковий запит", 4);
+
+        AppBarLayout appBarLayout = findViewById(R.id.app_bar);
+        appBarLayout.addOnOffsetChangedListener((appBarLayout1, verticalOffset) -> {
+            if (Math.abs(verticalOffset) == appBarLayout1.getTotalScrollRange()) {
+                // Collapsed
+                linearLayout.setVisibility(View.GONE);
+            } else if (verticalOffset == 0) {
+                // Expanded
+                linearLayout.setVisibility(View.VISIBLE);
+            } else {
+                // Somewhere in between
+            }
+        });
+
+
     }
 
 
@@ -73,7 +109,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.main_menu, menu);
+        getMenuInflater().inflate(R.menu.menu_toolbar, menu);
 
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
         searchView = (SearchView) menu.findItem(R.id.action_search).getActionView();
@@ -206,5 +242,17 @@ public class MainActivity extends AppCompatActivity {
 //                .withMessage(message)
 //                .withStyle(SnackBar.Style.ALERT)
 //                .show();
+    }
+
+    private void drawFilters(String itemName, int itemType){
+        linearLayout.addView(
+                new SearchFiltersView(this)
+                        .setItemName(itemName)
+                        .setItemType(itemType));
+    }
+
+    @Override
+    public void removeView(SearchFiltersView view) {
+        Log.e(TAG, "removeView: " + view.getItemType());
     }
 }
