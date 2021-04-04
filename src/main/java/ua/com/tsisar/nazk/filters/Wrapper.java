@@ -8,7 +8,13 @@ public class Wrapper<V> {
     }
 
     public void set(V value) {
-        this.value = value;
+        if(value instanceof Number && (Integer) value == 0) {
+            this.value = null;
+        }else if(value instanceof String && ((String) value).isEmpty()) {
+            this.value = null;
+        }else {
+            this.value = value;
+        }
     }
 
     public void clear(){

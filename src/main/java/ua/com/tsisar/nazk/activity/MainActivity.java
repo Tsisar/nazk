@@ -28,11 +28,9 @@ import ua.com.tsisar.nazk.SearchFiltersView;
 import ua.com.tsisar.nazk.api.JsonError;
 import ua.com.tsisar.nazk.dto.Answer;
 import ua.com.tsisar.nazk.dto.Item;
-import ua.com.tsisar.nazk.filters.DocumentType;
 import ua.com.tsisar.nazk.filters.Type;
-import ua.com.tsisar.nazk.util.Date;
 
-public class MainActivity extends AppCompatActivity implements SearchFiltersView.Listener{
+public class MainActivity extends AppCompatActivity implements SearchFiltersView.Listener {
     private static final String TAG = "MyLog";
 
     private static final int REQUEST_CODE_FILTERS = 1;
@@ -42,72 +40,18 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersView
 
     LinearLayout linearLayout;
 
-//    @Nullable
-//    private static Long nullify(long l){
-//        return l == 0 ? null : l;
-//    }
-//
-//    @Nullable
-//    private static Integer nullify(int i){
-//        return i == 0 ? null : i;
-//    }
-
-    private static String nullify(String s){
-        return s.isEmpty() ? null : s;
-    }
-
-    private static Long nullify(Date d){
-        return d.isClear() ? null : d.toLong();
-    }
-
-    private <V extends Number> V nullify(V  value){
-        return value.intValue() == 0 ? null : value;
-    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         compositeDisposable = new CompositeDisposable();
 
+        Log.i(TAG, "query: " + App.getFilters().query().get());
+        App.getFilters().query().clear();
+        Log.i(TAG, "query: " + App.getFilters().query().get());
+        App.getFilters().query().set("");
+        Log.i(TAG, "query: " + App.getFilters().query().get());
 
-        Log.i(TAG, "query: " + App.getTestFilters().query().get());
-        App.getTestFilters().query().set("Test String");
-        Log.i(TAG, "query: " + App.getTestFilters().query().get());
-        App.getTestFilters().query().clear();
-        Log.i(TAG, "query: " + App.getTestFilters().query().get());
-        Log.i(TAG, "query: " + App.getTestFilters().query().isClear());
-        App.getTestFilters().query().set("test2 string");
-        Log.i(TAG, "query: " + App.getTestFilters().query().get());
-
-        Log.i(TAG, "userDeclarantId: " + App.getTestFilters().userDeclarantId().get());
-        App.getTestFilters().userDeclarantId().set(123456789);
-        Log.i(TAG, "userDeclarantId: " + App.getTestFilters().userDeclarantId().get());
-        App.getTestFilters().userDeclarantId().clear();
-        Log.i(TAG, "userDeclarantId: " + App.getTestFilters().userDeclarantId().get());
-        Log.i(TAG, "userDeclarantId: " + App.getTestFilters().userDeclarantId().isClear());
-        App.getTestFilters().userDeclarantId().set(987654321);
-        Log.i(TAG, "userDeclarantId: " + App.getTestFilters().userDeclarantId().get());
-
-        Log.i(TAG, "documentType: " + App.getTestFilters().documentType().get());
-        App.getTestFilters().documentType().set(DocumentType.DOCUMENT_ALL);
-        Log.i(TAG, "documentType: " + App.getTestFilters().documentType().get());
-        App.getTestFilters().documentType().clear();
-        Log.i(TAG, "documentType: " + App.getTestFilters().documentType().get());
-        Log.i(TAG, "documentType: " + App.getTestFilters().documentType().isClear());
-        App.getTestFilters().documentType().set(DocumentType.DOCUMENT_DECLARATION);
-        Log.i(TAG, "documentType: " + App.getTestFilters().documentType().get());
-
-        Log.i(TAG, "startDate: " + App.getTestFilters().startDate());
-        Log.i(TAG, "startDate: " + App.getTestFilters().startDate().toLong());
-        App.getTestFilters().startDate().now();
-        Log.i(TAG, "startDate: " + App.getTestFilters().startDate());
-        App.getTestFilters().startDate().clear();
-        Log.i(TAG, "startDate: " + App.getTestFilters().startDate().toLong());
-        Log.i(TAG, "startDate: " + App.getTestFilters().startDate().isClear());
-        App.getTestFilters().startDate().set(2019, 1, 21);
-        Log.i(TAG, "startDate: " + App.getTestFilters().startDate());
-        Log.i(TAG, "startDate: " + App.getTestFilters().startDate().toLong());
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -158,15 +102,15 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersView
             public boolean onQueryTextSubmit(String query) {
                 searchView.clearFocus();
                 Log.i(TAG, "onQueryTextSubmit: " + query);
-                App.getFilters().setQuery(query);
-                searchDeclarations();
+                App.getFilters().query().set(query);
+                updateSearchFilters();
                 return true;
             }
 
             @Override
             public boolean onQueryTextChange(String newText) {
                 Log.i(TAG, "onQueryTextChange: " + newText);
-                App.getFilters().setQuery(newText);
+                App.getFilters().query().set(newText);
                 return true;
             }
         });
@@ -189,21 +133,17 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersView
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == RESULT_OK && requestCode == REQUEST_CODE_FILTERS) {
 
-            Log.i(TAG, "query: " + App.getFilters().getQuery());
-            Log.i(TAG, "userDeclarantId: " + App.getFilters().getUserDeclarantId());
-            Log.i(TAG, "documentType: " + App.getFilters().getDocumentType());
-            Log.i(TAG, "declarationType: " + App.getFilters().getDeclarationType());
-            Log.i(TAG, "declarationYear: " + App.getFilters().getDeclarationYear());
-            Log.i(TAG, "startDate: " + App.getFilters().getStartDate().toString());
-            Log.i(TAG, "endDate: " + App.getFilters().getEndDate().toString());
-            Log.i(TAG, "page: " + App.getFilters().getPage());
+            Log.i(TAG, "query: " + App.getFilters().query().get());
+            Log.i(TAG, "userDeclarantId: " + App.getFilters().userDeclarantId().get());
+            Log.i(TAG, "documentType: " + App.getFilters().documentType().get());
+            Log.i(TAG, "declarationType: " + App.getFilters().declarationType().get());
+            Log.i(TAG, "declarationYear: " + App.getFilters().declarationYear().get());
+            Log.i(TAG, "startDate: " + App.getFilters().startDate().toLong());
+            Log.i(TAG, "endDate: " + App.getFilters().endDate().toLong());
+            Log.i(TAG, "page: " + App.getFilters().page().get());
 
-            if(App.getFilters().getQuery() != null && !App.getFilters().getQuery().isEmpty()) {
-                searchView.post(() -> searchView.setQuery(App.getFilters().getQuery(), false));
-            }
-
-            //TODO тимчасово
-            searchDeclarations();
+            searchView.post(() -> searchView.setQuery(App.getFilters().query().get(), false));
+            updateSearchFilters();
         }
     }
 
@@ -249,29 +189,19 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersView
 
     private void searchDeclarations(){
         compositeDisposable.add(App.getApi().searchDeclarations(
-                nullify(App.getFilters().getQuery()),
-                nullify(App.getFilters().getUserDeclarantId()),
-                nullify(App.getFilters().getDocumentType()),
-                nullify(App.getFilters().getDeclarationType()),
-                nullify(App.getFilters().getDeclarationYear()),
-                nullify(App.getFilters().getStartDate()),
-                nullify(App.getFilters().getEndDate()),
-                nullify(App.getFilters().getPage()))
+                App.getFilters().query().get(),
+                App.getFilters().userDeclarantId().get(),
+                App.getFilters().documentType().get(),
+                App.getFilters().declarationType().get(),
+                App.getFilters().declarationYear().get(),
+                App.getFilters().startDate().toLong(),
+                App.getFilters().endDate().toLong(),
+                App.getFilters().page().get())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(MainActivity.this::onSearchDeclarationsSuccess,
                         MainActivity.this::onFailure));
 
-        if(!App.getTestFilters().query().isClear()){
-            addView(App.getTestFilters().query().get(), Type.QUERY);
-        }
-        if(!App.getTestFilters().documentType().isClear()){
-            addView(
-                    getResources().getStringArray(
-                            R.array.array_document_type)[
-                                    App.getTestFilters().documentType().get()],
-                    Type.DOCUMENT_TYPE);
-        }
     }
 
     private void showMessage(String message){
@@ -294,30 +224,58 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersView
         Log.e(TAG, "removeView: " + view.getFilterType());
         switch (view.getFilterType()){
             case QUERY:
-                App.getTestFilters().query().clear();
+                App.getFilters().query().clear();
+                searchView.post(() -> searchView.setQuery(null, false));
                 break;
             case USER_DECLARANT_ID:
-                App.getTestFilters().userDeclarantId().clear();
+                App.getFilters().userDeclarantId().clear();
                 break;
             case DOCUMENT_TYPE:
-                App.getTestFilters().documentType().clear();
+                App.getFilters().documentType().clear();
                 break;
             case DECLARATION_TYPE:
-                App.getTestFilters().declarationType().clear();
+                App.getFilters().declarationType().clear();
                 break;
             case DECLARATION_YEAR:
-                App.getTestFilters().declarationYear().clear();
+                App.getFilters().declarationYear().clear();
                 break;
             case START_DATE:
-                App.getTestFilters().startDate().clear();
+                App.getFilters().startDate().clear();
                 break;
             case END_DATE:
-                App.getTestFilters().endDate().clear();
+                App.getFilters().endDate().clear();
                 break;
             case PAGE:
-                App.getTestFilters().page().clear();
+                App.getFilters().page().clear();
                 break;
         }
         linearLayout.removeView(view);
+        searchDeclarations();
+    }
+
+    public void updateSearchFilters() {
+        linearLayout.removeAllViews();
+        if(!App.getFilters().query().isClear()){
+            addView(App.getFilters().query().get(), Type.QUERY);
+        }
+        if(!App.getFilters().documentType().isClear()){
+            addView(getResources().getStringArray(R.array.array_document_type)
+                            [App.getFilters().documentType().get()], Type.DOCUMENT_TYPE);
+        }
+        if(!App.getFilters().declarationType().isClear()){
+            addView(getResources().getStringArray(R.array.array_declaration_type)
+                            [App.getFilters().declarationType().get()], Type.DECLARATION_TYPE);
+        }
+        if(!App.getFilters().declarationYear().isClear()){
+            addView(App.getFilters().declarationYear().get().toString(), Type.DECLARATION_YEAR);
+        }
+        //TODO Обєднати в діапазон
+        if(!App.getFilters().startDate().isClear()){
+            addView(App.getFilters().startDate().toString(), Type.START_DATE);
+        }
+        if(!App.getFilters().endDate().isClear()){
+            addView(App.getFilters().endDate().toString(), Type.END_DATE);
+        }
+        searchDeclarations();
     }
 }

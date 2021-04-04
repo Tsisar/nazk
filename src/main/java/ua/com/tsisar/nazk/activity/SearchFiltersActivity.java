@@ -21,7 +21,8 @@ import java.util.Calendar;
 
 import ua.com.tsisar.nazk.App;
 import ua.com.tsisar.nazk.R;
-import ua.com.tsisar.nazk.filters.SearchFilters;
+import ua.com.tsisar.nazk.filters.DeclarationType;
+import ua.com.tsisar.nazk.filters.DocumentType;
 import ua.com.tsisar.nazk.util.Date;
 
 public class SearchFiltersActivity extends AppCompatActivity {
@@ -73,13 +74,15 @@ public class SearchFiltersActivity extends AppCompatActivity {
 
     private void initEditTextQuery(){
         editTextQuery = findViewById(R.id.edit_text_query);
-        editTextQuery.setText(App.getFilters().getQuery());
+        if(!App.getFilters().query().isClear()) {
+            editTextQuery.setText(App.getFilters().query().get());
+        }
     }
 
     private void initEditTextYear(){
         editTextYear = findViewById(R.id.edit_text_year);
-        if(App.getFilters().getDeclarationYear() > 0) {
-            editTextYear.setText(String.valueOf(App.getFilters().getDeclarationYear()));
+        if(!App.getFilters().declarationYear().isClear()) {
+            editTextYear.setText(String.valueOf(App.getFilters().declarationYear().get()));
         }
         editTextYear.setFilters(new InputFilter[]{new InputFilter.LengthFilter(4)});
         editTextYear.addTextChangedListener(new TextWatcher() {
@@ -123,30 +126,38 @@ public class SearchFiltersActivity extends AppCompatActivity {
 
     private void initSpinnerDocumentType(){
         Spinner spinner = initSpinner(R.id.spinner_document_type, R.array.array_document_type);
-        spinner.setSelection(App.getFilters().getDocumentType());
+        if(App.getFilters().documentType().isClear()){
+            spinner.setSelection(DocumentType.DOCUMENT_ALL);
+        }else {
+            spinner.setSelection(App.getFilters().documentType().get());
+        }
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                App.getFilters().setDocumentType(position);
+                App.getFilters().documentType().set(position);
             }
             @Override
             public void onNothingSelected(AdapterView<?> arg0) {
-                App.getFilters().setDocumentType(SearchFilters.DOCUMENT_ALL);
+                App.getFilters().documentType().set(DocumentType.DOCUMENT_ALL);
             }
         });
     }
 
     private void initSpinnerDeclarationType(){
         Spinner spinner = initSpinner(R.id.spinner_declaration_type, R.array.array_declaration_type);
-        spinner.setSelection(App.getFilters().getDeclarationType());
+        if(App.getFilters().declarationType().isClear()){
+            spinner.setSelection(DeclarationType.DECLARATION_ALL);
+        }else {
+            spinner.setSelection(App.getFilters().declarationType().get());
+        }
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                App.getFilters().setDeclarationType(position);
+                App.getFilters().declarationType().set(position);
             }
             @Override
             public void onNothingSelected(AdapterView<?> arg0) {
-                App.getFilters().setDeclarationType(SearchFilters.DECLARATION_ALL);
+                App.getFilters().declarationType().set(DeclarationType.DECLARATION_ALL);
             }
         });
     }
@@ -193,10 +204,10 @@ public class SearchFiltersActivity extends AppCompatActivity {
     }
 
     public void onFindClick(View view) {
-        checkEditTextYear();
+        App.getFilters().query().set(editTextQuery.getText().toString());
 
-        App.getFilters().setQuery(editTextQuery.getText().toString());
-        App.getFilters().setDeclarationYear(tryParse(editTextYear.getText().toString()));
+        checkEditTextYear();
+        App.getFilters().declarationYear().set(tryParse(editTextYear.getText().toString()));
 
         if(startDate.isClear() && !endDate.isClear())
             startDate.set(2016,7,1);
@@ -214,8 +225,8 @@ public class SearchFiltersActivity extends AppCompatActivity {
             endDate.now();
         }
 
-        App.getFilters().setStartDate(startDate);
-        App.getFilters().setEndDate(endDate);
+        App.getFilters().startDate().set(startDate);
+        App.getFilters().endDate().set(endDate);
 
 //        Log.i(TAG, "query: " + App.getFilters().getQuery());
 //        Log.i(TAG, "userDeclarantId: " + App.getFilters().getUserDeclarantId());
