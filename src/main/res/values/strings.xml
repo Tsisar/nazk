@@ -14,6 +14,14 @@
     <string name="date_format">%1$04d-%2$02d-%3$02d</string>
     <string name="refresh_finished">Знайдено %1$d документів</string>
 
+    <string-array name="array_document_type">
+        <item>Всі</item>
+        <item>Декларація</item>
+        <item>Повідомлення про суттєві зміни в майновому стані</item>
+        <item>Виправлена декларація</item>
+        <item>Виправлене повідомлення про суттєві зміни в майновому стані</item>
+    </string-array>
+
     <string-array name="array_declaration_type">
         <item>Всі</item>
         <item>Щорічна</item>
@@ -22,13 +30,6 @@
         <item>Кандидата на посаду</item>
     </string-array>
 
-    <string-array name="array_document_type">
-        <item>Всі</item>
-        <item>Декларація</item>
-        <item>Повідомлення про суттєві зміни в майновому стані</item>
-        <item>Виправлена декларація</item>
-        <item>Виправлене повідомлення про суттєві зміни в майновому стані</item>
-    </string-array>
     <string name="title_activity_scrolling">ScrollingActivity</string>
     <string name="large_text">
         "Material is the metaphor.\n\n"

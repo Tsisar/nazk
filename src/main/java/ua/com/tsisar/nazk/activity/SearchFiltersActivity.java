@@ -21,7 +21,7 @@ import java.util.Calendar;
 
 import ua.com.tsisar.nazk.App;
 import ua.com.tsisar.nazk.R;
-import ua.com.tsisar.nazk.search.SearchFilters;
+import ua.com.tsisar.nazk.filters.SearchFilters;
 import ua.com.tsisar.nazk.util.Date;
 
 public class SearchFiltersActivity extends AppCompatActivity {
@@ -179,6 +179,7 @@ public class SearchFiltersActivity extends AppCompatActivity {
 
     public void setEndDate(View view){
         Date date = endDate.isClear() ? new Date().now() : new Date().set(endDate);
+
         DatePickerDialog dialog = new DatePickerDialog(this, new DatePickerDialog.OnDateSetListener() {
             @Override
             public void onDateSet(DatePicker datePicker, int year, int month, int day) {

@@ -7,11 +7,13 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import ua.com.tsisar.nazk.filters.Type;
+
 public class SearchFiltersView extends LinearLayout implements View.OnClickListener{
 
     private Listener listener;
     private TextView itemName;
-    private int itemType;
+    private Type filterType;
 
     public interface Listener {
         void removeView(SearchFiltersView view);
@@ -54,13 +56,13 @@ public class SearchFiltersView extends LinearLayout implements View.OnClickListe
         return this;
     }
 
-    public SearchFiltersView setItemType(int type) {
-        itemType = type;
+    public SearchFiltersView setFilterType(Type type) {
+        filterType = type;
         return this;
     }
 
-    public int getItemType() {
-        return itemType;
+    public Type getFilterType() {
+        return filterType;
     }
 
     @Override

@@ -1,8 +1,8 @@
-package ua.com.tsisar.nazk.util;
+package ua.com.tsisar.nazk.util.date;
 
-public enum MonthLeap implements Month {
+public enum MonthTypical implements Month {
     JANUARY(31),
-    FEBRUARY(29),
+    FEBRUARY(28),
     MARCH(31),
     APRIL(30),
     MAY(31),
@@ -15,7 +15,7 @@ public enum MonthLeap implements Month {
     DECEMBER(31);
     private final int days;
 
-    MonthLeap(int days) {
+    MonthTypical(int days) {
         this.days = days;
     }
 
@@ -23,7 +23,7 @@ public enum MonthLeap implements Month {
         return days;
     }
 
-    public static MonthLeap forMonth(int month) {
-        return MonthLeap.values()[month];
+    public static MonthTypical forMonth(int month) {
+        return MonthTypical.values()[month];
     }
 }

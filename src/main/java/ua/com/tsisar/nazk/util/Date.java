@@ -5,6 +5,8 @@ import android.annotation.SuppressLint;
 import java.util.Calendar;
 import java.util.concurrent.TimeUnit;
 
+import ua.com.tsisar.nazk.util.date.Year;
+
 public class Date implements Comparable <Date>{
     private static final String DATE_FORMAT = "%1$02d.%2$02d.%3$04d";
     private int year;
@@ -30,10 +32,16 @@ public class Date implements Comparable <Date>{
 
     public Date now() {
         Calendar c = Calendar.getInstance();
-        this.year = c.get(Calendar.YEAR);;
-        this.month = c.get(Calendar.MONTH);;
-        this.day = c.get(Calendar.DATE);;
+        this.year = c.get(Calendar.YEAR);
+        this.month = c.get(Calendar.MONTH);
+        this.day = c.get(Calendar.DATE);
         return this;
+    }
+
+    public void clear(){
+        this.year = 0;
+        this.month = 0;
+        this.day = 0;
     }
 
     public Integer getYear() {
@@ -59,6 +67,10 @@ public class Date implements Comparable <Date>{
 
     public Long toLong() {
         long res = 0;
+
+        if(isClear()){
+            return null;
+        }
         for(int y = 1970; y < year; y++){
             res += Year.forYear(y).getDays();
         }

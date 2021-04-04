@@ -1,4 +1,4 @@
-package ua.com.tsisar.nazk.search;
+package ua.com.tsisar.nazk.filters;
 
 import androidx.annotation.IntDef;
 import java.lang.annotation.Retention;

@@ -21,7 +21,6 @@ import java.util.List;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 import ua.com.tsisar.nazk.App;
 import ua.com.tsisar.nazk.R;
@@ -29,6 +28,8 @@ import ua.com.tsisar.nazk.SearchFiltersView;
 import ua.com.tsisar.nazk.api.JsonError;
 import ua.com.tsisar.nazk.dto.Answer;
 import ua.com.tsisar.nazk.dto.Item;
+import ua.com.tsisar.nazk.filters.DocumentType;
+import ua.com.tsisar.nazk.filters.Type;
 import ua.com.tsisar.nazk.util.Date;
 
 public class MainActivity extends AppCompatActivity implements SearchFiltersView.Listener{
@@ -69,6 +70,45 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersView
         setContentView(R.layout.activity_main);
         compositeDisposable = new CompositeDisposable();
 
+
+        Log.i(TAG, "query: " + App.getTestFilters().query().get());
+        App.getTestFilters().query().set("Test String");
+        Log.i(TAG, "query: " + App.getTestFilters().query().get());
+        App.getTestFilters().query().clear();
+        Log.i(TAG, "query: " + App.getTestFilters().query().get());
+        Log.i(TAG, "query: " + App.getTestFilters().query().isClear());
+        App.getTestFilters().query().set("test2 string");
+        Log.i(TAG, "query: " + App.getTestFilters().query().get());
+
+        Log.i(TAG, "userDeclarantId: " + App.getTestFilters().userDeclarantId().get());
+        App.getTestFilters().userDeclarantId().set(123456789);
+        Log.i(TAG, "userDeclarantId: " + App.getTestFilters().userDeclarantId().get());
+        App.getTestFilters().userDeclarantId().clear();
+        Log.i(TAG, "userDeclarantId: " + App.getTestFilters().userDeclarantId().get());
+        Log.i(TAG, "userDeclarantId: " + App.getTestFilters().userDeclarantId().isClear());
+        App.getTestFilters().userDeclarantId().set(987654321);
+        Log.i(TAG, "userDeclarantId: " + App.getTestFilters().userDeclarantId().get());
+
+        Log.i(TAG, "documentType: " + App.getTestFilters().documentType().get());
+        App.getTestFilters().documentType().set(DocumentType.DOCUMENT_ALL);
+        Log.i(TAG, "documentType: " + App.getTestFilters().documentType().get());
+        App.getTestFilters().documentType().clear();
+        Log.i(TAG, "documentType: " + App.getTestFilters().documentType().get());
+        Log.i(TAG, "documentType: " + App.getTestFilters().documentType().isClear());
+        App.getTestFilters().documentType().set(DocumentType.DOCUMENT_DECLARATION);
+        Log.i(TAG, "documentType: " + App.getTestFilters().documentType().get());
+
+        Log.i(TAG, "startDate: " + App.getTestFilters().startDate());
+        Log.i(TAG, "startDate: " + App.getTestFilters().startDate().toLong());
+        App.getTestFilters().startDate().now();
+        Log.i(TAG, "startDate: " + App.getTestFilters().startDate());
+        App.getTestFilters().startDate().clear();
+        Log.i(TAG, "startDate: " + App.getTestFilters().startDate().toLong());
+        Log.i(TAG, "startDate: " + App.getTestFilters().startDate().isClear());
+        App.getTestFilters().startDate().set(2019, 1, 21);
+        Log.i(TAG, "startDate: " + App.getTestFilters().startDate());
+        Log.i(TAG, "startDate: " + App.getTestFilters().startDate().toLong());
+
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -76,10 +116,6 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersView
         toolBarLayout.setTitle(getTitle());
 
         linearLayout = findViewById(R.id.linear_layout_search_filters);
-        drawFilters("Якась декларація", 1);
-        drawFilters("Якийьь тип", 2);
-        drawFilters("2021", 3);
-        drawFilters("Пошуковий запит", 4);
 
         AppBarLayout appBarLayout = findViewById(R.id.app_bar);
         appBarLayout.addOnOffsetChangedListener((appBarLayout1, verticalOffset) -> {
@@ -223,17 +259,19 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersView
                 nullify(App.getFilters().getPage()))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<Answer>() {
-                    @Override
-                    public void accept(Answer answer) throws Exception {
-                        MainActivity.this.onSearchDeclarationsSuccess(answer);
-                    }
-                }, new Consumer<Throwable>() {
-                    @Override
-                    public void accept(Throwable throwable) throws Exception {
-                        MainActivity.this.onFailure(throwable);
-                    }
-                }));
+                .subscribe(MainActivity.this::onSearchDeclarationsSuccess,
+                        MainActivity.this::onFailure));
+
+        if(!App.getTestFilters().query().isClear()){
+            addView(App.getTestFilters().query().get(), Type.QUERY);
+        }
+        if(!App.getTestFilters().documentType().isClear()){
+            addView(
+                    getResources().getStringArray(
+                            R.array.array_document_type)[
+                                    App.getTestFilters().documentType().get()],
+                    Type.DOCUMENT_TYPE);
+        }
     }
 
     private void showMessage(String message){
@@ -244,15 +282,42 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersView
 //                .show();
     }
 
-    private void drawFilters(String itemName, int itemType){
+    private void addView(String name, Type type){
         linearLayout.addView(
                 new SearchFiltersView(this)
-                        .setItemName(itemName)
-                        .setItemType(itemType));
+                        .setItemName(name)
+                        .setFilterType(type));
     }
 
     @Override
     public void removeView(SearchFiltersView view) {
-        Log.e(TAG, "removeView: " + view.getItemType());
+        Log.e(TAG, "removeView: " + view.getFilterType());
+        switch (view.getFilterType()){
+            case QUERY:
+                App.getTestFilters().query().clear();
+                break;
+            case USER_DECLARANT_ID:
+                App.getTestFilters().userDeclarantId().clear();
+                break;
+            case DOCUMENT_TYPE:
+                App.getTestFilters().documentType().clear();
+                break;
+            case DECLARATION_TYPE:
+                App.getTestFilters().declarationType().clear();
+                break;
+            case DECLARATION_YEAR:
+                App.getTestFilters().declarationYear().clear();
+                break;
+            case START_DATE:
+                App.getTestFilters().startDate().clear();
+                break;
+            case END_DATE:
+                App.getTestFilters().endDate().clear();
+                break;
+            case PAGE:
+                App.getTestFilters().page().clear();
+                break;
+        }
+        linearLayout.removeView(view);
     }
 }

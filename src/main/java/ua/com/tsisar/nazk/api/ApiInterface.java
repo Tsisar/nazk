@@ -7,6 +7,7 @@ import retrofit2.http.GET;
 import retrofit2.http.Headers;
 import retrofit2.http.Query;
 import ua.com.tsisar.nazk.dto.Answer;
+import ua.com.tsisar.nazk.filters.SearchFilters;
 
 public interface ApiInterface {
     String QUERY = "query";
@@ -57,8 +58,8 @@ public interface ApiInterface {
     @GET("list")
     Single<Answer> searchDeclarations(@Query(QUERY) String query,
                                       @Query(USER_DECLARANT_ID) Integer userDeclarantId,
-                                      @Query(DOCUMENT_TYPE) Integer documentType,
-                                      @Query(DECLARATION_TYPE) Integer declarationType,
+                                      @Query(DOCUMENT_TYPE) @SearchFilters.Document Integer documentType,
+                                      @Query(DECLARATION_TYPE) @SearchFilters.Declaration Integer declarationType,
                                       @Query(DECLARATION_YEAR) Integer declarationYear,
                                       @Query(START_DATE) Long startDate,
                                       @Query(END_DATE) Long endDate,

@@ -1,4 +1,4 @@
-package ua.com.tsisar.nazk.util;
+package ua.com.tsisar.nazk.util.date;
 
 public enum Year {
     TYPICAL (365),
