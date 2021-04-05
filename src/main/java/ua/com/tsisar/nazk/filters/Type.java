@@ -6,7 +6,6 @@ public enum Type {
     DOCUMENT_TYPE,
     DECLARATION_TYPE,
     DECLARATION_YEAR,
-    START_DATE,
-    END_DATE,
+    PERIOD,
     PAGE;
 }

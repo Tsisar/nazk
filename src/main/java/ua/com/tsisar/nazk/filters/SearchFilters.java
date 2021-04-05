@@ -1,7 +1,5 @@
 package ua.com.tsisar.nazk.filters;
 
-import ua.com.tsisar.nazk.util.Date;
-
 public class SearchFilters {
 
     private final Wrapper<String> query = new Wrapper<>();
@@ -9,8 +7,7 @@ public class SearchFilters {
     private final DocumentType documentType = new DocumentType();
     private final DeclarationType declarationType = new DeclarationType();
     private final Wrapper<Integer> declarationYear = new Wrapper<>();
-    private final Date startDate = new Date();
-    private final Date endDate = new Date();
+    private final Period period = new Period();
     private final Wrapper<Integer> page = new Wrapper<>();
 
     public Wrapper<String> query() {
@@ -33,12 +30,8 @@ public class SearchFilters {
         return declarationYear;
     }
 
-    public Date startDate() {
-        return startDate;
-    }
-
-    public Date endDate() {
-        return endDate;
+    public Period period(){
+        return period;
     }
 
     public Wrapper<Integer> page() {

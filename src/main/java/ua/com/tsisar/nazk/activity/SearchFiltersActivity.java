@@ -9,15 +9,12 @@ import android.text.TextWatcher;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
-
-import java.util.Calendar;
 
 import ua.com.tsisar.nazk.App;
 import ua.com.tsisar.nazk.R;
@@ -30,11 +27,7 @@ public class SearchFiltersActivity extends AppCompatActivity {
 
     private EditText editTextQuery;
     private EditText editTextYear;
-
-    private Button buttonStartDate;
-    private Button buttonEndDate;
-
-//    private SearchFilters searchFilters;
+    private TextView textViewPeriod;
 
     private Date startDate;
     private Date endDate;
@@ -52,8 +45,8 @@ public class SearchFiltersActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search_filters);
 
-        startDate = new Date();
-        endDate = new Date();
+        startDate = new Date().set(App.getFilters().period().startDate());
+        endDate = new Date().set(App.getFilters().period().endDate());
 
         initEditTextQuery();
         initEditTextYear();
@@ -61,14 +54,10 @@ public class SearchFiltersActivity extends AppCompatActivity {
         initSpinnerDocumentType();
         initSpinnerDeclarationType();
 
-        buttonStartDate = findViewById(R.id.button_start_date);
-        if(!startDate.isClear()){
-            buttonStartDate.setText(startDate.toString());
-        }
-
-        buttonEndDate = findViewById(R.id.button_end_date);
-        if(!endDate.isClear()){
-            buttonEndDate.setText(endDate.toString());
+        textViewPeriod = findViewById(R.id.text_view_period);
+        if(!startDate.isClear() && !endDate.isClear()){
+            textViewPeriod.setText(String.format(getString(R.string.split_period),
+                    startDate.toString(), endDate.toString()));
         }
     }
 
@@ -97,14 +86,17 @@ public class SearchFiltersActivity extends AppCompatActivity {
             @Override
             public void afterTextChanged(Editable editable) {
                 int length = editable.toString().length();
+
                 if(length != 0) {
-                    Integer year = new Date().now().getYear();
-                    int a = tryParse("2015".substring(0, length));
+                    int year = new Date().now().getYear();
+
+                    int a = 2015/(int)Math.pow(10, 4-length);
                     int b = tryParse(editable.toString());
-                    int c = tryParse(year.toString().substring(0, length));
+                    int c = year/(int)Math.pow(10, 4-length);
 
                     if(a > b || b > c){
                         editable.delete(length-1, length);
+                        //TODO переробити на нормальний меседж
                         Toast.makeText(getApplicationContext(),"2015 - " + year, Toast.LENGTH_SHORT).show();
                     }
                 }
@@ -172,34 +164,40 @@ public class SearchFiltersActivity extends AppCompatActivity {
         return spinner;
     }
 
-    //TODO Період публікації зробити двома діалогами в любому випадку відкривати спочатку "З" потім "ПО". В разі не встановлення дати в якомусь діалозі - дату залишати пустою.
-    // dialog.getDatePicker().setMaxDate(new Date().getTime());
     public void setStartDate(View view){
         Date date = startDate.isClear() ? new Date().now() : new Date().set(startDate);
 
         DatePickerDialog dialog = new DatePickerDialog(this, (datePicker, year, month, day) -> {
-            buttonStartDate.setText(startDate.set(year, month, day).toString());
+            startDate.set(year, month, day);
+            setEndDate(view);
         }, date.getYear(), date.getMonth(), date.getDay());
-        // 01.08.2016
-        //dialog.getDatePicker().setMinDate(Calendar.getInstance().getTimeInMillis());
-        // date now;
-        dialog.getDatePicker().setMaxDate(Calendar.getInstance().getTimeInMillis());
-        dialog.setTitle("setStartDate");
+        dialog.setOnCancelListener(dialog12 -> {
+            startDate.clear();
+            endDate.clear();
+            textViewPeriod.setText(R.string.button_period);
+        });
+        dialog.getDatePicker().setMinDate(new Date().set(2016,7,1).toMillis());
+        dialog.getDatePicker().setMaxDate(new Date().now().toMillis());
+        dialog.setTitle(R.string.dialog_title_start_date);
         dialog.show();
     }
 
     public void setEndDate(View view){
         Date date = endDate.isClear() ? new Date().now() : new Date().set(endDate);
 
-        DatePickerDialog dialog = new DatePickerDialog(this, new DatePickerDialog.OnDateSetListener() {
-            @Override
-            public void onDateSet(DatePicker datePicker, int year, int month, int day) {
-                buttonEndDate.setText(endDate.set(year, month, day).toString());
-            }
+        DatePickerDialog dialog = new DatePickerDialog(this, (datePicker, year, month, day) -> {
+            endDate.set(year, month, day);
+            textViewPeriod.setText(String.format(getString(R.string.split_period),
+                    startDate.toString(), endDate.toString()));
         }, date.getYear(), date.getMonth(), date.getDay());
-        // setStartDate.toLong
-        //dialog.getDatePicker().setMinDate(Calendar.getInstance().getTimeInMillis());
-        dialog.getDatePicker().setMaxDate(Calendar.getInstance().getTimeInMillis());
+        dialog.setOnCancelListener(dialog12 -> {
+            startDate.clear();
+            endDate.clear();
+            textViewPeriod.setText(R.string.button_period);
+        });
+        dialog.getDatePicker().setMinDate(startDate.toMillis());
+        dialog.getDatePicker().setMaxDate(new Date().now().toMillis());
+        dialog.setTitle(R.string.dialog_title_end_date);
         dialog.show();
     }
 
@@ -209,24 +207,24 @@ public class SearchFiltersActivity extends AppCompatActivity {
         checkEditTextYear();
         App.getFilters().declarationYear().set(tryParse(editTextYear.getText().toString()));
 
-        if(startDate.isClear() && !endDate.isClear())
-            startDate.set(2016,7,1);
-        if(!startDate.isClear() && endDate.isClear())
-            endDate.now();
+//        if(startDate.isClear() && !endDate.isClear())
+//            startDate.set(2016,7,1);
+//        if(!startDate.isClear() && endDate.isClear())
+//            endDate.now();
+//
+//        //if startDate > endDate reverse it
+//        if(startDate.compareTo(endDate) > 0){
+//            Date tmp = new Date().set(endDate);
+//            endDate.set(startDate);
+//            startDate.set(tmp);
+//        }
+//
+//        if(endDate.compareTo(new Date().now()) > 0){
+//            endDate.now();
+//        }
 
-        //if startDate > endDate reverse it
-        if(startDate.compareTo(endDate) > 0){
-            Date tmp = new Date().set(endDate);
-            endDate.set(startDate);
-            startDate.set(tmp);
-        }
-
-        if(endDate.compareTo(new Date().now()) > 0){
-            endDate.now();
-        }
-
-        App.getFilters().startDate().set(startDate);
-        App.getFilters().endDate().set(endDate);
+        App.getFilters().period().startDate().set(startDate);
+        App.getFilters().period().endDate().set(endDate);
 
 //        Log.i(TAG, "query: " + App.getFilters().getQuery());
 //        Log.i(TAG, "userDeclarantId: " + App.getFilters().getUserDeclarantId());

@@ -9,6 +9,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
@@ -103,7 +104,7 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersView
                 searchView.clearFocus();
                 Log.i(TAG, "onQueryTextSubmit: " + query);
                 App.getFilters().query().set(query);
-                updateSearchFilters();
+                searchDeclarations();
                 return true;
             }
 
@@ -138,8 +139,8 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersView
             Log.i(TAG, "documentType: " + App.getFilters().documentType().get());
             Log.i(TAG, "declarationType: " + App.getFilters().declarationType().get());
             Log.i(TAG, "declarationYear: " + App.getFilters().declarationYear().get());
-            Log.i(TAG, "startDate: " + App.getFilters().startDate().toLong());
-            Log.i(TAG, "endDate: " + App.getFilters().endDate().toLong());
+            Log.i(TAG, "startDate: " + App.getFilters().period().startDate().toSeconds());
+            Log.i(TAG, "endDate: " + App.getFilters().period().endDate().toSeconds());
             Log.i(TAG, "page: " + App.getFilters().page().get());
 
             searchView.post(() -> searchView.setQuery(App.getFilters().query().get(), false));
@@ -178,7 +179,7 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersView
 //            recyclerView.setAdapter(recyclerAdapter);
         }catch (Exception e){
             e.printStackTrace();
-            showMessage("onSearchDeclarationsSuccess Exception: " + e.getMessage());
+//            showMessage("onSearchDeclarationsSuccess Exception: " + e.getMessage());
             showMessage("Error: " + JsonError.get(answer.getError()).getMessage());
         }
     }
@@ -194,8 +195,8 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersView
                 App.getFilters().documentType().get(),
                 App.getFilters().declarationType().get(),
                 App.getFilters().declarationYear().get(),
-                App.getFilters().startDate().toLong(),
-                App.getFilters().endDate().toLong(),
+                App.getFilters().period().startDate().toLong(),
+                App.getFilters().period().endDate().toLong(),
                 App.getFilters().page().get())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -206,6 +207,7 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersView
 
     private void showMessage(String message){
         Log.e(TAG, "Message: " + message);
+        Toast.makeText(getApplicationContext(),"Message: " + message, Toast.LENGTH_LONG).show();
 //        new SnackBar.Builder(this)
 //                .withMessage(message)
 //                .withStyle(SnackBar.Style.ALERT)
@@ -223,10 +225,10 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersView
     public void removeView(SearchFiltersView view) {
         Log.e(TAG, "removeView: " + view.getFilterType());
         switch (view.getFilterType()){
-            case QUERY:
-                App.getFilters().query().clear();
-                searchView.post(() -> searchView.setQuery(null, false));
-                break;
+//            case QUERY:
+//                App.getFilters().query().clear();
+//                searchView.post(() -> searchView.setQuery(null, false));
+//                break;
             case USER_DECLARANT_ID:
                 App.getFilters().userDeclarantId().clear();
                 break;
@@ -239,11 +241,8 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersView
             case DECLARATION_YEAR:
                 App.getFilters().declarationYear().clear();
                 break;
-            case START_DATE:
-                App.getFilters().startDate().clear();
-                break;
-            case END_DATE:
-                App.getFilters().endDate().clear();
+            case PERIOD:
+                App.getFilters().period().clear();
                 break;
             case PAGE:
                 App.getFilters().page().clear();
@@ -255,26 +254,27 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersView
 
     public void updateSearchFilters() {
         linearLayout.removeAllViews();
-        if(!App.getFilters().query().isClear()){
-            addView(App.getFilters().query().get(), Type.QUERY);
-        }
+//        if(!App.getFilters().query().isClear()){
+//            addView(App.getFilters().query().get(), Type.QUERY);
+//        }
         if(!App.getFilters().documentType().isClear()){
-            addView(getResources().getStringArray(R.array.array_document_type)
-                            [App.getFilters().documentType().get()], Type.DOCUMENT_TYPE);
+            addView(String.format(getString(R.string.filter_document_type), getResources().
+                    getStringArray(R.array.array_document_type)
+                            [App.getFilters().documentType().get()]), Type.DOCUMENT_TYPE);
         }
         if(!App.getFilters().declarationType().isClear()){
-            addView(getResources().getStringArray(R.array.array_declaration_type)
-                            [App.getFilters().declarationType().get()], Type.DECLARATION_TYPE);
+            addView(String.format(getString(R.string.filter_declaration_type), getResources().
+                    getStringArray(R.array.array_declaration_type)
+                            [App.getFilters().declarationType().get()]), Type.DECLARATION_TYPE);
         }
         if(!App.getFilters().declarationYear().isClear()){
-            addView(App.getFilters().declarationYear().get().toString(), Type.DECLARATION_YEAR);
+            addView(String.format(getString(R.string.filter_year),
+                    App.getFilters().declarationYear().get().toString()), Type.DECLARATION_YEAR);
         }
-        //TODO Обєднати в діапазон
-        if(!App.getFilters().startDate().isClear()){
-            addView(App.getFilters().startDate().toString(), Type.START_DATE);
-        }
-        if(!App.getFilters().endDate().isClear()){
-            addView(App.getFilters().endDate().toString(), Type.END_DATE);
+        if(!App.getFilters().period().isClear()){
+            addView(String.format(getString(R.string.filter_period),
+                    App.getFilters().period().startDate().toString(),
+                    App.getFilters().period().endDate().toString()), Type.PERIOD);
         }
         searchDeclarations();
     }

@@ -62,15 +62,12 @@ public class Date implements Comparable <Date>{
 
     @Override
     public int compareTo(Date date) {
-        return 0;
+        return (int)(toSeconds() - date.toSeconds());
     }
 
-    public Long toLong() {
+    public long toSeconds() {
         long res = 0;
 
-        if(isClear()){
-            return null;
-        }
         for(int y = 1970; y < year; y++){
             res += Year.forYear(y).getDays();
         }
@@ -80,6 +77,17 @@ public class Date implements Comparable <Date>{
         res += day - 1;
 
         return TimeUnit.SECONDS.convert(res, TimeUnit.DAYS);
+    }
+
+    public long toMillis(){
+        return toSeconds()*1000;
+    }
+
+    public Long toLong(){
+        if(isClear()){
+            return null;
+        }
+        return toSeconds();
     }
 
     @Override
