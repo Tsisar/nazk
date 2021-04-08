@@ -14,11 +14,14 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.appbar.CollapsingToolbarLayout;
 
-import java.util.List;
+import java.util.Objects;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
@@ -26,9 +29,9 @@ import io.reactivex.schedulers.Schedulers;
 import ua.com.tsisar.nazk.App;
 import ua.com.tsisar.nazk.R;
 import ua.com.tsisar.nazk.SearchFiltersView;
+import ua.com.tsisar.nazk.adapter.RecyclerAdapter;
 import ua.com.tsisar.nazk.api.JsonError;
 import ua.com.tsisar.nazk.dto.Answer;
-import ua.com.tsisar.nazk.dto.Item;
 import ua.com.tsisar.nazk.filters.Type;
 
 public class MainActivity extends AppCompatActivity implements SearchFiltersView.Listener {
@@ -39,20 +42,15 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersView
 
     private CompositeDisposable compositeDisposable;
 
-    LinearLayout linearLayout;
+    private LinearLayout linearLayout;
+    private RecyclerView recyclerView;
+    private RecyclerAdapter recyclerAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         compositeDisposable = new CompositeDisposable();
-
-        Log.i(TAG, "query: " + App.getFilters().query().get());
-        App.getFilters().query().clear();
-        Log.i(TAG, "query: " + App.getFilters().query().get());
-        App.getFilters().query().set("");
-        Log.i(TAG, "query: " + App.getFilters().query().get());
-
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -75,6 +73,14 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersView
             }
         });
 
+        recyclerView = findViewById(R.id.recycler_view_item);
+        recyclerView.setItemAnimator(new DefaultItemAnimator());
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+//        recyclerView.addOnItemTouchListener(
+//                new RecyclerItemClickListener(this, (View view, int position) -> {
+//
+//                })
+//        );
 
     }
 
@@ -139,8 +145,8 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersView
             Log.i(TAG, "documentType: " + App.getFilters().documentType().get());
             Log.i(TAG, "declarationType: " + App.getFilters().declarationType().get());
             Log.i(TAG, "declarationYear: " + App.getFilters().declarationYear().get());
-            Log.i(TAG, "startDate: " + App.getFilters().period().startDate().toSeconds());
-            Log.i(TAG, "endDate: " + App.getFilters().period().endDate().toSeconds());
+            Log.i(TAG, "startDate: " + App.getFilters().period().startDate().toLong());
+            Log.i(TAG, "endDate: " + App.getFilters().period().endDate().toLong());
             Log.i(TAG, "page: " + App.getFilters().page().get());
 
             searchView.post(() -> searchView.setQuery(App.getFilters().query().get(), false));
@@ -166,30 +172,30 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersView
 //                searchResult.setText(String.format(getString(R.string.search_result), totalItems));
             }
             //Log.e(TAG, "Items: " + answer.getData());
-            List<Item> items = answer.getData();
-            for(Item item : items){
-                Log.v(TAG, "Item: " + item.getLastname() + " "
-                        + item.getFirstname() + " "
-                        + item.getMiddlename() + " - "
-                        + item.getWorkPost() + " - "
-                        + item.getWorkPlace() + " - "
-                        + item.getId());
-            }
-//            recyclerAdapter = new RecyclerAdapter(this, answer.getItems());
-//            recyclerView.setAdapter(recyclerAdapter);
+//            List<Item> items = answer.getData();
+//            for(Item item : items){
+//                Log.v(TAG, "Item: " + item.getLastname() + " "
+//                        + item.getFirstname() + " "
+//                        + item.getMiddlename() + " - "
+//                        + item.getWorkPost() + " - "
+//                        + item.getWorkPlace() + " - "
+//                        + item.getId());
+//            }
+            recyclerAdapter = new RecyclerAdapter(this, answer.getData());
+            recyclerView.setAdapter(recyclerAdapter);
         }catch (Exception e){
             e.printStackTrace();
 //            showMessage("onSearchDeclarationsSuccess Exception: " + e.getMessage());
-            showMessage("Error: " + JsonError.get(answer.getError()).getMessage());
+            showMessage(JsonError.get(answer.getError()).getMessage());
         }
     }
 
     private void onFailure(Throwable throwable) {
-        showMessage("onFailure: " + throwable.getMessage());
+        showMessage(throwable.getMessage());
     }
 
     private void searchDeclarations(){
-        compositeDisposable.add(App.getApi().searchDeclarations(
+        compositeDisposable.add(Objects.requireNonNull(App.getApi().searchDeclarations(
                 App.getFilters().query().get(),
                 App.getFilters().userDeclarantId().get(),
                 App.getFilters().documentType().get(),
@@ -197,7 +203,7 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersView
                 App.getFilters().declarationYear().get(),
                 App.getFilters().period().startDate().toLong(),
                 App.getFilters().period().endDate().toLong(),
-                App.getFilters().page().get())
+                App.getFilters().page().get()))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(MainActivity.this::onSearchDeclarationsSuccess,
@@ -217,14 +223,14 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersView
     private void addView(String name, Type type){
         linearLayout.addView(
                 new SearchFiltersView(this)
-                        .setItemName(name)
-                        .setFilterType(type));
+                        .setName(name)
+                        .setType(type));
     }
 
     @Override
     public void removeView(SearchFiltersView view) {
-        Log.e(TAG, "removeView: " + view.getFilterType());
-        switch (view.getFilterType()){
+        Log.e(TAG, "removeView: " + view.getType());
+        switch (view.getType()){
 //            case QUERY:
 //                App.getFilters().query().clear();
 //                searchView.post(() -> searchView.setQuery(null, false));

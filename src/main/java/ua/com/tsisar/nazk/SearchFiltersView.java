@@ -12,8 +12,8 @@ import ua.com.tsisar.nazk.filters.Type;
 public class SearchFiltersView extends LinearLayout implements View.OnClickListener{
 
     private Listener listener;
-    private TextView itemName;
-    private Type filterType;
+    private TextView name;
+    private Type type;
 
     public interface Listener {
         void removeView(SearchFiltersView view);
@@ -47,22 +47,22 @@ public class SearchFiltersView extends LinearLayout implements View.OnClickListe
         View view = inflate(getContext(), R.layout.item_search_filters, null);
         ImageButton cleanButton = view.findViewById(R.id.sf_clean_button);
         cleanButton.setOnClickListener(this);
-        itemName = view.findViewById(R.id.sf_item_name_textView);
+        name = view.findViewById(R.id.sf_item_name_textView);
         addView(view);
     }
 
-    public SearchFiltersView setItemName(String name) {
-        itemName.setText(name);
+    public SearchFiltersView setName(String name) {
+        this.name.setText(name);
         return this;
     }
 
-    public SearchFiltersView setFilterType(Type type) {
-        filterType = type;
+    public SearchFiltersView setType(Type type) {
+        this.type = type;
         return this;
     }
 
-    public Type getFilterType() {
-        return filterType;
+    public Type getType() {
+        return type;
     }
 
     @Override
