@@ -11,22 +11,33 @@
     android:background="@drawable/background_blue_stroke">
 
     <TextView
-        android:id="@+id/text_view_item_lastname"
+        android:id="@+id/text_view_item_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textStyle="bold"/>
+
+    <TextView
+        android:id="@+id/text_view_item_document"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"/>
 
     <TextView
-        android:id="@+id/text_view_item_firstname"
+        android:id="@+id/text_view_item_year"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"/>
 
-    <!--<TextView-->
-        <!--android:id="@+id/position_textView"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="wrap_content"/>-->
+    <TextView
+        android:id="@+id/text_view_item_work_place"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
 
     <TextView
-        android:id="@+id/text_view_item_place_of_work"
+        android:id="@+id/text_view_item_work_post"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
+    <TextView
+        android:id="@+id/text_view_item_date"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"/>
 

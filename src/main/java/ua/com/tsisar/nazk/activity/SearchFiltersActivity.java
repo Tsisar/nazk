@@ -169,7 +169,7 @@ public class SearchFiltersActivity extends AppCompatActivity {
 
         DatePickerDialog dialog = new DatePickerDialog(this, (datePicker, year, month, day) -> {
             startDate.set(year, month, day);
-            setEndDate(view);
+            setEndDate();
         }, date.getYear(), date.getMonth(), date.getDay());
         dialog.setOnCancelListener(dialog12 -> {
             startDate.clear();
@@ -182,7 +182,7 @@ public class SearchFiltersActivity extends AppCompatActivity {
         dialog.show();
     }
 
-    public void setEndDate(View view){
+    private void setEndDate(){
         Date date = endDate.isClear() ? new Date().now() : new Date().set(endDate);
 
         DatePickerDialog dialog = new DatePickerDialog(this, (datePicker, year, month, day) -> {
@@ -202,6 +202,7 @@ public class SearchFiltersActivity extends AppCompatActivity {
     }
 
     public void onFindClick(View view) {
+        App.getFilters().page().clear();
         App.getFilters().query().set(editTextQuery.getText().toString());
 
         checkEditTextYear();

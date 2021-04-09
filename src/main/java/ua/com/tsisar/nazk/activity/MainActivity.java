@@ -9,6 +9,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -42,9 +43,13 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersView
 
     private CompositeDisposable compositeDisposable;
 
-    private LinearLayout linearLayout;
+    private TextView textViewPage;
+    private LinearLayout linearLayoutFilters;
+    private LinearLayout linearLayoutPage;
     private RecyclerView recyclerView;
     private RecyclerAdapter recyclerAdapter;
+
+    private int maxPage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,16 +63,19 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersView
         CollapsingToolbarLayout toolBarLayout = findViewById(R.id.toolbar_layout);
         toolBarLayout.setTitle(getTitle());
 
-        linearLayout = findViewById(R.id.linear_layout_search_filters);
+        linearLayoutFilters = findViewById(R.id.linear_layout_search_filters);
+        linearLayoutPage = findViewById(R.id.linear_layout_content_page);
+        linearLayoutPage.setVisibility(View.GONE);
+        textViewPage = findViewById(R.id.text_view_content_page);
 
         AppBarLayout appBarLayout = findViewById(R.id.app_bar);
         appBarLayout.addOnOffsetChangedListener((appBarLayout1, verticalOffset) -> {
             if (Math.abs(verticalOffset) == appBarLayout1.getTotalScrollRange()) {
                 // Collapsed
-                linearLayout.setVisibility(View.GONE);
+                linearLayoutFilters.setVisibility(View.GONE);
             } else if (verticalOffset == 0) {
                 // Expanded
-                linearLayout.setVisibility(View.VISIBLE);
+                linearLayoutFilters.setVisibility(View.VISIBLE);
             } else {
                 // Somewhere in between
             }
@@ -83,8 +91,6 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersView
 //        );
 
     }
-
-
 
     @Override
     protected void onDestroy() {
@@ -110,6 +116,7 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersView
                 searchView.clearFocus();
                 Log.i(TAG, "onQueryTextSubmit: " + query);
                 App.getFilters().query().set(query);
+                App.getFilters().page().clear();
                 searchDeclarations();
                 return true;
             }
@@ -161,10 +168,12 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersView
 //                searchResult.setText(getString(R.string.search_null));
                 showMessage(String.format(getString(R.string.refresh_finished), 0));
             } else {
-                if(answer.getNotice() != null) {
-                    showMessage(answer.getNotice());
-                } else {
-                    showMessage(String.format(getString(R.string.refresh_finished), answer.getCount()));
+                if(App.getFilters().page().isClear()) {
+                    if (answer.getNotice() != null) {
+                        showMessage(answer.getNotice());
+                    } else {
+                        showMessage(String.format(getString(R.string.refresh_finished), answer.getCount()));
+                    }
                 }
 //                Log.i(TAG, "DeclarationYear: " + answer.getData().get(0).getDeclarationYear());
 //                Log.i(TAG, "Lastname: " + answer.getData().get(0).getData().getStep1().getData().getLastname());
@@ -181,6 +190,7 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersView
 //                        + item.getWorkPlace() + " - "
 //                        + item.getId());
 //            }
+            showPage(answer.getCount());
             recyclerAdapter = new RecyclerAdapter(this, answer.getData());
             recyclerView.setAdapter(recyclerAdapter);
         }catch (Exception e){
@@ -221,7 +231,7 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersView
     }
 
     private void addView(String name, Type type){
-        linearLayout.addView(
+        linearLayoutFilters.addView(
                 new SearchFiltersView(this)
                         .setName(name)
                         .setType(type));
@@ -254,12 +264,12 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersView
                 App.getFilters().page().clear();
                 break;
         }
-        linearLayout.removeView(view);
+        linearLayoutFilters.removeView(view);
         searchDeclarations();
     }
 
-    public void updateSearchFilters() {
-        linearLayout.removeAllViews();
+    private void updateSearchFilters() {
+        linearLayoutFilters.removeAllViews();
 //        if(!App.getFilters().query().isClear()){
 //            addView(App.getFilters().query().get(), Type.QUERY);
 //        }
@@ -281,6 +291,32 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersView
             addView(String.format(getString(R.string.filter_period),
                     App.getFilters().period().startDate().toString(),
                     App.getFilters().period().endDate().toString()), Type.PERIOD);
+        }
+        searchDeclarations();
+    }
+
+    private void showPage(int count){
+        maxPage = (count-1)/100 +1;
+
+        if(count > 100) {
+            if(App.getFilters().page().isClear()){
+                App.getFilters().page().set(1);
+            }
+            linearLayoutPage.setVisibility(View.VISIBLE);
+            textViewPage.setText(String.format("Сторінка %s із %s", App.getFilters().page().get(), maxPage));
+        }else {
+            linearLayoutPage.setVisibility(View.GONE);
+            App.getFilters().page().clear();
+        }
+    }
+
+    public void toPage(View view){
+        int currentPage = App.getFilters().page().get();
+
+        if(view.getId() == R.id.button_next_page && currentPage < maxPage) {
+            App.getFilters().page().set(currentPage + 1);
+        }else if(view.getId() == R.id.button_prev_page && currentPage > 1){
+            App.getFilters().page().set(currentPage - 1);
         }
         searchDeclarations();
     }

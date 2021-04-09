@@ -8,6 +8,9 @@ public class Item {
     @SerializedName("data")
     @Expose
     private ItemData data;
+    @SerializedName("type")
+    @Expose
+    private Integer documentType;
     @SerializedName("declaration_type")
     @Expose
     private Integer declarationType;
@@ -30,6 +33,14 @@ public class Item {
 
     public void setData(ItemData data) {
         this.data = data;
+    }
+
+    public Integer getDocumentType() {
+        return documentType;
+    }
+
+    public void setDocumentType(Integer documentType) {
+        this.documentType = documentType;
     }
 
     public Integer getDeclarationType() {
@@ -74,15 +85,15 @@ public class Item {
 
     //testing
 
-    public String getLastname() {
+    public String getLastName() {
         return data.getStep1().getData().getLastname();
     }
 
-    public String getFirstname() {
+    public String getFirstName() {
         return data.getStep1().getData().getFirstname();
     }
 
-    public String getMiddlename() {
+    public String getMiddleName() {
         return data.getStep1().getData().getMiddlename();
     }
 
