@@ -11,12 +11,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -24,6 +24,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.appbar.CollapsingToolbarLayout;
+import com.google.android.material.snackbar.Snackbar;
 
 import java.util.Objects;
 
@@ -56,6 +57,7 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersView
     private RecyclerAdapter recyclerAdapter;
 
     private SwipeRefreshLayout swipeRefreshLayout;
+    private CoordinatorLayout coordinatorLayout;
 
     private int maxPage;
 
@@ -71,6 +73,7 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersView
         CollapsingToolbarLayout toolBarLayout = findViewById(R.id.toolbar_layout);
         toolBarLayout.setTitle(getTitle());
 
+        coordinatorLayout = findViewById(R.id.coordinator_layout_main);
         linearLayoutFilters = findViewById(R.id.linear_layout_search_filters);
         linearLayoutPage = findViewById(R.id.linear_layout_content_page);
         linearLayoutPage.setVisibility(View.GONE);
@@ -103,10 +106,6 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersView
         if (compositeDisposable != null && !compositeDisposable.isDisposed()) {
             compositeDisposable.dispose();
         }
-    }
-
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
     }
 
     protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
@@ -230,11 +229,7 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersView
 
     private void showMessage(String message){
         Log.e(TAG, "Message: " + message);
-        Toast.makeText(getApplicationContext(),"Message: " + message, Toast.LENGTH_LONG).show();
-//        new SnackBar.Builder(this)
-//                .withMessage(message)
-//                .withStyle(SnackBar.Style.ALERT)
-//                .show();
+        Snackbar.make(coordinatorLayout,message,Snackbar.LENGTH_LONG).show();
     }
 
     private void addView(String name, Type type){
@@ -334,7 +329,6 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersView
 
     @Override
     public void onRefresh() {
-        showMessage("Оновлення");
         App.getFilters().page().clear();
         searchDeclarations();
     }
