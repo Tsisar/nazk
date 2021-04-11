@@ -13,6 +13,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
@@ -78,10 +79,8 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersView
         AppBarLayout appBarLayout = findViewById(R.id.app_bar);
         appBarLayout.addOnOffsetChangedListener((appBarLayout1, verticalOffset) -> {
             if (Math.abs(verticalOffset) == appBarLayout1.getTotalScrollRange()) {
-                // Collapsed
                 linearLayoutFilters.setVisibility(View.GONE);
             } else if (verticalOffset == 0) {
-                // Expanded
                 linearLayoutFilters.setVisibility(View.VISIBLE);
             }
         });
@@ -90,9 +89,8 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersView
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.addOnItemTouchListener(
-                new RecyclerItemClickListener(this, (View view, int position) -> {
-                    openUri(URL + recyclerAdapter.getItem(position).getId());
-                })
+                new RecyclerItemClickListener(this, (View view, int position) ->
+                        openUri(URL + recyclerAdapter.getItem(position).getId()))
         );
 
         swipeRefreshLayout = findViewById(R.id.refresh);
@@ -105,6 +103,16 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersView
         if (compositeDisposable != null && !compositeDisposable.isDisposed()) {
             compositeDisposable.dispose();
         }
+    }
+
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+    }
+
+    protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        updateSearchFilters();
+        searchDeclarations();
     }
 
     @Override

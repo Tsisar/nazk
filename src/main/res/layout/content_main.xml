@@ -43,7 +43,7 @@
         <ImageButton
             android:id="@+id/button_prev_page"
             android:layout_width="wrap_content"
-            android:layout_height="64dp"
+            android:layout_height="48dp"
             android:src="@drawable/ic_prev_24dp"
             android:background="#00000000"
             android:layout_weight="1"
@@ -52,14 +52,14 @@
         <TextView
             android:id="@+id/text_view_content_page"
             android:layout_width="wrap_content"
-            android:layout_height="64dp"
+            android:layout_height="48dp"
             android:gravity="center"
             android:layout_weight="1" />
 
         <ImageButton
             android:id="@+id/button_next_page"
             android:layout_width="wrap_content"
-            android:layout_height="64dp"
+            android:layout_height="48dp"
             android:src="@drawable/ic_next_24dp"
             android:background="#00000000"
             android:layout_weight="1"
