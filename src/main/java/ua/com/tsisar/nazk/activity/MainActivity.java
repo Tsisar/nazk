@@ -3,6 +3,7 @@ package ua.com.tsisar.nazk.activity;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -18,6 +19,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.appbar.CollapsingToolbarLayout;
@@ -30,13 +32,16 @@ import io.reactivex.schedulers.Schedulers;
 import ua.com.tsisar.nazk.App;
 import ua.com.tsisar.nazk.R;
 import ua.com.tsisar.nazk.SearchFiltersView;
-import ua.com.tsisar.nazk.adapter.RecyclerAdapter;
 import ua.com.tsisar.nazk.api.JsonError;
 import ua.com.tsisar.nazk.dto.Answer;
 import ua.com.tsisar.nazk.filters.Type;
+import ua.com.tsisar.nazk.recycler.RecyclerAdapter;
+import ua.com.tsisar.nazk.recycler.RecyclerItemClickListener;
 
-public class MainActivity extends AppCompatActivity implements SearchFiltersView.Listener {
+public class MainActivity extends AppCompatActivity implements SearchFiltersView.Listener, SwipeRefreshLayout.OnRefreshListener {
     private static final String TAG = "MyLog";
+
+    private static final String URL = "https://public.nazk.gov.ua/documents/";
 
     private static final int REQUEST_CODE_FILTERS = 1;
     private SearchView searchView;
@@ -48,6 +53,8 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersView
     private LinearLayout linearLayoutPage;
     private RecyclerView recyclerView;
     private RecyclerAdapter recyclerAdapter;
+
+    private SwipeRefreshLayout swipeRefreshLayout;
 
     private int maxPage;
 
@@ -76,20 +83,20 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersView
             } else if (verticalOffset == 0) {
                 // Expanded
                 linearLayoutFilters.setVisibility(View.VISIBLE);
-            } else {
-                // Somewhere in between
             }
         });
 
         recyclerView = findViewById(R.id.recycler_view_item);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-//        recyclerView.addOnItemTouchListener(
-//                new RecyclerItemClickListener(this, (View view, int position) -> {
-//
-//                })
-//        );
+        recyclerView.addOnItemTouchListener(
+                new RecyclerItemClickListener(this, (View view, int position) -> {
+                    openUri(URL + recyclerAdapter.getItem(position).getId());
+                })
+        );
 
+        swipeRefreshLayout = findViewById(R.id.refresh);
+        swipeRefreshLayout.setOnRefreshListener(this);
     }
 
     @Override
@@ -163,7 +170,7 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersView
 
     private void onSearchDeclarationsSuccess(Answer answer) {
         try {
-//            swipeRefreshLayout.setRefreshing(false);
+            swipeRefreshLayout.setRefreshing(false);
             if (answer.getCount() == 0) {
 //                searchResult.setText(getString(R.string.search_null));
                 showMessage(String.format(getString(R.string.refresh_finished), 0));
@@ -180,16 +187,6 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersView
 //                int totalItems = answer.getPage().getTotalItems();
 //                searchResult.setText(String.format(getString(R.string.search_result), totalItems));
             }
-            //Log.e(TAG, "Items: " + answer.getData());
-//            List<Item> items = answer.getData();
-//            for(Item item : items){
-//                Log.v(TAG, "Item: " + item.getLastname() + " "
-//                        + item.getFirstname() + " "
-//                        + item.getMiddlename() + " - "
-//                        + item.getWorkPost() + " - "
-//                        + item.getWorkPlace() + " - "
-//                        + item.getId());
-//            }
             showPage(answer.getCount());
             recyclerAdapter = new RecyclerAdapter(this, answer.getData());
             recyclerView.setAdapter(recyclerAdapter);
@@ -201,10 +198,12 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersView
     }
 
     private void onFailure(Throwable throwable) {
+        swipeRefreshLayout.setRefreshing(false);
         showMessage(throwable.getMessage());
     }
 
     private void searchDeclarations(){
+        swipeRefreshLayout.setRefreshing(true);
         compositeDisposable.add(Objects.requireNonNull(App.getApi().searchDeclarations(
                 App.getFilters().query().get(),
                 App.getFilters().userDeclarantId().get(),
@@ -240,18 +239,14 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersView
     @Override
     public void removeView(SearchFiltersView view) {
         Log.e(TAG, "removeView: " + view.getType());
+        App.getFilters().page().clear();
         switch (view.getType()){
 //            case QUERY:
 //                App.getFilters().query().clear();
 //                searchView.post(() -> searchView.setQuery(null, false));
 //                break;
-            case USER_DECLARANT_ID:
-                App.getFilters().userDeclarantId().clear();
-                break;
             case DOCUMENT_TYPE:
                 App.getFilters().documentType().clear();
-                break;
-            case DECLARATION_TYPE:
                 App.getFilters().declarationType().clear();
                 break;
             case DECLARATION_YEAR:
@@ -259,9 +254,6 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersView
                 break;
             case PERIOD:
                 App.getFilters().period().clear();
-                break;
-            case PAGE:
-                App.getFilters().page().clear();
                 break;
         }
         linearLayoutFilters.removeView(view);
@@ -276,12 +268,12 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersView
         if(!App.getFilters().documentType().isClear()){
             addView(String.format(getString(R.string.filter_document_type), getResources().
                     getStringArray(R.array.array_document_type)
-                            [App.getFilters().documentType().get()]), Type.DOCUMENT_TYPE);
-        }
-        if(!App.getFilters().declarationType().isClear()){
-            addView(String.format(getString(R.string.filter_declaration_type), getResources().
-                    getStringArray(R.array.array_declaration_type)
-                            [App.getFilters().declarationType().get()]), Type.DECLARATION_TYPE);
+                            [App.getFilters().documentType().get()]) +
+                    (App.getFilters().declarationType().isClear() ? "" :
+                            String.format(getString(R.string.filter_declaration_type),
+                                    getResources().getStringArray(R.array.array_declaration_type)
+                                            [App.getFilters().declarationType().get()])),
+                    Type.DOCUMENT_TYPE);
         }
         if(!App.getFilters().declarationYear().isClear()){
             addView(String.format(getString(R.string.filter_year),
@@ -318,6 +310,24 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersView
         }else if(view.getId() == R.id.button_prev_page && currentPage > 1){
             App.getFilters().page().set(currentPage - 1);
         }
+        searchDeclarations();
+    }
+
+    private void openUri(String url){
+        try {
+            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+            startActivity(intent);
+        }
+        catch (Exception e){
+            e.printStackTrace();
+            showMessage(e.getMessage());
+        }
+    }
+
+    @Override
+    public void onRefresh() {
+        showMessage("Оновлення");
+        App.getFilters().page().clear();
         searchDeclarations();
     }
 }

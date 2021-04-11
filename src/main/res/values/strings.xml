@@ -9,7 +9,7 @@
     <string name="hint_period">Період публікації</string>
     <string name="filter_year">Рік: %s</string>
     <string name="filter_document_type">Документ: %s</string>
-    <string name="filter_declaration_type">Декларація: %s</string>
+    <string name="filter_declaration_type">\u0020(%s)</string>
     <string name="filter_period">Період: %s - %s</string>
     <string name="button_find">Шукати</string>
     <string name="button_period">з - по</string>

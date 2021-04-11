@@ -1,4 +1,4 @@
-package ua.com.tsisar.nazk.adapter;
+package ua.com.tsisar.nazk.recycler;
 
 import android.content.Context;
 import android.view.LayoutInflater;
