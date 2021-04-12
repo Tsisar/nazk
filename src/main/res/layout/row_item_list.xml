@@ -8,7 +8,7 @@
     android:paddingHorizontal="@dimen/row_horizontal_padding"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/background_blue_stroke">
+    android:background="@drawable/background_stroke">
 
     <TextView
         android:id="@+id/text_view_item_name"

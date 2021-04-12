@@ -11,11 +11,11 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.MyApplication">
+        android:theme="@style/Theme.Nazk">
         <activity android:name=".activity.SearchFiltersActivity" />
         <activity
             android:name=".activity.MainActivity"
-            android:theme="@style/Theme.MyApplication.NoActionBar">
+            android:theme="@style/Theme.Nazk.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

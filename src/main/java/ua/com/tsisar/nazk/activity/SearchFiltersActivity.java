@@ -7,14 +7,14 @@ import android.text.Editable;
 import android.text.InputFilter;
 import android.text.TextWatcher;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.EditText;
-import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.google.android.material.textfield.MaterialAutoCompleteTextView;
+import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
 
 import ua.com.tsisar.nazk.App;
 import ua.com.tsisar.nazk.R;
@@ -24,14 +24,23 @@ import ua.com.tsisar.nazk.util.Date;
 
 public class SearchFiltersActivity extends AppCompatActivity {
 
-    private EditText editTextQuery;
-    private EditText editTextYear;
+    private TextInputLayout inputTextQuery;
+    private TextInputLayout inputTextYear;
+    private TextInputEditText editTextQuery;
+    private TextInputEditText editTextYear;
     private TextView textViewPeriod;
 
     private Date startDate;
     private Date endDate;
 
-    private Spinner declarationTypeSpinner;
+    private TextInputLayout inputTextDeclaration;
+    private MaterialAutoCompleteTextView textViewDeclarationType;
+
+    @DocumentType.Document
+    private int documentType = DocumentType.DOCUMENT_ALL;
+
+    @DeclarationType.Declaration
+    private int declarationType = DeclarationType.DECLARATION_ALL;
 
     public static Integer tryParse(String string) {
         try {
@@ -60,16 +69,46 @@ public class SearchFiltersActivity extends AppCompatActivity {
             textViewPeriod.setText(String.format(getString(R.string.split_period),
                     startDate.toString(), endDate.toString()));
         }
+
+
     }
 
     private void initEditTextQuery(){
+        inputTextQuery = findViewById(R.id.input_text_query);
         editTextQuery = findViewById(R.id.edit_text_query);
         if(!App.getFilters().query().isClear()) {
             editTextQuery.setText(App.getFilters().query().get());
         }
+        editTextQuery.setOnFocusChangeListener((view, hasFocus) -> {
+            if (!hasFocus) {
+                if(editTextQuery.getText().toString().length() < 3 ||
+                        editTextQuery.getText().toString().length() > 255){
+                    inputTextQuery.setError("Введіть від 3 до 255 символів.");
+                }else{
+                    inputTextQuery.setError(null);
+                }
+            }
+        });
+        editTextQuery.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                if(charSequence.toString().length() > 3 && charSequence.toString().length() < 255){
+                    inputTextQuery.setError(null);
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+            }
+        });
     }
 
     private void initEditTextYear(){
+        inputTextYear = findViewById(R.id.input_text_year);
         editTextYear = findViewById(R.id.edit_text_year);
         if(!App.getFilters().declarationYear().isClear()) {
             editTextYear.setText(String.valueOf(App.getFilters().declarationYear().get()));
@@ -97,8 +136,9 @@ public class SearchFiltersActivity extends AppCompatActivity {
 
                     if(a > b || b > c){
                         editable.delete(length-1, length);
-                        //TODO переробити на нормальний меседж
-                        Toast.makeText(getApplicationContext(),"2015 - " + year, Toast.LENGTH_SHORT).show();
+                        inputTextYear.setError("Введіть рік від 2015 до " + year + ".");
+                    }else{
+                        inputTextYear.setError(null);
                     }
                 }
             }
@@ -118,63 +158,46 @@ public class SearchFiltersActivity extends AppCompatActivity {
     }
 
     private void initSpinnerDocumentType(){
-        Spinner spinner = initSpinner(R.id.spinner_document_type, R.array.array_document_type);
-        if(App.getFilters().documentType().isClear()){
-            spinner.setSelection(DocumentType.DOCUMENT_ALL);
-            setEnableDeclarationTypeSpinner(DocumentType.DOCUMENT_ALL);
-        }else {
-            spinner.setSelection(App.getFilters().documentType().get());
-            setEnableDeclarationTypeSpinner(App.getFilters().documentType().get());
+        if(!App.getFilters().documentType().isClear()) {
+            documentType = App.getFilters().documentType().get();
         }
-        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                App.getFilters().documentType().set(position);
-                setEnableDeclarationTypeSpinner(position);
-            }
-            @Override
-            public void onNothingSelected(AdapterView<?> arg0) {
-                App.getFilters().documentType().set(DocumentType.DOCUMENT_ALL);
-                setEnableDeclarationTypeSpinner(DocumentType.DOCUMENT_ALL);
-            }
+        setEnableDeclarationTypeSpinner();
+
+        String[] strings = getResources().getStringArray(R.array.array_document_type);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, R.layout.list_item, strings);
+        MaterialAutoCompleteTextView textViewDocumentType = findViewById(R.id.auto_complete_text_view_document_type);
+        textViewDocumentType.setAdapter(adapter);
+        textViewDocumentType.setText(documentType==DocumentType.DOCUMENT_ALL?null:strings[documentType], false);
+        textViewDocumentType.setOnItemClickListener((parent, view, position, id) -> {
+            documentType = position;
+            setEnableDeclarationTypeSpinner();
         });
     }
 
     private void initSpinnerDeclarationType(){
-        declarationTypeSpinner = initSpinner(R.id.spinner_declaration_type, R.array.array_declaration_type);
-        if(App.getFilters().declarationType().isClear()){
-            declarationTypeSpinner.setSelection(DeclarationType.DECLARATION_ALL);
-        }else {
-            declarationTypeSpinner.setSelection(App.getFilters().declarationType().get());
+        if(!App.getFilters().declarationType().isClear()) {
+            declarationType = App.getFilters().declarationType().get();
         }
-        declarationTypeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                App.getFilters().declarationType().set(position);
-            }
-            @Override
-            public void onNothingSelected(AdapterView<?> arg0) {
-                App.getFilters().declarationType().set(DeclarationType.DECLARATION_ALL);
-            }
-        });
+
+        inputTextDeclaration = findViewById(R.id.input_text_declaration_type);
+        String[] strings = getResources().getStringArray(R.array.array_declaration_type);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, R.layout.list_item, strings);
+        textViewDeclarationType = findViewById(R.id.auto_complete_text_view_declaration_type);
+        textViewDeclarationType.setAdapter(adapter);
+        textViewDeclarationType.setText(declarationType==DeclarationType.DECLARATION_ALL?null:strings[declarationType], false);
+        textViewDeclarationType.setOnItemClickListener((parent, view, position, id) -> declarationType = position);
     }
 
-    private void setEnableDeclarationTypeSpinner(int type){
-        if(type == DocumentType.DOCUMENT_DECLARATION || type == DocumentType.DOCUMENT_NEW_DECLARATION) {
-            declarationTypeSpinner.setEnabled(true);
-        }else {
-            declarationTypeSpinner.setEnabled(false);
+    private void setEnableDeclarationTypeSpinner(){
+        if(documentType == DocumentType.DOCUMENT_DECLARATION ||
+                documentType == DocumentType.DOCUMENT_NEW_DECLARATION) {
+            inputTextDeclaration.setEnabled(true);
+        }else{
+            declarationType = DeclarationType.DECLARATION_ALL;
+            inputTextDeclaration.setEnabled(false);
+            textViewDeclarationType.setText(getResources().
+                    getStringArray(R.array.array_declaration_type)[declarationType], false);
         }
-    }
-
-    private Spinner initSpinner(int viewId, int arrayId){
-        Spinner spinner = findViewById(viewId);
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
-                android.R.layout.simple_spinner_item,
-                getResources().getStringArray(arrayId));
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinner.setAdapter(adapter);
-        return spinner;
     }
 
     public void setStartDate(View view){
@@ -187,7 +210,7 @@ public class SearchFiltersActivity extends AppCompatActivity {
         dialog.setOnCancelListener(dialog12 -> {
             startDate.clear();
             endDate.clear();
-            textViewPeriod.setText(R.string.button_period);
+            textViewPeriod.setText(null);
         });
         dialog.getDatePicker().setMinDate(new Date().set(2016,7,1).toMillis());
         dialog.getDatePicker().setMaxDate(new Date().now().toMillis());
@@ -206,7 +229,7 @@ public class SearchFiltersActivity extends AppCompatActivity {
         dialog.setOnCancelListener(dialog12 -> {
             startDate.clear();
             endDate.clear();
-            textViewPeriod.setText(R.string.button_period);
+            textViewPeriod.setText(null);
         });
         dialog.getDatePicker().setMinDate(startDate.toMillis());
         dialog.getDatePicker().setMaxDate(new Date().now().toMillis());
@@ -215,12 +238,13 @@ public class SearchFiltersActivity extends AppCompatActivity {
     }
 
     public void onFindClick(View view) {
+        checkEditTextYear();
+
         App.getFilters().page().clear();
         App.getFilters().query().set(editTextQuery.getText().toString());
-
-        checkEditTextYear();
         App.getFilters().declarationYear().set(tryParse(editTextYear.getText().toString()));
-
+        App.getFilters().documentType().set(documentType);
+        App.getFilters().declarationType().set(declarationType);
         App.getFilters().period().startDate().set(startDate);
         App.getFilters().period().endDate().set(endDate);
 

@@ -1,4 +1,4 @@
-package ua.com.tsisar.nazk;
+package ua.com.tsisar.nazk.view;
 
 import android.content.Context;
 import android.util.AttributeSet;
@@ -7,6 +7,7 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import ua.com.tsisar.nazk.R;
 import ua.com.tsisar.nazk.filters.Type;
 
 public class SearchFiltersView extends LinearLayout implements View.OnClickListener{

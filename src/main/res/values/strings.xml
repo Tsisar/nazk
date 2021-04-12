@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">ЄДРД</string>
-    <string name="action_settings">Фільтри</string>
-    <string name="search">Пошук</string>
+    <string name="filter_title">Фільтри</string>
+    <string name="search_title">Пошук</string>
     <string name="hint_query">Пошуковий запит</string>
     <string name="hint_year">Рік</string>
     <string name="hint_document_type">Тип документу</string>
@@ -12,7 +12,7 @@
     <string name="filter_declaration_type">\u0020(%s)</string>
     <string name="filter_period">Період: %s - %s</string>
     <string name="button_find">Шукати</string>
-    <string name="button_period">з - по</string>
+<!--    <string name="button_period">з - по</string>-->
     <string name="date_format">%1$04d-%2$02d-%3$02d</string>
     <string name="dialog_title_start_date">Починаючи з дати</string>
     <string name="dialog_title_end_date">По дату</string>

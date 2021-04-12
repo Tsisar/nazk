@@ -33,7 +33,7 @@ import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
 import ua.com.tsisar.nazk.App;
 import ua.com.tsisar.nazk.R;
-import ua.com.tsisar.nazk.SearchFiltersView;
+import ua.com.tsisar.nazk.view.SearchFiltersView;
 import ua.com.tsisar.nazk.api.JsonError;
 import ua.com.tsisar.nazk.dto.Answer;
 import ua.com.tsisar.nazk.filters.Type;
@@ -119,7 +119,7 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersView
         getMenuInflater().inflate(R.menu.menu_toolbar, menu);
 
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-        searchView = (SearchView) menu.findItem(R.id.action_search).getActionView();
+        searchView = (SearchView) menu.findItem(R.id.search).getActionView();
 
         searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
         searchView.setIconifiedByDefault(false); // Do not iconify the widget; expand it by default
@@ -148,7 +148,7 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersView
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-        if (id == R.id.action_settings) {
+        if (id == R.id.filter) {
             Intent intent = new Intent(this, SearchFiltersActivity.class);
             startActivityForResult(intent, REQUEST_CODE_FILTERS);
             return true;
