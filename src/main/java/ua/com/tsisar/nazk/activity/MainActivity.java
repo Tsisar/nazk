@@ -33,18 +33,17 @@ import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
 import ua.com.tsisar.nazk.App;
 import ua.com.tsisar.nazk.R;
-import ua.com.tsisar.nazk.view.SearchFiltersView;
 import ua.com.tsisar.nazk.api.JsonError;
 import ua.com.tsisar.nazk.dto.Answer;
+import ua.com.tsisar.nazk.dto.Item;
 import ua.com.tsisar.nazk.filters.Type;
 import ua.com.tsisar.nazk.recycler.RecyclerAdapter;
-import ua.com.tsisar.nazk.recycler.RecyclerItemClickListener;
+import ua.com.tsisar.nazk.view.SearchFiltersView;
 
 public class MainActivity extends AppCompatActivity implements SearchFiltersView.Listener, SwipeRefreshLayout.OnRefreshListener {
     private static final String TAG = "MyLog";
 
     private static final String URL = "https://public.nazk.gov.ua/documents/";
-
     private static final int REQUEST_CODE_FILTERS = 1;
     private SearchView searchView;
 
@@ -91,13 +90,11 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersView
         recyclerView = findViewById(R.id.recycler_view_item);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        recyclerView.addOnItemTouchListener(
-                new RecyclerItemClickListener(this, (View view, int position) ->
-                        openUri(URL + recyclerAdapter.getItem(position).getId()))
-        );
 
         swipeRefreshLayout = findViewById(R.id.refresh);
         swipeRefreshLayout.setOnRefreshListener(this);
+
+
     }
 
     @Override
@@ -170,7 +167,11 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersView
             Log.i(TAG, "endDate: " + App.getFilters().period().endDate().toLong());
             Log.i(TAG, "page: " + App.getFilters().page().get());
 
-            searchView.post(() -> searchView.setQuery(App.getFilters().query().get(), false));
+            try {
+                searchView.post(() -> searchView.setQuery(App.getFilters().query().get(), false));
+            }catch (NullPointerException e){
+                Log.i(TAG, "NullPointerException: " + e);
+            }
             updateSearchFilters();
         }
     }
@@ -189,18 +190,25 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersView
                         showMessage(String.format(getString(R.string.refresh_finished), answer.getCount()));
                     }
                 }
-//                Log.i(TAG, "DeclarationYear: " + answer.getData().get(0).getDeclarationYear());
-//                Log.i(TAG, "Lastname: " + answer.getData().get(0).getData().getStep1().getData().getLastname());
-//                int totalItems = answer.getPage().getTotalItems();
 //                searchResult.setText(String.format(getString(R.string.search_result), totalItems));
             }
             showPage(answer.getCount());
             recyclerAdapter = new RecyclerAdapter(this, answer.getData());
+            recyclerAdapter.setOnItemClickListener(new RecyclerAdapter.onItemClickListener() {
+                @Override
+                public void onItemClick(Item item) {
+                    openURL(URL + item.getId());
+                }
+            });
             recyclerView.setAdapter(recyclerAdapter);
         }catch (Exception e){
             e.printStackTrace();
 //            showMessage("onSearchDeclarationsSuccess Exception: " + e.getMessage());
-            showMessage(JsonError.get(answer.getError()).getMessage());
+            if(JsonError.get(answer.getError()) != null) {
+                showMessage(JsonError.get(answer.getError()).getMessage());
+            }else {
+                showMessage("JsonError: " + answer.getError());
+            }
         }
     }
 
@@ -316,10 +324,9 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersView
         searchDeclarations();
     }
 
-    private void openUri(String url){
+    public void openURL(String url){
         try {
-            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-            startActivity(intent);
+            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
         }
         catch (Exception e){
             e.printStackTrace();

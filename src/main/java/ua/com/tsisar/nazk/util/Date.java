@@ -7,7 +7,7 @@ import java.util.concurrent.TimeUnit;
 
 import ua.com.tsisar.nazk.util.date.Year;
 
-public class Date implements Comparable <Date>{
+public class Date{
     private static final String DATE_FORMAT = "%1$02d.%2$02d.%3$04d";
     private int year;
     private int month;
@@ -44,6 +44,10 @@ public class Date implements Comparable <Date>{
         this.day = 0;
     }
 
+    public boolean isClear() {
+        return year == 0 && month == 0 && day == 0;
+    }
+
     public Integer getYear() {
         return year;
     }
@@ -54,15 +58,6 @@ public class Date implements Comparable <Date>{
 
     public Integer getDay() {
         return day;
-    }
-
-    public boolean isClear() {
-        return year == 0 && month == 0 && day == 0;
-    }
-
-    @Override
-    public int compareTo(Date date) {
-        return (int)(toSeconds() - date.toSeconds());
     }
 
     public long toSeconds() {

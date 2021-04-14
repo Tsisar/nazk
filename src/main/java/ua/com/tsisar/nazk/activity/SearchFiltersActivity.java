@@ -28,6 +28,7 @@ public class SearchFiltersActivity extends AppCompatActivity {
     private TextInputLayout inputTextYear;
     private TextInputEditText editTextQuery;
     private TextInputEditText editTextYear;
+    //private TextInputEditText textViewPeriod;
     private TextView textViewPeriod;
 
     private Date startDate;
@@ -69,8 +70,6 @@ public class SearchFiltersActivity extends AppCompatActivity {
             textViewPeriod.setText(String.format(getString(R.string.split_period),
                     startDate.toString(), endDate.toString()));
         }
-
-
     }
 
     private void initEditTextQuery(){
@@ -81,8 +80,9 @@ public class SearchFiltersActivity extends AppCompatActivity {
         }
         editTextQuery.setOnFocusChangeListener((view, hasFocus) -> {
             if (!hasFocus) {
-                if(editTextQuery.getText().toString().length() < 3 ||
-                        editTextQuery.getText().toString().length() > 255){
+                if((editTextQuery.getText().toString().length() < 3 ||
+                        editTextQuery.getText().toString().length() > 255) &&
+                        editTextQuery.getText().toString().length() != 0){
                     inputTextQuery.setError("Введіть від 3 до 255 символів.");
                 }else{
                     inputTextQuery.setError(null);
@@ -195,8 +195,7 @@ public class SearchFiltersActivity extends AppCompatActivity {
         }else{
             declarationType = DeclarationType.DECLARATION_ALL;
             inputTextDeclaration.setEnabled(false);
-            textViewDeclarationType.setText(getResources().
-                    getStringArray(R.array.array_declaration_type)[declarationType], false);
+            textViewDeclarationType.setText(null, false);
         }
     }
 

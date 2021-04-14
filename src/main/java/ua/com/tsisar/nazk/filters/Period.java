@@ -20,7 +20,7 @@ public class Period {
     }
 
     public boolean isClear() {
-        return startDate.isClear() || endDate.isClear();
+        return startDate.isClear() && endDate.isClear();
     }
 
 }

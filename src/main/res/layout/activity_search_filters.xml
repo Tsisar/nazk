@@ -102,25 +102,19 @@
 
             </com.google.android.material.textfield.TextInputLayout>
 
-            <com.google.android.material.textfield.TextInputLayout
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+
+            <TextView
+                style="@style/Widget.Nazk.TextView"
+                android:background="@drawable/background_text_view"
+                android:id="@+id/text_view_period"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="56dp"
                 android:layout_margin="4dp"
+                android:textSize="16sp"
+                android:gravity="center_vertical"
+                android:paddingHorizontal="16dp"
                 android:hint="@string/hint_period"
-                android:onClick="setStartDate">
-
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/text_view_period"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:clickable="false"
-                    android:cursorVisible="false"
-                    android:focusable="false"
-                    android:focusableInTouchMode="false"
-                    android:onClick="setStartDate"/>
-
-            </com.google.android.material.textfield.TextInputLayout>
+                android:onClick="setStartDate"/>
 
         </LinearLayout>
 
