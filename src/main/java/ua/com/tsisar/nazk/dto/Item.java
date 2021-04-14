@@ -27,6 +27,17 @@ public class Item {
     @Expose
     private String date;
 
+    public Item(ItemData data, Integer documentType, Integer declarationType,
+                Integer declarationYear, String id, Integer userDeclarantId, String date) {
+        this.data = data;
+        this.documentType = documentType;
+        this.declarationType = declarationType;
+        this.declarationYear = declarationYear;
+        this.id = id;
+        this.userDeclarantId = userDeclarantId;
+        this.date = date;
+    }
+
     public ItemData getData() {
         return data;
     }
@@ -81,6 +92,19 @@ public class Item {
 
     public void setDate(String date) {
         this.date = date;
+    }
+
+    @Override
+    public String toString() {
+        return "Item{" +
+                "data=" + data +
+                ", documentType=" + documentType +
+                ", declarationType=" + declarationType +
+                ", declarationYear=" + declarationYear +
+                ", id='" + id + '\'' +
+                ", userDeclarantId=" + userDeclarantId +
+                ", date='" + date + '\'' +
+                '}';
     }
 
     //testing

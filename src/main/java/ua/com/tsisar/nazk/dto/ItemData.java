@@ -9,6 +9,10 @@ public class ItemData {
     @Expose
     private Step1 step1;
 
+    public ItemData(Step1 step1) {
+        this.step1 = step1;
+    }
+
     public Step1 getStep1() {
         return step1;
     }
@@ -17,4 +21,10 @@ public class ItemData {
         this.step1 = step1;
     }
 
+    @Override
+    public String toString() {
+        return "ItemData{" +
+                "step1=" + step1 +
+                '}';
+    }
 }

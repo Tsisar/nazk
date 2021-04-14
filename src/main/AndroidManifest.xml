@@ -12,6 +12,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Nazk">
+        <activity android:name=".activity.FavoritesActivity"></activity>
         <activity android:name=".activity.SearchFiltersActivity" />
         <activity
             android:name=".activity.MainActivity"

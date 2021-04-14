@@ -21,6 +21,14 @@ public class Step1Data {
     @Expose
     private String workPlace;
 
+    public Step1Data(String lastname, String firstname, String middlename, String workPost, String workPlace) {
+        this.lastname = lastname;
+        this.firstname = firstname;
+        this.middlename = middlename;
+        this.workPost = workPost;
+        this.workPlace = workPlace;
+    }
+
     public String getLastname() {
         return lastname;
     }
@@ -61,4 +69,14 @@ public class Step1Data {
         this.workPlace = workPlace;
     }
 
+    @Override
+    public String toString() {
+        return "Step1Data{" +
+                "lastname='" + lastname + '\'' +
+                ", firstname='" + firstname + '\'' +
+                ", middlename='" + middlename + '\'' +
+                ", workPost='" + workPost + '\'' +
+                ", workPlace='" + workPlace + '\'' +
+                '}';
+    }
 }

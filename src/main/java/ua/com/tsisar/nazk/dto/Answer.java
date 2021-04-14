@@ -51,4 +51,14 @@ public class Answer {
     public void setError(Integer error) {
         this.error = error;
     }
+
+    @Override
+    public String toString() {
+        return "Answer{" +
+                "data=" + data +
+                ", count=" + count +
+                ", notice='" + notice + '\'' +
+                ", error=" + error +
+                '}';
+    }
 }

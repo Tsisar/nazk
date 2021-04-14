@@ -12,7 +12,7 @@
     <string name="filter_declaration_type">\u0020(%s)</string>
     <string name="filter_period">Період: %s - %s</string>
     <string name="button_find">Шукати</string>
-<!--    <string name="button_period">з - по</string>-->
+    <!--    <string name="button_period">з - по</string>-->
     <string name="date_format">%1$04d-%2$02d-%3$02d</string>
     <string name="dialog_title_start_date">Починаючи з дати</string>
     <string name="dialog_title_end_date">По дату</string>
@@ -126,4 +126,5 @@
         "For example, position the FAB to one side of stream of a cards so the FAB won’t interfere "
         "when a user tries to pick up one of cards.\n\n"
     </string>
+    <string name="filter_favorites">Вибране</string>
 </resources>

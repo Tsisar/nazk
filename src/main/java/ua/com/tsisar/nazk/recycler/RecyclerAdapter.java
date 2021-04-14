@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 
+import ua.com.tsisar.nazk.DBHelper;
 import ua.com.tsisar.nazk.R;
 import ua.com.tsisar.nazk.dto.Item;
 
@@ -26,6 +27,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.itemVi
     private final LayoutInflater inflater;
     private final List<Item> items;
     private final Context context;
+    private final DBHelper dbHelper;
 
     public interface onItemClickListener {
         void onItemClick(Item item);
@@ -35,8 +37,9 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.itemVi
 
     public RecyclerAdapter(Context context, List<Item> items){
         this.context = context;
-        inflater = LayoutInflater.from(context);
         this.items = items;
+        inflater = LayoutInflater.from(context);
+        dbHelper = new DBHelper(context);
     }
 
     public void setOnItemClickListener(onItemClickListener listener){
@@ -48,7 +51,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.itemVi
     public itemViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
 
         View view = inflater.inflate(R.layout.row_item_list, parent, false);
-        return new itemViewHolder(view);
+        return new itemViewHolder(view, dbHelper);
     }
 
     @Override
@@ -57,20 +60,8 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.itemVi
             return;
 
         Item item = items.get(position);
-        String documentType = context.getResources()
-                .getStringArray(R.array.array_document_type)[item.getDocumentType()];
-        String declarationType = context.getResources()
-                .getStringArray(R.array.array_declaration_type)[item.getDeclarationType()];
 
-        holder.setName(item.getFirstName(), item.getMiddleName(), item.getLastName());
-        holder.setDocument(item.getDeclarationType() != 0?
-                String.format("%s (%s)", documentType, declarationType):documentType);
-        holder.setYear(String.format("Рік: %s", item.getDeclarationYear()));
-        holder.setWorkPlace(String.format("Місце роботи: %s", item.getWorkPlace()));
-        holder.setWorkPost(String.format("Посада: %s", item.getWorkPost()));
-        holder.setDate(String.format("Дата та час подання: %s", dateFormat(item.getDate())));
-        holder.setId(item.getId());
-
+        holder.setItem(context, item);
         if(listener != null){
             holder.itemView.setOnClickListener(view -> listener.onItemClick(item));
         }
@@ -85,22 +76,10 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.itemVi
         }
     }
 
-    public String dateFormat(String date) {
-        try {
-            SimpleDateFormat inputDateFormat =
-                    new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ", Locale.getDefault());
-            SimpleDateFormat outputDateFormat =
-                    new SimpleDateFormat("dd.MM.yyyy HH:mm", Locale.getDefault());
-            return outputDateFormat.format(Objects.requireNonNull(inputDateFormat.parse(date)));
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-        return "";
-    }
 
     static class itemViewHolder extends RecyclerView.ViewHolder {
         private static final String NAME_FORMAT = "%s %s %s";
-        private String id;
+        private Item item;
         private final TextView name;
         private final TextView document;
         private final TextView year;
@@ -108,9 +87,11 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.itemVi
         private final TextView workPost;
         private final TextView date;
         private final ImageButton star;
+        private final DBHelper dbHelper;
 
-        private itemViewHolder(View itemView) {
+        private itemViewHolder(View itemView, DBHelper dbHelper) {
             super(itemView);
+            this.dbHelper = dbHelper;
 
             name = itemView.findViewById(R.id.text_view_item_name);
             document = itemView.findViewById(R.id.text_view_item_document);
@@ -122,40 +103,47 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.itemVi
             star.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Log.i("MyLog", "Star " + id);
+                    Log.i("MyLog", "Star " + item.getId());
                     v.setSelected(!v.isSelected());
+                    if(dbHelper.isSaved(item.getId())){
+                        dbHelper.delete(item.getId());
+                    }else {
+                        dbHelper.save(item);
+                    }
                 }
             });
         }
 
-        void setName(String firstName, String middleName, String lastName){
-            name.setText(String.format(NAME_FORMAT, lastName, firstName, middleName));
+        void setItem(Context context, Item item){
+            this.item = item;
+            star.setSelected(dbHelper.isSaved(item.getId()));
+
+            String documentType = context.getResources()
+                    .getStringArray(R.array.array_document_type)[item.getDocumentType()];
+            String declarationType = context.getResources()
+                    .getStringArray(R.array.array_declaration_type)[item.getDeclarationType()];
+
+            name.setText(String.format(NAME_FORMAT,
+                    item.getLastName(), item.getFirstName(), item.getMiddleName()));
+            document.setText(item.getDeclarationType() != 0?
+                    String.format("%s (%s)", documentType, declarationType):documentType);
+            year.setText(String.format("Рік: %s", item.getDeclarationYear()));
+            workPlace.setText(String.format("Місце роботи: %s", item.getWorkPlace()));
+            workPost.setText(String.format("Посада: %s", item.getWorkPost()));
+            date.setText(String.format("Дата та час подання: %s", dateFormat(item.getDate())));
         }
 
-        void setDocument(String string){
-            document.setText(string);
-        }
-
-        void setYear(String string){
-            year.setText(string);
-        }
-
-        void setWorkPlace(String string){
-            workPlace.setText(string);
-        }
-
-        void setWorkPost(String string){
-            workPost.setText(string);
-        }
-
-        void setDate(String string){
-            date.setText(string);
-        }
-
-        void setId(String id){
-            this.id = id;
-            star.setSelected(id.equals("878b057f-4e33-458a-994b-d8ba6e05f0d3")
-                    || id.equals("0beff010-769c-4348-8400-1e990bb9e66b"));
+        private String dateFormat(String date) {
+            try {
+                SimpleDateFormat inputDateFormat =
+                        new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ", Locale.getDefault());
+                SimpleDateFormat outputDateFormat =
+                        new SimpleDateFormat("dd.MM.yyyy HH:mm", Locale.getDefault());
+                return outputDateFormat.format(Objects.requireNonNull(inputDateFormat.parse(date)));
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            return "";
         }
     }
 }

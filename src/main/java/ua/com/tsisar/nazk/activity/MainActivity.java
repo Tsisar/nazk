@@ -26,12 +26,14 @@ import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.appbar.CollapsingToolbarLayout;
 import com.google.android.material.snackbar.Snackbar;
 
+import java.util.List;
 import java.util.Objects;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
 import ua.com.tsisar.nazk.App;
+import ua.com.tsisar.nazk.DBHelper;
 import ua.com.tsisar.nazk.R;
 import ua.com.tsisar.nazk.api.JsonError;
 import ua.com.tsisar.nazk.dto.Answer;
@@ -45,6 +47,7 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersView
 
     private static final String URL = "https://public.nazk.gov.ua/documents/";
     private static final int REQUEST_CODE_FILTERS = 1;
+    private static final int REQUEST_CODE_FAVORITES = 2;
     private SearchView searchView;
 
     private CompositeDisposable compositeDisposable;
@@ -53,7 +56,6 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersView
     private LinearLayout linearLayoutFilters;
     private LinearLayout linearLayoutPage;
     private RecyclerView recyclerView;
-    private RecyclerAdapter recyclerAdapter;
 
     private SwipeRefreshLayout swipeRefreshLayout;
     private CoordinatorLayout coordinatorLayout;
@@ -145,10 +147,16 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersView
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-        if (id == R.id.filter) {
-            Intent intent = new Intent(this, SearchFiltersActivity.class);
-            startActivityForResult(intent, REQUEST_CODE_FILTERS);
-            return true;
+        switch (id) {
+            case R.id.filter:
+                startActivityForResult(new Intent(this, SearchFiltersActivity.class),
+                        REQUEST_CODE_FILTERS);
+                return true;
+            case R.id.favorites:
+                DBHelper dbHelper = new DBHelper(this);
+                drawItems(dbHelper.getFavoritesList());
+                showPage(100);
+                return true;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -192,15 +200,8 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersView
                 }
 //                searchResult.setText(String.format(getString(R.string.search_result), totalItems));
             }
+            drawItems(answer.getData());
             showPage(answer.getCount());
-            recyclerAdapter = new RecyclerAdapter(this, answer.getData());
-            recyclerAdapter.setOnItemClickListener(new RecyclerAdapter.onItemClickListener() {
-                @Override
-                public void onItemClick(Item item) {
-                    openURL(URL + item.getId());
-                }
-            });
-            recyclerView.setAdapter(recyclerAdapter);
         }catch (Exception e){
             e.printStackTrace();
 //            showMessage("onSearchDeclarationsSuccess Exception: " + e.getMessage());
@@ -210,6 +211,17 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersView
                 showMessage("JsonError: " + answer.getError());
             }
         }
+    }
+
+    private void drawItems(List<Item> list){
+        RecyclerAdapter recyclerAdapter = new RecyclerAdapter(this, list);
+        recyclerAdapter.setOnItemClickListener(new RecyclerAdapter.onItemClickListener() {
+            @Override
+            public void onItemClick(Item item) {
+                openURL(URL + item.getId());
+            }
+        });
+        recyclerView.setAdapter(recyclerAdapter);
     }
 
     private void onFailure(Throwable throwable) {
