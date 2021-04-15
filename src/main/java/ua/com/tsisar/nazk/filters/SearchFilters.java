@@ -37,4 +37,14 @@ public class SearchFilters {
     public Wrapper<Integer> page() {
         return page;
     }
+
+    public void clear(){
+        query.clear();
+        userDeclarantId.clear();
+        documentType.clear();
+        declarationType.clear();
+        declarationYear.clear();
+        period.clear();
+        page.clear();
+    }
 }

@@ -65,7 +65,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
         // делаем запрос всех данных из таблицы TABLE, получаем Cursor
         Cursor cursor = database.query(TABLE, null, null, null,
-                null, null, null, null);
+                null, null, LAST_NAME + ", " + FIRST_NAME + ", " + MIDDLE_NAME, null);
 
         // ставим позицию курсора на первую строку выборки
         // если в выборке нет строк, вернется false

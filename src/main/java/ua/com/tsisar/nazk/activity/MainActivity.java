@@ -47,7 +47,6 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersView
 
     private static final String URL = "https://public.nazk.gov.ua/documents/";
     private static final int REQUEST_CODE_FILTERS = 1;
-    private static final int REQUEST_CODE_FAVORITES = 2;
     private SearchView searchView;
 
     private CompositeDisposable compositeDisposable;
@@ -156,6 +155,8 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersView
                 DBHelper dbHelper = new DBHelper(this);
                 drawItems(dbHelper.getFavoritesList());
                 showPage(100);
+                App.getFilters().clear();
+                linearLayoutFilters.removeAllViews();
                 return true;
         }
         return super.onOptionsItemSelected(item);
