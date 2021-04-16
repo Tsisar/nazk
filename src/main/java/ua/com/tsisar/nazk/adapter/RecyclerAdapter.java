@@ -1,4 +1,4 @@
-package ua.com.tsisar.nazk.recycler;
+package ua.com.tsisar.nazk.adapter;
 
 import android.content.Context;
 import android.util.Log;
@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 
-import ua.com.tsisar.nazk.DBHelper;
+import ua.com.tsisar.nazk.util.DBHelper;
 import ua.com.tsisar.nazk.R;
 import ua.com.tsisar.nazk.dto.Item;
 
@@ -105,10 +105,10 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.itemVi
                 public void onClick(View v) {
                     Log.i("MyLog", "Star " + item.getId());
                     v.setSelected(!v.isSelected());
-                    if(dbHelper.isSaved(item.getId())){
-                        dbHelper.delete(item.getId());
+                    if(dbHelper.isSavedFavorites(item.getId())){
+                        dbHelper.deleteFavorites(item.getId());
                     }else {
-                        dbHelper.save(item);
+                        dbHelper.saveFavorites(item);
                     }
                 }
             });
@@ -116,7 +116,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.itemVi
 
         void setItem(Context context, Item item){
             this.item = item;
-            star.setSelected(dbHelper.isSaved(item.getId()));
+            star.setSelected(dbHelper.isSavedFavorites(item.getId()));
 
             String documentType = context.getResources()
                     .getStringArray(R.array.array_document_type)[item.getDocumentType()];

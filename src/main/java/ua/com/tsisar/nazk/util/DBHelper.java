@@ -1,4 +1,4 @@
-package ua.com.tsisar.nazk;
+package ua.com.tsisar.nazk.util;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -17,9 +17,10 @@ import ua.com.tsisar.nazk.dto.Step1Data;
 public class DBHelper extends SQLiteOpenHelper {
     private final static String TAG = "MyLog";
 
-    private static final String NAME = "favorites_db";
-    private static final String TABLE = "favorites";
-    private static final String LIMIT = "100";
+    private static final String NAME = "nazk_client_db";
+
+    private static final String FAVORITES = "favorites";
+    private static final String FAVORITES_LIMIT = "100";
 
     private static final String DOCUMENT_ID = "document_id";
     private static final String FIRST_NAME = "first_name";
@@ -33,13 +34,18 @@ public class DBHelper extends SQLiteOpenHelper {
     private static final String USER_DECLARANT_ID = "user_declarant_id";
     private static final String DATE = "date";
 
+    private static final String HISTORY = "history";
+    private static final String HISTORY_LIMIT = "10";
+
+    private static final String QUERY = "history_query";
+
     public DBHelper(Context context) {
         super(context, NAME, null, 1);
     }
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL("create table " + TABLE + " ("
+        db.execSQL("create table " + FAVORITES + " ("
                 + "id integer primary key autoincrement,"
                 + DOCUMENT_ID + " text,"
                 + FIRST_NAME + " text,"
@@ -53,6 +59,11 @@ public class DBHelper extends SQLiteOpenHelper {
                 + USER_DECLARANT_ID + " Integer,"
                 + DATE + " text"
                 + ");");
+
+        db.execSQL("create table " + HISTORY + " ("
+                + "_id integer primary key autoincrement,"
+                + QUERY + " text"
+                + ");");
     }
 
     @Override
@@ -60,11 +71,10 @@ public class DBHelper extends SQLiteOpenHelper {
     }
 
     public ArrayList<Item> getFavoritesList(){
-        SQLiteDatabase database = this.getWritableDatabase();
         ArrayList<Item> list = new ArrayList<>();
 
         // делаем запрос всех данных из таблицы TABLE, получаем Cursor
-        Cursor cursor = database.query(TABLE, null, null, null,
+        Cursor cursor = this.getWritableDatabase().query(FAVORITES, null, null, null,
                 null, null, LAST_NAME + ", " + FIRST_NAME + ", " + MIDDLE_NAME, null);
 
         // ставим позицию курсора на первую строку выборки
@@ -99,30 +109,17 @@ public class DBHelper extends SQLiteOpenHelper {
         return  list;
     }
 
-    public boolean isSaved(String id){
-        SQLiteDatabase database = this.getWritableDatabase();
-        ArrayList<String> list = new ArrayList<>();
-
-        Cursor cursor = database.query(TABLE, null, DOCUMENT_ID + " = \'" + id + "\'",
-                null, null, null, null, LIMIT);
-
-        if (cursor.moveToFirst()) {
-            do {
-                list.add(cursor.getString(cursor.getColumnIndex(DOCUMENT_ID)));
-            } while (cursor.moveToNext());
-        } else {
-            Log.d(TAG, "0 rows");
-        }
-        cursor.close();
-
-        return !list.isEmpty();
+    public boolean isSavedFavorites(String id){
+        return this.getReadableDatabase().query(
+                FAVORITES, null, DOCUMENT_ID + " = \'" + id + "\'",
+                null, null, null, null, null).moveToFirst();
     }
 
-    public void delete(String id){
-        this.getWritableDatabase().execSQL("delete from " + TABLE + " where " + DOCUMENT_ID + " = \'" + id + "\';");
+    public void deleteFavorites(String id){
+        this.getWritableDatabase().execSQL("delete from " + FAVORITES + " where " + DOCUMENT_ID + " = \'" + id + "\';");
     }
 
-    public void save(Item item){
+    public void saveFavorites(Item item){
         // создаем объект для данных
         ContentValues cv = new ContentValues();
         // подключаемся к БД
@@ -140,9 +137,36 @@ public class DBHelper extends SQLiteOpenHelper {
         cv.put(USER_DECLARANT_ID, item.getUserDeclarantId());
         cv.put(DATE, item.getDate());
 
-        long rowID = db.insert(TABLE, null, cv);
+        long rowID = db.insert(FAVORITES, null, cv);
 
         Log.d(TAG, "row inserted, ID = " + rowID);
     }
 
+    public Cursor loadHistory(String query){
+        return this.getReadableDatabase().query(
+                HISTORY, null, QUERY + " like \'" + query + "%\'",
+                null, null, null, null, HISTORY_LIMIT);
+    }
+
+    public void saveHistory(String query){
+       if(!isSavedHistory(query)) {
+           ContentValues cv = new ContentValues();
+           SQLiteDatabase db = this.getWritableDatabase();
+
+           cv.put(QUERY, query);
+
+           long rowID = db.insert(HISTORY, null, cv);
+           Log.d(TAG, "row inserted, ID = " + rowID);
+       }
+    }
+
+    public void deleteHistory(String query){
+        this.getWritableDatabase().execSQL("delete from " + HISTORY + " where " + QUERY + " = \'" + query + "\';");
+    }
+
+    public boolean isSavedHistory(String query){
+        return this.getReadableDatabase().query(
+                HISTORY, null, QUERY + " = \'" + query + "\'",
+                null, null, null, null, null).moveToFirst();
+    }
 }

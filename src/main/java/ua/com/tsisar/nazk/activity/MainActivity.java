@@ -1,5 +1,6 @@
 package ua.com.tsisar.nazk.activity;
 
+import android.annotation.SuppressLint;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
@@ -33,13 +34,14 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
 import ua.com.tsisar.nazk.App;
-import ua.com.tsisar.nazk.DBHelper;
+import ua.com.tsisar.nazk.adapter.CursorExAdapter;
 import ua.com.tsisar.nazk.R;
 import ua.com.tsisar.nazk.api.JsonError;
 import ua.com.tsisar.nazk.dto.Answer;
 import ua.com.tsisar.nazk.dto.Item;
 import ua.com.tsisar.nazk.filters.Type;
-import ua.com.tsisar.nazk.recycler.RecyclerAdapter;
+import ua.com.tsisar.nazk.adapter.RecyclerAdapter;
+import ua.com.tsisar.nazk.util.DBHelper;
 import ua.com.tsisar.nazk.view.SearchFiltersView;
 
 public class MainActivity extends AppCompatActivity implements SearchFiltersView.Listener, SwipeRefreshLayout.OnRefreshListener {
@@ -47,6 +49,7 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersView
 
     private static final String URL = "https://public.nazk.gov.ua/documents/";
     private static final int REQUEST_CODE_FILTERS = 1;
+
     private SearchView searchView;
 
     private CompositeDisposable compositeDisposable;
@@ -61,11 +64,15 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersView
 
     private int maxPage;
 
+    private DBHelper dbHelper;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         compositeDisposable = new CompositeDisposable();
+
+        dbHelper = new DBHelper(this);
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -94,8 +101,16 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersView
 
         swipeRefreshLayout = findViewById(R.id.refresh);
         swipeRefreshLayout.setOnRefreshListener(this);
+    }
 
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
 
+        if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
+            String query = intent.getStringExtra(SearchManager.QUERY);
+            Log.i("MyContentProvider", "Query: " + query);
+        }
     }
 
     @Override
@@ -116,12 +131,22 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersView
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_toolbar, menu);
 
-        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
         searchView = (SearchView) menu.findItem(R.id.search).getActionView();
-
-        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
         searchView.setIconifiedByDefault(false); // Do not iconify the widget; expand it by default
         searchView.setQueryHint(getString(R.string.hint_query));
+        searchView.setOnSuggestionListener(new SearchView.OnSuggestionListener() {
+            @Override
+            public boolean onSuggestionSelect(int position) {
+                Log.i(TAG, "onSuggestionSelect: " + position);
+                return false;
+            }
+
+            @Override
+            public boolean onSuggestionClick(int position) {
+                Log.i(TAG, "onSuggestionClick: " + position);
+                return false;
+            }
+        });
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
@@ -130,6 +155,7 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersView
                 App.getFilters().query().set(query);
                 App.getFilters().page().clear();
                 searchDeclarations();
+                dbHelper.saveHistory(query);
                 return true;
             }
 
@@ -137,12 +163,15 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersView
             public boolean onQueryTextChange(String newText) {
                 Log.i(TAG, "onQueryTextChange: " + newText);
                 App.getFilters().query().set(newText);
+                searchView.setSuggestionsAdapter(new CursorExAdapter(getContext(), dbHelper.loadHistory(newText)));
                 return true;
             }
         });
+
         return true;
     }
 
+    @SuppressLint("NonConstantResourceId")
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
@@ -152,7 +181,6 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersView
                         REQUEST_CODE_FILTERS);
                 return true;
             case R.id.favorites:
-                DBHelper dbHelper = new DBHelper(this);
                 drawItems(dbHelper.getFavoritesList());
                 showPage(100);
                 App.getFilters().clear();
@@ -216,12 +244,7 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersView
 
     private void drawItems(List<Item> list){
         RecyclerAdapter recyclerAdapter = new RecyclerAdapter(this, list);
-        recyclerAdapter.setOnItemClickListener(new RecyclerAdapter.onItemClickListener() {
-            @Override
-            public void onItemClick(Item item) {
-                openURL(URL + item.getId());
-            }
-        });
+        recyclerAdapter.setOnItemClickListener(item -> openURL(URL + item.getId()));
         recyclerView.setAdapter(recyclerAdapter);
     }
 
@@ -351,5 +374,9 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersView
     public void onRefresh() {
         App.getFilters().page().clear();
         searchDeclarations();
+    }
+
+    public Context getContext() {
+        return this;
     }
 }

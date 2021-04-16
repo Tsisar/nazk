@@ -8,9 +8,8 @@ public class Wrapper<V> {
     }
 
     public void set(V value) {
-        if(value instanceof Number && (Integer) value == 0) {
-            this.value = null;
-        }else if(value instanceof String && ((String) value).isEmpty()) {
+        if((value instanceof Number && (Integer) value == 0) ||
+                (value instanceof String && ((String) value).isEmpty())) {
             this.value = null;
         }else {
             this.value = value;
