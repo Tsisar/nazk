@@ -16,12 +16,12 @@
         android:background="@drawable/background_stroke">
 
         <TextView
-            android:id="@+id/sf_item_name_textView"
+            android:id="@+id/text_view_item_filters_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
 
         <ImageButton
-            android:id="@+id/sf_clean_button"
+            android:id="@+id/image_button_item_filters_clear"
             android:layout_marginStart="@dimen/row_vertical_padding"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

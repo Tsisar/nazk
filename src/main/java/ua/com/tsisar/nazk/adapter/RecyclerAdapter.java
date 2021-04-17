@@ -28,12 +28,11 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.itemVi
     private final List<Item> items;
     private final Context context;
     private final DBHelper dbHelper;
+    private onItemClickListener listener;
 
     public interface onItemClickListener {
         void onItemClick(Item item);
     }
-
-    private onItemClickListener listener;
 
     public RecyclerAdapter(Context context, List<Item> items){
         this.context = context;
@@ -50,7 +49,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.itemVi
     @Override
     public itemViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
 
-        View view = inflater.inflate(R.layout.row_item_list, parent, false);
+        View view = inflater.inflate(R.layout.item_results, parent, false);
         return new itemViewHolder(view, dbHelper);
     }
 
@@ -60,7 +59,6 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.itemVi
             return;
 
         Item item = items.get(position);
-
         holder.setItem(context, item);
         if(listener != null){
             holder.itemView.setOnClickListener(view -> listener.onItemClick(item));

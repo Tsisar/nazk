@@ -45,10 +45,10 @@ public class SearchFiltersView extends LinearLayout implements View.OnClickListe
     }
 
     private void initView() {
-        View view = inflate(getContext(), R.layout.item_search_filters, null);
-        ImageButton cleanButton = view.findViewById(R.id.sf_clean_button);
+        View view = inflate(getContext(), R.layout.item_filters, null);
+        ImageButton cleanButton = view.findViewById(R.id.image_button_item_filters_clear);
         cleanButton.setOnClickListener(this);
-        name = view.findViewById(R.id.sf_item_name_textView);
+        name = view.findViewById(R.id.text_view_item_filters_name);
         addView(view);
     }
 

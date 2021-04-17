@@ -75,7 +75,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
         // делаем запрос всех данных из таблицы TABLE, получаем Cursor
         Cursor cursor = this.getWritableDatabase().query(FAVORITES, null, null, null,
-                null, null, LAST_NAME + ", " + FIRST_NAME + ", " + MIDDLE_NAME, null);
+                null, null, LAST_NAME + ", " + FIRST_NAME + ", " + MIDDLE_NAME, FAVORITES_LIMIT);
 
         // ставим позицию курсора на первую строку выборки
         // если в выборке нет строк, вернется false
@@ -110,9 +110,12 @@ public class DBHelper extends SQLiteOpenHelper {
     }
 
     public boolean isSavedFavorites(String id){
-        return this.getReadableDatabase().query(
+        Cursor cursor = this.getReadableDatabase().query(
                 FAVORITES, null, DOCUMENT_ID + " = \'" + id + "\'",
-                null, null, null, null, null).moveToFirst();
+                null, null, null, null, null);
+        boolean res = cursor.moveToFirst();
+        cursor.close();
+        return res;
     }
 
     public void deleteFavorites(String id){
@@ -145,7 +148,7 @@ public class DBHelper extends SQLiteOpenHelper {
     public Cursor loadHistory(String query){
         return this.getReadableDatabase().query(
                 HISTORY, null, QUERY + " like \'" + query + "%\'",
-                null, null, null, null, HISTORY_LIMIT);
+                null, null, null, "_id DESC", HISTORY_LIMIT);
     }
 
     public void saveHistory(String query){
@@ -165,8 +168,11 @@ public class DBHelper extends SQLiteOpenHelper {
     }
 
     public boolean isSavedHistory(String query){
-        return this.getReadableDatabase().query(
+        Cursor cursor = this.getReadableDatabase().query(
                 HISTORY, null, QUERY + " = \'" + query + "\'",
-                null, null, null, null, null).moveToFirst();
+                null, null, null, null, null);
+        boolean res = cursor.moveToFirst();
+        cursor.close();
+        return res;
     }
 }
