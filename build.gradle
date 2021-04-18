@@ -10,7 +10,7 @@ android {
         applicationId "ua.tsisar.pavel.nazk"
         minSdkVersion 20
         targetSdkVersion 30
-        versionCode 20
+        versionCode 21
         versionName '2.0'
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
