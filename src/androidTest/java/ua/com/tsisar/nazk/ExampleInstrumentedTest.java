@@ -1,4 +1,4 @@
-package ua.com.tsisar.nazk;
+package ua.tsisar.pavel.nazk;
 
 import android.content.Context;
 
@@ -21,6 +21,6 @@ public class ExampleInstrumentedTest {
     public void useAppContext() {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
-        assertEquals("ua.com.tsisar.nazk", appContext.getPackageName());
+        assertEquals("ua.tsisar.pavel.nazk", appContext.getPackageName());
     }
 }

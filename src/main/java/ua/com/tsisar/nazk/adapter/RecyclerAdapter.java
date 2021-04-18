@@ -1,4 +1,4 @@
-package ua.com.tsisar.nazk.adapter;
+package ua.tsisar.pavel.nazk.adapter;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -16,9 +16,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 
-import ua.com.tsisar.nazk.R;
-import ua.com.tsisar.nazk.dto.Item;
-import ua.com.tsisar.nazk.util.DBHelper;
+import ua.tsisar.pavel.nazk.R;
+import ua.tsisar.pavel.nazk.dto.Item;
+import ua.tsisar.pavel.nazk.util.DBHelper;
 
 
 public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.itemViewHolder> {

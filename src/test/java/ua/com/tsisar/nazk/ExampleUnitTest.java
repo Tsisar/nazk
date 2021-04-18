@@ -1,4 +1,4 @@
-package ua.com.tsisar.nazk;
+package ua.tsisar.pavel.nazk;
 
 import org.junit.Test;
 

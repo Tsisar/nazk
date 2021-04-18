@@ -1,4 +1,4 @@
-package ua.com.tsisar.nazk.util.date;
+package ua.tsisar.pavel.nazk.util.date;
 
 public enum MonthTypical implements Month {
     JANUARY(31),

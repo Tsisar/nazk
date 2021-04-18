@@ -1,4 +1,4 @@
-package ua.com.tsisar.nazk.dto;
+package ua.tsisar.pavel.nazk.dto;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;

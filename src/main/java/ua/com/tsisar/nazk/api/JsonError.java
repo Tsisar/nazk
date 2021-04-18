@@ -1,4 +1,4 @@
-package ua.com.tsisar.nazk.api;
+package ua.tsisar.pavel.nazk.api;
 
 import java.util.HashMap;
 import java.util.Map;

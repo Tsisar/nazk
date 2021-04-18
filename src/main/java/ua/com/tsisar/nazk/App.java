@@ -1,4 +1,4 @@
-package ua.com.tsisar.nazk;
+package ua.tsisar.pavel.nazk;
 
 import android.app.Application;
 
@@ -8,8 +8,8 @@ import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.converter.scalars.ScalarsConverterFactory;
-import ua.com.tsisar.nazk.api.ApiInterface;
-import ua.com.tsisar.nazk.filters.SearchFilters;
+import ua.tsisar.pavel.nazk.api.ApiInterface;
+import ua.tsisar.pavel.nazk.filters.SearchFilters;
 
 public class App extends Application {
     private static ApiInterface apiInterface;

@@ -1,4 +1,4 @@
-package ua.com.tsisar.nazk.api;
+package ua.tsisar.pavel.nazk.api;
 
 import androidx.annotation.Nullable;
 
@@ -6,9 +6,9 @@ import io.reactivex.Single;
 import retrofit2.http.GET;
 import retrofit2.http.Headers;
 import retrofit2.http.Query;
-import ua.com.tsisar.nazk.dto.Answer;
-import ua.com.tsisar.nazk.filters.DeclarationType;
-import ua.com.tsisar.nazk.filters.DocumentType;
+import ua.tsisar.pavel.nazk.dto.Answer;
+import ua.tsisar.pavel.nazk.filters.DeclarationType;
+import ua.tsisar.pavel.nazk.filters.DocumentType;
 
 public interface ApiInterface {
     String QUERY = "query";

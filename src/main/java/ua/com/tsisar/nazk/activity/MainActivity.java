@@ -1,4 +1,4 @@
-package ua.com.tsisar.nazk.activity;
+package ua.tsisar.pavel.nazk.activity;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -33,16 +33,16 @@ import java.util.Objects;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
-import ua.com.tsisar.nazk.App;
-import ua.com.tsisar.nazk.R;
-import ua.com.tsisar.nazk.adapter.CursorExAdapter;
-import ua.com.tsisar.nazk.adapter.RecyclerAdapter;
-import ua.com.tsisar.nazk.api.JsonError;
-import ua.com.tsisar.nazk.dto.Answer;
-import ua.com.tsisar.nazk.dto.Item;
-import ua.com.tsisar.nazk.filters.Type;
-import ua.com.tsisar.nazk.util.DBHelper;
-import ua.com.tsisar.nazk.view.SearchFiltersView;
+import ua.tsisar.pavel.nazk.App;
+import ua.tsisar.pavel.nazk.R;
+import ua.tsisar.pavel.nazk.adapter.CursorExAdapter;
+import ua.tsisar.pavel.nazk.adapter.RecyclerAdapter;
+import ua.tsisar.pavel.nazk.api.JsonError;
+import ua.tsisar.pavel.nazk.dto.Answer;
+import ua.tsisar.pavel.nazk.dto.Item;
+import ua.tsisar.pavel.nazk.filters.Type;
+import ua.tsisar.pavel.nazk.util.DBHelper;
+import ua.tsisar.pavel.nazk.view.SearchFiltersView;
 
 public class MainActivity extends AppCompatActivity implements SearchFiltersView.Listener, SwipeRefreshLayout.OnRefreshListener {
     private static final String TAG = "MyLog";

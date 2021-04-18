@@ -1,4 +1,4 @@
-package ua.com.tsisar.nazk.activity;
+package ua.tsisar.pavel.nazk.activity;
 
 import android.app.DatePickerDialog;
 import android.content.Intent;
@@ -16,11 +16,11 @@ import com.google.android.material.textfield.MaterialAutoCompleteTextView;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 
-import ua.com.tsisar.nazk.App;
-import ua.com.tsisar.nazk.R;
-import ua.com.tsisar.nazk.filters.DeclarationType;
-import ua.com.tsisar.nazk.filters.DocumentType;
-import ua.com.tsisar.nazk.util.Date;
+import ua.tsisar.pavel.nazk.App;
+import ua.tsisar.pavel.nazk.R;
+import ua.tsisar.pavel.nazk.filters.DeclarationType;
+import ua.tsisar.pavel.nazk.filters.DocumentType;
+import ua.tsisar.pavel.nazk.util.Date;
 
 public class SearchFiltersActivity extends AppCompatActivity {
 

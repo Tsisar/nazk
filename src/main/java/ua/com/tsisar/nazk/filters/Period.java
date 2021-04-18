@@ -1,6 +1,6 @@
-package ua.com.tsisar.nazk.filters;
+package ua.tsisar.pavel.nazk.filters;
 
-import ua.com.tsisar.nazk.util.Date;
+import ua.tsisar.pavel.nazk.util.Date;
 
 public class Period {
     private final Date startDate = new Date();

@@ -1,4 +1,4 @@
-package ua.com.tsisar.nazk.adapter;
+package ua.tsisar.pavel.nazk.adapter;
 
 import android.content.Context;
 import android.database.Cursor;
@@ -9,7 +9,7 @@ import android.widget.TextView;
 
 import androidx.cursoradapter.widget.CursorAdapter;
 
-import ua.com.tsisar.nazk.R;
+import ua.tsisar.pavel.nazk.R;
 
 public class CursorExAdapter extends CursorAdapter {
     private static final String QUERY = "history_query";

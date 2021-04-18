@@ -1,11 +1,11 @@
-package ua.com.tsisar.nazk.util;
+package ua.tsisar.pavel.nazk.util;
 
 import android.annotation.SuppressLint;
 
 import java.util.Calendar;
 import java.util.concurrent.TimeUnit;
 
-import ua.com.tsisar.nazk.util.date.Year;
+import ua.tsisar.pavel.nazk.util.date.Year;
 
 public class Date{
     private static final String DATE_FORMAT = "%1$02d.%2$02d.%3$04d";

@@ -1,4 +1,4 @@
-package ua.com.tsisar.nazk.filters;
+package ua.tsisar.pavel.nazk.filters;
 
 public class SearchFilters {
 

@@ -1,4 +1,4 @@
-package ua.com.tsisar.nazk.util;
+package ua.tsisar.pavel.nazk.util;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -8,10 +8,10 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 import java.util.ArrayList;
 
-import ua.com.tsisar.nazk.dto.Item;
-import ua.com.tsisar.nazk.dto.ItemData;
-import ua.com.tsisar.nazk.dto.Step1;
-import ua.com.tsisar.nazk.dto.Step1Data;
+import ua.tsisar.pavel.nazk.dto.Item;
+import ua.tsisar.pavel.nazk.dto.ItemData;
+import ua.tsisar.pavel.nazk.dto.Step1;
+import ua.tsisar.pavel.nazk.dto.Step1Data;
 
 public class DBHelper extends SQLiteOpenHelper {
     private static final String NAME = "nazk_client_db";
