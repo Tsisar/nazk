@@ -5,7 +5,6 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.util.Log;
 
 import java.util.ArrayList;
 
@@ -15,8 +14,6 @@ import ua.com.tsisar.nazk.dto.Step1;
 import ua.com.tsisar.nazk.dto.Step1Data;
 
 public class DBHelper extends SQLiteOpenHelper {
-    private final static String TAG = "MyLog";
-
     private static final String NAME = "nazk_client_db";
 
     private static final String FAVORITES = "favorites";
@@ -101,11 +98,11 @@ public class DBHelper extends SQLiteOpenHelper {
                 // переход на следующую строку
                 // а если следующей нет (текущая - последняя), то false - выходим из цикла
             } while (cursor.moveToNext());
-        } else {
-            Log.d(TAG, "0 rows");
         }
+//        } else {
+//            Log.d(TAG, "0 rows");
+//        }
         cursor.close();
-        Log.d(TAG, "list: " + list);
         return  list;
     }
 
@@ -140,9 +137,9 @@ public class DBHelper extends SQLiteOpenHelper {
         cv.put(USER_DECLARANT_ID, item.getUserDeclarantId());
         cv.put(DATE, item.getDate());
 
-        long rowID = db.insert(FAVORITES, null, cv);
-
-        Log.d(TAG, "row inserted, ID = " + rowID);
+        db.insert(FAVORITES, null, cv);
+//        long rowID = db.insert(FAVORITES, null, cv);
+//        Log.d(TAG, "row inserted, ID = " + rowID);
     }
 
     public Cursor loadHistory(String query){
@@ -158,8 +155,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
            cv.put(QUERY, query);
 
-           long rowID = db.insert(HISTORY, null, cv);
-           Log.d(TAG, "row inserted, ID = " + rowID);
+           db.insert(HISTORY, null, cv);
        }
     }
 

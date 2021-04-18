@@ -3,8 +3,10 @@ package ua.com.tsisar.nazk.activity;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.text.util.Linkify;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -12,7 +14,6 @@ import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
@@ -53,6 +54,7 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersView
 
     private CompositeDisposable compositeDisposable;
 
+    private TextView textViewInfo;
     private TextView textViewPage;
     private LinearLayout linearLayoutFilters;
     private LinearLayout linearLayoutPage;
@@ -64,7 +66,6 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersView
     private int maxPage;
 
     private DBHelper dbHelper;
-    //private Cursor cursor;
     private CursorExAdapter cursorAdapter;
 
     @Override
@@ -86,6 +87,8 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersView
         linearLayoutPage = findViewById(R.id.linear_layout_content_page);
         linearLayoutPage.setVisibility(View.GONE);
         textViewPage = findViewById(R.id.text_view_content_page);
+        textViewInfo = findViewById(R.id.info);
+        Linkify.addLinks(textViewInfo, Linkify.ALL);
 
         AppBarLayout appBarLayout = findViewById(R.id.app_bar);
         appBarLayout.addOnOffsetChangedListener((appBarLayout1, verticalOffset) -> {
@@ -116,11 +119,11 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersView
         }
     }
 
-    protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
-        super.onRestoreInstanceState(savedInstanceState);
-        updateSearchFilters();
-        searchDeclarations();
-    }
+//    protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
+//        super.onRestoreInstanceState(savedInstanceState);
+//        updateSearchFilters();
+//        searchDeclarations();
+//    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -136,14 +139,15 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersView
             @Override
             public void onItemDelete(String query) {
                 dbHelper.deleteHistory(query);
+                //TODO changeCursor?
                 cursorAdapter.changeCursor(dbHelper.loadHistory(App.getFilters().query().get()));
             }
         });
 
         searchView = (SearchView) menu.findItem(R.id.search).getActionView();
+        searchView.setSuggestionsAdapter(cursorAdapter);
         searchView.setIconifiedByDefault(false); // Do not iconify the widget; expand it by default
         searchView.setQueryHint(getString(R.string.hint_query));
-
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
@@ -158,8 +162,17 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersView
             @Override
             public boolean onQueryTextChange(String newText) {
                 App.getFilters().query().set(newText);
-                cursorAdapter.changeCursor(dbHelper.loadHistory(newText));
-                searchView.setSuggestionsAdapter(cursorAdapter);
+                //TODO changeCursor?
+                Cursor newCursor = dbHelper.loadHistory(newText);
+                Cursor oldCursor = cursorAdapter.swapCursor(newCursor);
+
+                Log.w(TAG, "newText: " + newText);
+                Log.w(TAG, "oldCursor: " + oldCursor);
+                Log.w(TAG, "newCursor: " + newCursor);
+                Log.w(TAG, "_______________________________________________________");
+//                if(oldCursor != null && !oldCursor.isClosed()) {
+//                    oldCursor.close();
+//                }
                 return true;
             }
         });
@@ -190,20 +203,10 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersView
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == RESULT_OK && requestCode == REQUEST_CODE_FILTERS) {
-
-            Log.i(TAG, "query: " + App.getFilters().query().get());
-            Log.i(TAG, "userDeclarantId: " + App.getFilters().userDeclarantId().get());
-            Log.i(TAG, "documentType: " + App.getFilters().documentType().get());
-            Log.i(TAG, "declarationType: " + App.getFilters().declarationType().get());
-            Log.i(TAG, "declarationYear: " + App.getFilters().declarationYear().get());
-            Log.i(TAG, "startDate: " + App.getFilters().period().startDate().toLong());
-            Log.i(TAG, "endDate: " + App.getFilters().period().endDate().toLong());
-            Log.i(TAG, "page: " + App.getFilters().page().get());
-
             try {
                 searchView.post(() -> searchView.setQuery(App.getFilters().query().get(), false));
             }catch (NullPointerException e){
-                Log.i(TAG, "NullPointerException: " + e);
+                showMessage(e.getMessage());
             }
             updateSearchFilters();
         }
@@ -239,8 +242,9 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersView
     }
 
     private void drawItems(List<Item> list){
+        textViewInfo.setVisibility(View.GONE);
         RecyclerAdapter recyclerAdapter = new RecyclerAdapter(this, list);
-        recyclerAdapter.setOnItemClickListener(item -> MainActivity.this.openURL(URL + item.getId()));
+        recyclerAdapter.setOnItemClickListener(item -> openURL(URL + item.getId()));
         recyclerView.setAdapter(recyclerAdapter);
     }
 
@@ -268,7 +272,6 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersView
     }
 
     private void showMessage(String message){
-        Log.e(TAG, "Message: " + message);
         Snackbar.make(coordinatorLayout,message,Snackbar.LENGTH_LONG).show();
     }
 
@@ -281,7 +284,6 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersView
 
     @Override
     public void removeView(SearchFiltersView view) {
-        Log.e(TAG, "removeView: " + view.getType());
         App.getFilters().page().clear();
         switch (view.getType()){
 //            case QUERY:
@@ -356,7 +358,7 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersView
         searchDeclarations();
     }
 
-    public void openURL(String url){
+    private void openURL(String url){
         try {
             startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
         }
@@ -372,7 +374,7 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersView
         searchDeclarations();
     }
 
-    public Context getContext() {
+    private Context getContext() {
         return this;
     }
 }

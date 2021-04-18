@@ -1,7 +1,6 @@
 package ua.com.tsisar.nazk.adapter;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,13 +16,12 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 
-import ua.com.tsisar.nazk.util.DBHelper;
 import ua.com.tsisar.nazk.R;
 import ua.com.tsisar.nazk.dto.Item;
+import ua.com.tsisar.nazk.util.DBHelper;
 
 
 public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.itemViewHolder> {
-    private static final String TAG = "MyLog";
     private final LayoutInflater inflater;
     private final List<Item> items;
     private final Context context;
@@ -98,16 +96,12 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.itemVi
             workPost = itemView.findViewById(R.id.text_view_item_work_post);
             date = itemView.findViewById(R.id.text_view_item_date);
             star = itemView.findViewById(R.id.image_button_star);
-            star.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Log.i("MyLog", "Star " + item.getId());
-                    v.setSelected(!v.isSelected());
-                    if(dbHelper.isSavedFavorites(item.getId())){
-                        dbHelper.deleteFavorites(item.getId());
-                    }else {
-                        dbHelper.saveFavorites(item);
-                    }
+            star.setOnClickListener(v -> {
+                v.setSelected(!v.isSelected());
+                if(dbHelper.isSavedFavorites(item.getId())){
+                    dbHelper.deleteFavorites(item.getId());
+                }else {
+                    dbHelper.saveFavorites(item);
                 }
             });
         }

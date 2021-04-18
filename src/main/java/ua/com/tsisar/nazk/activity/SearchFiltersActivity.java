@@ -28,7 +28,6 @@ public class SearchFiltersActivity extends AppCompatActivity {
     private TextInputLayout inputTextYear;
     private TextInputEditText editTextQuery;
     private TextInputEditText editTextYear;
-    //private TextInputEditText textViewPeriod;
     private TextView textViewPeriod;
 
     private Date startDate;
@@ -43,7 +42,7 @@ public class SearchFiltersActivity extends AppCompatActivity {
     @DeclarationType.Declaration
     private int declarationType = DeclarationType.DECLARATION_ALL;
 
-    public static Integer tryParse(String string) {
+    private static Integer tryParse(String string) {
         try {
             return Integer.parseInt(string);
         } catch (NumberFormatException e) {
