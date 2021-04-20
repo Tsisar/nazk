@@ -1,8 +1,8 @@
 package ua.tsisar.pavel.nazk.util.date;
 
 public enum Year {
-    TYPICAL (365),
-    LEAP (366);
+    TYPICAL(365),
+    LEAP(366);
     private final int days;
 
     Year(int days) {
@@ -17,7 +17,7 @@ public enum Year {
         return ((year % 4 == 0 && year % 100 != 0) || year % 400 == 0) ? LEAP : TYPICAL;
     }
 
-    public Month forMonth(int month){
+    public Month forMonth(int month) {
         return this == Year.LEAP ? MonthLeap.forMonth(month) : MonthTypical.forMonth(month);
     }
 }

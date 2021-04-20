@@ -67,15 +67,12 @@ public class DBHelper extends SQLiteOpenHelper {
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
     }
 
-    public ArrayList<Item> getFavoritesList(){
+    public ArrayList<Item> getFavoritesList() {
         ArrayList<Item> list = new ArrayList<>();
 
-        // делаем запрос всех данных из таблицы TABLE, получаем Cursor
         Cursor cursor = this.getWritableDatabase().query(FAVORITES, null, null, null,
                 null, null, LAST_NAME + ", " + FIRST_NAME + ", " + MIDDLE_NAME, FAVORITES_LIMIT);
 
-        // ставим позицию курсора на первую строку выборки
-        // если в выборке нет строк, вернется false
         if (cursor.moveToFirst()) {
             do {
                 list.add(new Item(
@@ -95,18 +92,13 @@ public class DBHelper extends SQLiteOpenHelper {
                         cursor.getInt(cursor.getColumnIndex(USER_DECLARANT_ID)),
                         cursor.getString(cursor.getColumnIndex(DATE))));
 
-                // переход на следующую строку
-                // а если следующей нет (текущая - последняя), то false - выходим из цикла
             } while (cursor.moveToNext());
         }
-//        } else {
-//            Log.d(TAG, "0 rows");
-//        }
         cursor.close();
-        return  list;
+        return list;
     }
 
-    public boolean isSavedFavorites(String id){
+    public boolean isSavedFavorites(String id) {
         Cursor cursor = this.getReadableDatabase().query(
                 FAVORITES, null, DOCUMENT_ID + " = \'" + id + "\'",
                 null, null, null, null, null);
@@ -115,14 +107,12 @@ public class DBHelper extends SQLiteOpenHelper {
         return res;
     }
 
-    public void deleteFavorites(String id){
+    public void deleteFavorites(String id) {
         this.getWritableDatabase().execSQL("delete from " + FAVORITES + " where " + DOCUMENT_ID + " = \'" + id + "\';");
     }
 
-    public void saveFavorites(Item item){
-        // создаем объект для данных
+    public void saveFavorites(Item item) {
         ContentValues cv = new ContentValues();
-        // подключаемся к БД
         SQLiteDatabase db = this.getWritableDatabase();
 
         cv.put(DOCUMENT_ID, item.getId());
@@ -138,32 +128,30 @@ public class DBHelper extends SQLiteOpenHelper {
         cv.put(DATE, item.getDate());
 
         db.insert(FAVORITES, null, cv);
-//        long rowID = db.insert(FAVORITES, null, cv);
-//        Log.d(TAG, "row inserted, ID = " + rowID);
     }
 
-    public Cursor loadHistory(String query){
+    public Cursor loadHistory(String query) {
         return this.getReadableDatabase().query(
                 HISTORY, null, QUERY + " like \'" + query + "%\'",
                 null, null, null, "_id DESC", HISTORY_LIMIT);
     }
 
-    public void saveHistory(String query){
-       if(!isSavedHistory(query)) {
-           ContentValues cv = new ContentValues();
-           SQLiteDatabase db = this.getWritableDatabase();
+    public void saveHistory(String query) {
+        if (!isSavedHistory(query)) {
+            ContentValues cv = new ContentValues();
+            SQLiteDatabase db = this.getWritableDatabase();
 
-           cv.put(QUERY, query);
+            cv.put(QUERY, query);
 
-           db.insert(HISTORY, null, cv);
-       }
+            db.insert(HISTORY, null, cv);
+        }
     }
 
-    public void deleteHistory(String query){
+    public void deleteHistory(String query) {
         this.getWritableDatabase().execSQL("delete from " + HISTORY + " where " + QUERY + " = \'" + query + "\';");
     }
 
-    public boolean isSavedHistory(String query){
+    public boolean isSavedHistory(String query) {
         Cursor cursor = this.getReadableDatabase().query(
                 HISTORY, null, QUERY + " = \'" + query + "\'",
                 null, null, null, null, null);

@@ -1,6 +1,5 @@
 package ua.tsisar.pavel.nazk.activity;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -14,6 +13,7 @@ import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
@@ -49,6 +49,9 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersView
 
     private static final String URL = "https://public.nazk.gov.ua/documents/";
     private static final int REQUEST_CODE_FILTERS = 1;
+
+    private static final int ID_FILTER = R.id.filter;
+    private static final int ID_FAVORITES = R.id.favorites;
 
     private SearchView searchView;
 
@@ -114,16 +117,18 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersView
             compositeDisposable.dispose();
         }
 
-        if(cursorAdapter != null && cursorAdapter.getCursor() != null) {
+        if (cursorAdapter != null && cursorAdapter.getCursor() != null) {
             cursorAdapter.getCursor().close();
         }
     }
 
-//    protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
-//        super.onRestoreInstanceState(savedInstanceState);
-//        updateSearchFilters();
-//        searchDeclarations();
-//    }
+    protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        if (App.getFilters().isClean()) {
+            updateSearchFilters();
+            searchDeclarations();
+        }
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -139,7 +144,6 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersView
             @Override
             public void onItemDelete(String query) {
                 dbHelper.deleteHistory(query);
-                //TODO changeCursor?
                 cursorAdapter.changeCursor(dbHelper.loadHistory(App.getFilters().query().get()));
             }
         });
@@ -153,7 +157,7 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersView
             public boolean onQueryTextSubmit(String query) {
                 searchView.clearFocus();
                 App.getFilters().query().set(query);
-                App.getFilters().page().clear();
+                App.getFilters().page().clean();
                 searchDeclarations();
                 dbHelper.saveHistory(query);
                 return true;
@@ -180,19 +184,19 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersView
         return true;
     }
 
-    @SuppressLint("NonConstantResourceId")
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         switch (id) {
-            case R.id.filter:
+            case ID_FILTER:
                 startActivityForResult(new Intent(this, SearchFiltersActivity.class),
                         REQUEST_CODE_FILTERS);
                 return true;
-            case R.id.favorites:
+            case ID_FAVORITES:
                 drawItems(dbHelper.getFavoritesList());
                 showPage(100);
-                App.getFilters().clear();
+                App.getFilters().clean();
                 linearLayoutFilters.removeAllViews();
                 return true;
         }
@@ -205,7 +209,7 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersView
         if (resultCode == RESULT_OK && requestCode == REQUEST_CODE_FILTERS) {
             try {
                 searchView.post(() -> searchView.setQuery(App.getFilters().query().get(), false));
-            }catch (NullPointerException e){
+            } catch (NullPointerException e) {
                 showMessage(e.getMessage());
             }
             updateSearchFilters();
@@ -216,32 +220,30 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersView
         try {
             swipeRefreshLayout.setRefreshing(false);
             if (answer.getCount() == 0) {
-//                searchResult.setText(getString(R.string.search_null));
                 showMessage(String.format(getString(R.string.refresh_finished), 0));
             } else {
-                if(App.getFilters().page().isClear()) {
+                if (App.getFilters().page().isClean()) {
                     if (answer.getNotice() != null) {
                         showMessage(answer.getNotice());
                     } else {
                         showMessage(String.format(getString(R.string.refresh_finished), answer.getCount()));
                     }
                 }
-//                searchResult.setText(String.format(getString(R.string.search_result), totalItems));
             }
             drawItems(answer.getData());
             showPage(answer.getCount());
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
-//            showMessage("onSearchDeclarationsSuccess Exception: " + e.getMessage());
-            if(JsonError.get(answer.getError()) != null) {
+//            showMessage(e.getMessage());
+            if (JsonError.get(answer.getError()) != null) {
                 showMessage(JsonError.get(answer.getError()).getMessage());
-            }else {
-                showMessage("JsonError: " + answer.getError());
+            } else {
+                showMessage(getString(R.string.json_error) + answer.getError());
             }
         }
     }
 
-    private void drawItems(List<Item> list){
+    private void drawItems(List<Item> list) {
         textViewInfo.setVisibility(View.GONE);
         RecyclerAdapter recyclerAdapter = new RecyclerAdapter(this, list);
         recyclerAdapter.setOnItemClickListener(item -> openURL(URL + item.getId()));
@@ -253,7 +255,7 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersView
         showMessage(throwable.getMessage());
     }
 
-    private void searchDeclarations(){
+    private void searchDeclarations() {
         swipeRefreshLayout.setRefreshing(true);
         compositeDisposable.add(Objects.requireNonNull(App.getApi().searchDeclarations(
                 App.getFilters().query().get(),
@@ -271,11 +273,11 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersView
 
     }
 
-    private void showMessage(String message){
-        Snackbar.make(coordinatorLayout,message,Snackbar.LENGTH_LONG).show();
+    private void showMessage(String message) {
+        Snackbar.make(coordinatorLayout, message, Snackbar.LENGTH_LONG).show();
     }
 
-    private void addView(String name, Type type){
+    private void addView(String name, Type type) {
         linearLayoutFilters.addView(
                 new SearchFiltersView(this)
                         .setName(name)
@@ -284,21 +286,21 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersView
 
     @Override
     public void removeView(SearchFiltersView view) {
-        App.getFilters().page().clear();
-        switch (view.getType()){
+        App.getFilters().page().clean();
+        switch (view.getType()) {
 //            case QUERY:
 //                App.getFilters().query().clear();
 //                searchView.post(() -> searchView.setQuery(null, false));
 //                break;
             case DOCUMENT_TYPE:
-                App.getFilters().documentType().clear();
-                App.getFilters().declarationType().clear();
+                App.getFilters().documentType().clean();
+                App.getFilters().declarationType().clean();
                 break;
             case DECLARATION_YEAR:
-                App.getFilters().declarationYear().clear();
+                App.getFilters().declarationYear().clean();
                 break;
             case PERIOD:
-                App.getFilters().period().clear();
+                App.getFilters().period().clean();
                 break;
         }
         linearLayoutFilters.removeView(view);
@@ -310,21 +312,21 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersView
 //        if(!App.getFilters().query().isClear()){
 //            addView(App.getFilters().query().get(), Type.QUERY);
 //        }
-        if(!App.getFilters().documentType().isClear()){
+        if (!App.getFilters().documentType().isClean()) {
             addView(String.format(getString(R.string.filter_document_type), getResources().
-                    getStringArray(R.array.array_document_type)
+                            getStringArray(R.array.array_document_type)
                             [App.getFilters().documentType().get()]) +
-                    (App.getFilters().declarationType().isClear() ? "" :
-                            String.format(getString(R.string.filter_declaration_type),
-                                    getResources().getStringArray(R.array.array_declaration_type)
-                                            [App.getFilters().declarationType().get()])),
+                            (App.getFilters().declarationType().isClean() ? "" :
+                                    String.format(getString(R.string.filter_declaration_type),
+                                            getResources().getStringArray(R.array.array_declaration_type)
+                                                    [App.getFilters().declarationType().get()])),
                     Type.DOCUMENT_TYPE);
         }
-        if(!App.getFilters().declarationYear().isClear()){
+        if (!App.getFilters().declarationYear().isClean()) {
             addView(String.format(getString(R.string.filter_year),
                     App.getFilters().declarationYear().get().toString()), Type.DECLARATION_YEAR);
         }
-        if(!App.getFilters().period().isClear()){
+        if (!App.getFilters().period().isClean()) {
             addView(String.format(getString(R.string.filter_period),
                     App.getFilters().period().startDate().toString(),
                     App.getFilters().period().endDate().toString()), Type.PERIOD);
@@ -332,37 +334,36 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersView
         searchDeclarations();
     }
 
-    private void showPage(int count){
-        maxPage = (count-1)/100 +1;
+    private void showPage(int count) {
+        maxPage = (count - 1) / 100 + 1;
 
-        if(count > 100) {
-            if(App.getFilters().page().isClear()){
+        if (count > 100) {
+            if (App.getFilters().page().isClean()) {
                 App.getFilters().page().set(1);
             }
             linearLayoutPage.setVisibility(View.VISIBLE);
-            textViewPage.setText(String.format("Сторінка %s із %s", App.getFilters().page().get(), maxPage));
-        }else {
+            textViewPage.setText(String.format(getString(R.string.page_format), App.getFilters().page().get(), maxPage));
+        } else {
             linearLayoutPage.setVisibility(View.GONE);
-            App.getFilters().page().clear();
+            App.getFilters().page().clean();
         }
     }
 
-    public void toPage(View view){
+    public void toPage(View view) {
         int currentPage = App.getFilters().page().get();
 
-        if(view.getId() == R.id.button_next_page && currentPage < maxPage) {
+        if (view.getId() == R.id.button_next_page && currentPage < maxPage) {
             App.getFilters().page().set(currentPage + 1);
-        }else if(view.getId() == R.id.button_prev_page && currentPage > 1){
+        } else if (view.getId() == R.id.button_prev_page && currentPage > 1) {
             App.getFilters().page().set(currentPage - 1);
         }
         searchDeclarations();
     }
 
-    private void openURL(String url){
+    private void openURL(String url) {
         try {
             startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             showMessage(e.getMessage());
         }
@@ -370,7 +371,7 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersView
 
     @Override
     public void onRefresh() {
-        App.getFilters().page().clear();
+        App.getFilters().page().clean();
         searchDeclarations();
     }
 

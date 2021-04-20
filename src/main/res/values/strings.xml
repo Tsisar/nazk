@@ -45,4 +45,14 @@
         та кольоровою гамою, що використовується на сайті НАЗК.
         \n\n© Павло Цісар\nua.pavlo.tsisar@gmail.com\nhttps://github.com/Tsisar/nazk
     </string>
+    <string name="json_error">JsonError: </string>
+    <string name="page_format">Сторінка %d із %d</string>
+    <string name="query_input_error">Введіть від 3 до 255 символів.</string>
+    <string name="year_input_error">Введіть рік від 2015 до %d.</string>
+    <string name="item_declaration_type">%s (%s)</string>
+    <string name="item_declaration_year">Рік: %d</string>
+    <string name="item_work_place">Місце роботи: %s</string>
+    <string name="item_work_post">Посада: %s</string>
+    <string name="item_date">Дата та час подання: %s</string>
+    <string name="item_name">%s %s %s</string>
 </resources>

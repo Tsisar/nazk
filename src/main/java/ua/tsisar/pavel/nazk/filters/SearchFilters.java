@@ -2,19 +2,19 @@ package ua.tsisar.pavel.nazk.filters;
 
 public class SearchFilters {
 
-    private final Wrapper<String> query = new Wrapper<>();
-    private final Wrapper<Integer> userDeclarantId = new Wrapper<>();
+    private final WrapperString query = new WrapperString();
+    private final WrapperInteger userDeclarantId = new WrapperInteger();
     private final DocumentType documentType = new DocumentType();
     private final DeclarationType declarationType = new DeclarationType();
-    private final Wrapper<Integer> declarationYear = new Wrapper<>();
+    private final WrapperInteger declarationYear = new WrapperInteger();
     private final Period period = new Period();
-    private final Wrapper<Integer> page = new Wrapper<>();
+    private final WrapperInteger page = new WrapperInteger();
 
-    public Wrapper<String> query() {
+    public WrapperString query() {
         return query;
     }
 
-    public Wrapper<Integer> userDeclarantId() {
+    public WrapperInteger userDeclarantId() {
         return userDeclarantId;
     }
 
@@ -26,25 +26,30 @@ public class SearchFilters {
         return declarationType;
     }
 
-    public Wrapper<Integer> declarationYear() {
+    public WrapperInteger declarationYear() {
         return declarationYear;
     }
 
-    public Period period(){
+    public Period period() {
         return period;
     }
 
-    public Wrapper<Integer> page() {
+    public WrapperInteger page() {
         return page;
     }
 
-    public void clear(){
-        query.clear();
-        userDeclarantId.clear();
-        documentType.clear();
-        declarationType.clear();
-        declarationYear.clear();
-        period.clear();
-        page.clear();
+    public void clean() {
+        query.clean();
+        userDeclarantId.clean();
+        documentType.clean();
+        declarationType.clean();
+        declarationYear.clean();
+        period.clean();
+        page.clean();
+    }
+
+    public boolean isClean() {
+        return query.isClean() && userDeclarantId.isClean() && documentType.isClean() &&
+                declarationType.isClean() && declarationYear.isClean() && period.isClean() && page.isClean();
     }
 }

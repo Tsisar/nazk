@@ -32,17 +32,17 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.itemVi
         void onItemClick(Item item);
     }
 
-    public RecyclerAdapter(Context context, List<Item> items){
+    public RecyclerAdapter(Context context, List<Item> items) {
         this.context = context;
         this.items = items;
         inflater = LayoutInflater.from(context);
         dbHelper = new DBHelper(context);
     }
 
-    public void setOnItemClickListener(onItemClickListener listener){
+    public void setOnItemClickListener(onItemClickListener listener) {
         this.listener = listener;
     }
-    
+
     @NonNull
     @Override
     public itemViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -53,28 +53,29 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.itemVi
 
     @Override
     public void onBindViewHolder(@NonNull itemViewHolder holder, int position) {
-        if(items == null)
+        if (items == null)
             return;
 
         Item item = items.get(position);
         holder.setItem(context, item);
-        if(listener != null){
+        if (listener != null) {
             holder.itemView.setOnClickListener(view -> listener.onItemClick(item));
         }
     }
 
     @Override
     public int getItemCount() {
-        if(items == null) {
+        if (items == null) {
             return 0;
-        }else{
+        } else {
             return items.size();
         }
     }
 
 
     static class itemViewHolder extends RecyclerView.ViewHolder {
-        private static final String NAME_FORMAT = "%s %s %s";
+        private static final String INPUT_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ssZ";
+        private static final String OUTPUT_DATE_FORMAT = "dd.MM.yyyy HH:mm";
         private Item item;
         private final TextView name;
         private final TextView document;
@@ -98,15 +99,15 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.itemVi
             star = itemView.findViewById(R.id.image_button_star);
             star.setOnClickListener(v -> {
                 v.setSelected(!v.isSelected());
-                if(dbHelper.isSavedFavorites(item.getId())){
+                if (dbHelper.isSavedFavorites(item.getId())) {
                     dbHelper.deleteFavorites(item.getId());
-                }else {
+                } else {
                     dbHelper.saveFavorites(item);
                 }
             });
         }
 
-        void setItem(Context context, Item item){
+        void setItem(Context context, Item item) {
             this.item = item;
             star.setSelected(dbHelper.isSavedFavorites(item.getId()));
 
@@ -115,22 +116,27 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.itemVi
             String declarationType = context.getResources()
                     .getStringArray(R.array.array_declaration_type)[item.getDeclarationType()];
 
-            name.setText(String.format(NAME_FORMAT,
+            name.setText(String.format(context.getResources().getString(R.string.item_name),
                     item.getLastName(), item.getFirstName(), item.getMiddleName()));
-            document.setText(item.getDeclarationType() != 0?
-                    String.format("%s (%s)", documentType, declarationType):documentType);
-            year.setText(String.format("Рік: %s", item.getDeclarationYear()));
-            workPlace.setText(String.format("Місце роботи: %s", item.getWorkPlace()));
-            workPost.setText(String.format("Посада: %s", item.getWorkPost()));
-            date.setText(String.format("Дата та час подання: %s", dateFormat(item.getDate())));
+            document.setText(item.getDeclarationType() != 0 ?
+                    String.format(context.getResources().getString(R.string.item_declaration_type),
+                            documentType, declarationType) : documentType);
+            year.setText(String.format(context.getResources().getString(R.string.item_declaration_year),
+                    item.getDeclarationYear()));
+            workPlace.setText(String.format(context.getResources().getString(R.string.item_work_place),
+                    item.getWorkPlace()));
+            workPost.setText(String.format(context.getResources().getString(R.string.item_work_post),
+                    item.getWorkPost()));
+            date.setText(String.format(context.getResources().getString(R.string.item_date),
+                    dateFormat(item.getDate())));
         }
 
         private String dateFormat(String date) {
             try {
                 SimpleDateFormat inputDateFormat =
-                        new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ", Locale.getDefault());
+                        new SimpleDateFormat(INPUT_DATE_FORMAT, Locale.getDefault());
                 SimpleDateFormat outputDateFormat =
-                        new SimpleDateFormat("dd.MM.yyyy HH:mm", Locale.getDefault());
+                        new SimpleDateFormat(OUTPUT_DATE_FORMAT, Locale.getDefault());
                 return outputDateFormat.format(Objects.requireNonNull(inputDateFormat.parse(date)));
             } catch (ParseException e) {
                 e.printStackTrace();

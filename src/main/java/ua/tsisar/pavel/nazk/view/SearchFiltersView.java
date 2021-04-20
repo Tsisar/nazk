@@ -10,7 +10,7 @@ import android.widget.TextView;
 import ua.tsisar.pavel.nazk.R;
 import ua.tsisar.pavel.nazk.filters.Type;
 
-public class SearchFiltersView extends LinearLayout implements View.OnClickListener{
+public class SearchFiltersView extends LinearLayout implements View.OnClickListener {
 
     private Listener listener;
     private TextView name;

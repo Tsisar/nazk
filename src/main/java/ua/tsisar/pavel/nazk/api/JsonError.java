@@ -38,7 +38,7 @@ public enum JsonError {
     private final Integer code;
     private final String message;
 
-    JsonError(Integer code, String message){
+    JsonError(Integer code, String message) {
         this.code = code;
         this.message = message;
     }
@@ -55,7 +55,7 @@ public enum JsonError {
         }
     }
 
-    public Integer getCode(){
+    public Integer getCode() {
         return code;
     }
 

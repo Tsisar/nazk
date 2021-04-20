@@ -65,25 +65,26 @@ public class SearchFiltersActivity extends AppCompatActivity {
         initSpinnerDocumentType();
 
         textViewPeriod = findViewById(R.id.text_view_period);
-        if(!startDate.isClear() && !endDate.isClear()){
+        if (!startDate.isClear() && !endDate.isClear()) {
             textViewPeriod.setText(String.format(getString(R.string.split_period),
                     startDate.toString(), endDate.toString()));
         }
     }
 
-    private void initEditTextQuery(){
+    private void initEditTextQuery() {
         inputTextQuery = findViewById(R.id.input_text_query);
         editTextQuery = findViewById(R.id.edit_text_query);
-        if(!App.getFilters().query().isClear()) {
+        if (!App.getFilters().query().isClean()) {
             editTextQuery.setText(App.getFilters().query().get());
         }
         editTextQuery.setOnFocusChangeListener((view, hasFocus) -> {
             if (!hasFocus) {
-                if((editTextQuery.getText().toString().length() < 3 ||
-                        editTextQuery.getText().toString().length() > 255) &&
-                        editTextQuery.getText().toString().length() != 0){
-                    inputTextQuery.setError("Введіть від 3 до 255 символів.");
-                }else{
+                if (editTextQuery.getText() != null &&
+                        editTextQuery.getText().toString().length() != 0 &&
+                        (editTextQuery.getText().toString().length() < 3 ||
+                                editTextQuery.getText().toString().length() > 255)) {
+                    inputTextQuery.setError(getString(R.string.query_input_error));
+                } else {
                     inputTextQuery.setError(null);
                 }
             }
@@ -95,7 +96,7 @@ public class SearchFiltersActivity extends AppCompatActivity {
 
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                if(charSequence.toString().length() > 3 && charSequence.toString().length() < 255){
+                if (charSequence.toString().length() > 3 && charSequence.toString().length() < 255) {
                     inputTextQuery.setError(null);
                 }
             }
@@ -106,10 +107,10 @@ public class SearchFiltersActivity extends AppCompatActivity {
         });
     }
 
-    private void initEditTextYear(){
+    private void initEditTextYear() {
         inputTextYear = findViewById(R.id.input_text_year);
         editTextYear = findViewById(R.id.edit_text_year);
-        if(!App.getFilters().declarationYear().isClear()) {
+        if (!App.getFilters().declarationYear().isClean()) {
             editTextYear.setText(String.valueOf(App.getFilters().declarationYear().get()));
         }
         editTextYear.setFilters(new InputFilter[]{new InputFilter.LengthFilter(4)});
@@ -126,17 +127,17 @@ public class SearchFiltersActivity extends AppCompatActivity {
             public void afterTextChanged(Editable editable) {
                 int length = editable.toString().length();
 
-                if(length != 0) {
+                if (length != 0) {
                     int year = new Date().now().getYear();
 
-                    int a = 2015/(int)Math.pow(10, 4-length);
+                    int a = 2015 / (int) Math.pow(10, 4 - length);
                     int b = tryParse(editable.toString());
-                    int c = year/(int)Math.pow(10, 4-length);
+                    int c = year / (int) Math.pow(10, 4 - length);
 
-                    if(a > b || b > c){
-                        editable.delete(length-1, length);
-                        inputTextYear.setError("Введіть рік від 2015 до " + year + ".");
-                    }else{
+                    if (a > b || b > c) {
+                        editable.delete(length - 1, length);
+                        inputTextYear.setError(String.format(getString(R.string.year_input_error), year));
+                    } else {
                         inputTextYear.setError(null);
                     }
                 }
@@ -149,15 +150,17 @@ public class SearchFiltersActivity extends AppCompatActivity {
         });
     }
 
-    private void checkEditTextYear(){
-        if(!editTextYear.getText().toString().isEmpty() && tryParse(editTextYear.getText().toString()) < 2015){
+    private void checkEditTextYear() {
+        if (editTextYear.getText() != null &&
+                !editTextYear.getText().toString().isEmpty() &&
+                tryParse(editTextYear.getText().toString()) < 2015) {
             String actualYear = new Date().now().getYear().toString();
             editTextYear.setText(actualYear);
         }
     }
 
-    private void initSpinnerDocumentType(){
-        if(!App.getFilters().documentType().isClear()) {
+    private void initSpinnerDocumentType() {
+        if (!App.getFilters().documentType().isClean()) {
             documentType = App.getFilters().documentType().get();
         }
         setEnableDeclarationTypeSpinner();
@@ -166,15 +169,15 @@ public class SearchFiltersActivity extends AppCompatActivity {
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this, R.layout.item_spinner, strings);
         MaterialAutoCompleteTextView textViewDocumentType = findViewById(R.id.auto_complete_text_view_document_type);
         textViewDocumentType.setAdapter(adapter);
-        textViewDocumentType.setText(documentType==DocumentType.DOCUMENT_ALL?null:strings[documentType], false);
+        textViewDocumentType.setText(documentType == DocumentType.DOCUMENT_ALL ? null : strings[documentType], false);
         textViewDocumentType.setOnItemClickListener((parent, view, position, id) -> {
             documentType = position;
             setEnableDeclarationTypeSpinner();
         });
     }
 
-    private void initSpinnerDeclarationType(){
-        if(!App.getFilters().declarationType().isClear()) {
+    private void initSpinnerDeclarationType() {
+        if (!App.getFilters().declarationType().isClean()) {
             declarationType = App.getFilters().declarationType().get();
         }
 
@@ -183,22 +186,22 @@ public class SearchFiltersActivity extends AppCompatActivity {
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this, R.layout.item_spinner, strings);
         textViewDeclarationType = findViewById(R.id.auto_complete_text_view_declaration_type);
         textViewDeclarationType.setAdapter(adapter);
-        textViewDeclarationType.setText(declarationType==DeclarationType.DECLARATION_ALL?null:strings[declarationType], false);
+        textViewDeclarationType.setText(declarationType == DeclarationType.DECLARATION_ALL ? null : strings[declarationType], false);
         textViewDeclarationType.setOnItemClickListener((parent, view, position, id) -> declarationType = position);
     }
 
-    private void setEnableDeclarationTypeSpinner(){
-        if(documentType == DocumentType.DOCUMENT_DECLARATION ||
+    private void setEnableDeclarationTypeSpinner() {
+        if (documentType == DocumentType.DOCUMENT_DECLARATION ||
                 documentType == DocumentType.DOCUMENT_NEW_DECLARATION) {
             inputTextDeclaration.setEnabled(true);
-        }else{
+        } else {
             declarationType = DeclarationType.DECLARATION_ALL;
             inputTextDeclaration.setEnabled(false);
             textViewDeclarationType.setText(null, false);
         }
     }
 
-    public void setStartDate(View view){
+    public void setStartDate(View view) {
         Date date = startDate.isClear() ? new Date().now() : new Date().set(startDate);
 
         DatePickerDialog dialog = new DatePickerDialog(this, (datePicker, year, month, day) -> {
@@ -210,13 +213,13 @@ public class SearchFiltersActivity extends AppCompatActivity {
             endDate.clear();
             textViewPeriod.setText(null);
         });
-        dialog.getDatePicker().setMinDate(new Date().set(2016,7,1).toMillis());
+        dialog.getDatePicker().setMinDate(new Date().set(2016, 7, 1).toMillis());
         dialog.getDatePicker().setMaxDate(new Date().now().toMillis());
         dialog.setTitle(R.string.dialog_title_start_date);
         dialog.show();
     }
 
-    private void setEndDate(){
+    private void setEndDate() {
         Date date = endDate.isClear() ? new Date().now() : new Date().set(endDate);
 
         DatePickerDialog dialog = new DatePickerDialog(this, (datePicker, year, month, day) -> {
@@ -238,9 +241,9 @@ public class SearchFiltersActivity extends AppCompatActivity {
     public void onFindClick(View view) {
         checkEditTextYear();
 
-        App.getFilters().page().clear();
-        App.getFilters().query().set(editTextQuery.getText().toString());
-        App.getFilters().declarationYear().set(tryParse(editTextYear.getText().toString()));
+        App.getFilters().page().clean();
+        App.getFilters().query().set(editTextQuery.getText() != null ? editTextQuery.getText().toString() : "");
+        App.getFilters().declarationYear().set(tryParse(editTextYear.getText() != null ? editTextYear.getText().toString() : ""));
         App.getFilters().documentType().set(documentType);
         App.getFilters().declarationType().set(declarationType);
         App.getFilters().period().startDate().set(startDate);

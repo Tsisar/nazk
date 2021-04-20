@@ -5,10 +5,11 @@ import androidx.annotation.IntDef;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
-public class DeclarationType extends Wrapper<Integer> {
+public class DeclarationType extends WrapperInteger {
     @IntDef({DECLARATION_ALL, DECLARATION_ANNUAL, DECLARATION_BEFORE_DISMISSAL, DECLARATION_AFTER_DISMISSAL, DECLARATION_CANDIDATES})
     @Retention(RetentionPolicy.SOURCE)
-    public @interface Declaration {}
+    public @interface Declaration {
+    }
 
     public static final int DECLARATION_ALL = 0;
     public static final int DECLARATION_ANNUAL = 1;
@@ -17,7 +18,7 @@ public class DeclarationType extends Wrapper<Integer> {
     public static final int DECLARATION_CANDIDATES = 4;
 
     @Override
-    public void set(@Declaration Integer i){
+    public void set(@Declaration Integer i) {
         super.set(i);
     }
 }

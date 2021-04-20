@@ -18,6 +18,7 @@ public class CursorExAdapter extends CursorAdapter {
 
     public interface onItemClickListener {
         void onItemClick(String query);
+
         void onItemDelete(String query);
     }
 
@@ -25,7 +26,7 @@ public class CursorExAdapter extends CursorAdapter {
         super(context, cursor, false);
     }
 
-    public void setOnItemClickListener(onItemClickListener listener){
+    public void setOnItemClickListener(onItemClickListener listener) {
         this.listener = listener;
     }
 
@@ -35,7 +36,7 @@ public class CursorExAdapter extends CursorAdapter {
 
         textView.setText(name);
 
-        if(listener != null) {
+        if (listener != null) {
             view.setOnClickListener(v -> listener.onItemClick(name));
             view.findViewById(R.id.image_button_history_clear).setOnClickListener(v -> listener.onItemDelete(name));
         }
