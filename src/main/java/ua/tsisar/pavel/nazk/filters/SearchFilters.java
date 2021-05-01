@@ -49,7 +49,12 @@ public class SearchFilters {
     }
 
     public boolean isClean() {
-        return query.isClean() && userDeclarantId.isClean() && documentType.isClean() &&
-                declarationType.isClean() && declarationYear.isClean() && period.isClean() && page.isClean();
+        return query.isClean() &&
+                userDeclarantId.isClean() &&
+                documentType.isClean() &&
+                declarationType.isClean() &&
+                declarationYear.isClean() &&
+                period.isClean() &&
+                page.isClean();
     }
 }

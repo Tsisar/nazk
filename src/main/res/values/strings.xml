@@ -16,7 +16,7 @@
     <string name="dialog_title_end_date">По дату</string>
     <string name="refresh_finished">Знайдено %1$d документів</string>
     <string name="split_period">%s - %s</string>
-    <string name="filter_favorites">Вибране</string>
+    <string name="favorites">Вибране</string>
 
     <string-array name="array_document_type">
         <item>Всі</item>

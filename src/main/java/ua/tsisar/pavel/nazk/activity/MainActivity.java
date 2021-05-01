@@ -44,9 +44,9 @@ import ua.tsisar.pavel.nazk.filters.Type;
 import ua.tsisar.pavel.nazk.util.DBHelper;
 import ua.tsisar.pavel.nazk.view.SearchFiltersView;
 
-public class MainActivity extends AppCompatActivity implements SearchFiltersView.Listener, SwipeRefreshLayout.OnRefreshListener {
+public class MainActivity extends AppCompatActivity
+        implements SearchFiltersView.Listener, SwipeRefreshLayout.OnRefreshListener {
     private static final String TAG = "MyLog";
-
     private static final String URL = "https://public.nazk.gov.ua/documents/";
     private static final int REQUEST_CODE_FILTERS = 1;
 
@@ -63,13 +63,29 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersView
     private LinearLayout linearLayoutPage;
     private RecyclerView recyclerView;
 
+    private CollapsingToolbarLayout toolBarLayout;
     private SwipeRefreshLayout swipeRefreshLayout;
     private CoordinatorLayout coordinatorLayout;
 
     private int maxPage;
 
     private DBHelper dbHelper;
-    private CursorExAdapter cursorAdapter;
+
+    private State state = State.MAIN;
+
+    enum State{
+        MAIN,
+        FAVORITES
+    }
+
+    private void setState(State state){
+        this.state = state;
+        if(state == State.MAIN) {
+            toolBarLayout.setTitle(getString(R.string.app_name));
+        }else{
+            toolBarLayout.setTitle(getString(R.string.favorites));
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,7 +98,7 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersView
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        CollapsingToolbarLayout toolBarLayout = findViewById(R.id.toolbar_layout);
+        toolBarLayout = findViewById(R.id.toolbar_layout);
         toolBarLayout.setTitle(getTitle());
 
         coordinatorLayout = findViewById(R.id.coordinator_layout_main);
@@ -117,8 +133,23 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersView
             compositeDisposable.dispose();
         }
 
-        if (cursorAdapter != null && cursorAdapter.getCursor() != null) {
-            cursorAdapter.getCursor().close();
+        if (searchView.getSuggestionsAdapter().getCursor() != null &&
+                searchView.getSuggestionsAdapter().getCursor() != null) {
+            searchView.getSuggestionsAdapter().getCursor().close();
+        }
+
+        if(dbHelper != null){
+            dbHelper.close();
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        if(state == State.FAVORITES){
+            setState(State.MAIN);
+            searchDeclarations();
+        }else {
+            super.onBackPressed();
         }
     }
 
@@ -134,7 +165,7 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersView
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_toolbar, menu);
 
-        cursorAdapter = new CursorExAdapter(getContext(), null);
+        CursorExAdapter cursorAdapter = new CursorExAdapter(getContext(), null);
         cursorAdapter.setOnItemClickListener(new CursorExAdapter.onItemClickListener() {
             @Override
             public void onItemClick(String query) {
@@ -144,7 +175,7 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersView
             @Override
             public void onItemDelete(String query) {
                 dbHelper.deleteHistory(query);
-                cursorAdapter.changeCursor(dbHelper.loadHistory(App.getFilters().query().get()));
+                searchView.getSuggestionsAdapter().changeCursor(dbHelper.loadHistory(App.getFilters().query().get()));
             }
         });
 
@@ -166,17 +197,19 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersView
             @Override
             public boolean onQueryTextChange(String newText) {
                 App.getFilters().query().set(newText);
-                //TODO changeCursor?
-                Cursor newCursor = dbHelper.loadHistory(newText);
-                Cursor oldCursor = cursorAdapter.swapCursor(newCursor);
+                Cursor oldCursor = searchView.getSuggestionsAdapter().swapCursor(dbHelper.loadHistory(newText));
 
-                Log.w(TAG, "newText: " + newText);
-                Log.w(TAG, "oldCursor: " + oldCursor);
-                Log.w(TAG, "newCursor: " + newCursor);
-                Log.w(TAG, "_______________________________________________________");
-//                if(oldCursor != null && !oldCursor.isClosed()) {
-//                    oldCursor.close();
-//                }
+                new Thread(() -> {
+                    try {
+                        Thread.sleep(200);
+                        if (oldCursor != null) {
+                            oldCursor.close();
+                        }
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }).start();
+                Log.i(TAG, "searchView: " + searchView.getSuggestionsAdapter().getCursor());
                 return true;
             }
         });
@@ -194,19 +227,27 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersView
                         REQUEST_CODE_FILTERS);
                 return true;
             case ID_FAVORITES:
-                drawItems(dbHelper.getFavoritesList());
-                showPage(100);
-                App.getFilters().clean();
-                linearLayoutFilters.removeAllViews();
+                loadFavorites();
                 return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void loadFavorites(){
+        setState(State.FAVORITES);
+        drawItems(dbHelper.getFavoritesList());
+        showPage(100);
+        //App.getFilters().clean();
+        searchView.setQuery(null, false);
+        linearLayoutFilters.removeAllViews();
+        swipeRefreshLayout.setRefreshing(false);
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == RESULT_OK && requestCode == REQUEST_CODE_FILTERS) {
+            setState(State.MAIN);
             try {
                 searchView.post(() -> searchView.setQuery(App.getFilters().query().get(), false));
             } catch (NullPointerException e) {
@@ -237,6 +278,7 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersView
 //            showMessage(e.getMessage());
             if (JsonError.get(answer.getError()) != null) {
                 showMessage(JsonError.get(answer.getError()).getMessage());
+                Log.e(TAG, "JsonError: " + answer.getError());
             } else {
                 showMessage(getString(R.string.json_error) + answer.getError());
             }
@@ -371,8 +413,12 @@ public class MainActivity extends AppCompatActivity implements SearchFiltersView
 
     @Override
     public void onRefresh() {
-        App.getFilters().page().clean();
-        searchDeclarations();
+        if(state == State.MAIN) {
+            App.getFilters().page().clean();
+            searchDeclarations();
+        }else {
+            loadFavorites();
+        }
     }
 
     private Context getContext() {

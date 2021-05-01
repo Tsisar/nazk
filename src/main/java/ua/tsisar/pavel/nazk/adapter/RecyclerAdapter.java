@@ -28,6 +28,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.itemVi
     private final DBHelper dbHelper;
     private onItemClickListener listener;
 
+
     public interface onItemClickListener {
         void onItemClick(Item item);
     }
