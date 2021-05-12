@@ -1,6 +1,8 @@
 package ua.tsisar.pavel.nazk.activity;
 
+import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.util.Linkify;
@@ -71,16 +73,16 @@ public class MainActivity extends AppCompatActivity
 
     private State state = State.MAIN;
 
-    enum State {
+    enum State{
         MAIN,
         FAVORITES
     }
 
-    private void setState(State state) {
+    private void setState(State state){
         this.state = state;
-        if (state == State.MAIN) {
+        if(state == State.MAIN) {
             toolBarLayout.setTitle(getString(R.string.app_name));
-        } else {
+        }else{
             toolBarLayout.setTitle(getString(R.string.favorites));
         }
     }
@@ -136,17 +138,17 @@ public class MainActivity extends AppCompatActivity
             searchView.getSuggestionsAdapter().getCursor().close();
         }
 
-        if (dbHelper != null) {
+        if(dbHelper != null){
             dbHelper.close();
         }
     }
 
     @Override
     public void onBackPressed() {
-        if (state == State.FAVORITES) {
+        if(state == State.FAVORITES){
             setState(State.MAIN);
             searchDeclarations();
-        } else {
+        }else {
             super.onBackPressed();
         }
     }
@@ -163,7 +165,7 @@ public class MainActivity extends AppCompatActivity
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_toolbar, menu);
 
-        CursorExAdapter cursorAdapter = new CursorExAdapter(this, null);
+        CursorExAdapter cursorAdapter = new CursorExAdapter(getContext(), null);
         cursorAdapter.setOnItemClickListener(new CursorExAdapter.onItemClickListener() {
             @Override
             public void onItemClick(String query) {
@@ -195,10 +197,23 @@ public class MainActivity extends AppCompatActivity
             @Override
             public boolean onQueryTextChange(String newText) {
                 App.getFilters().query().set(newText);
-                searchView.getSuggestionsAdapter().changeCursor(dbHelper.loadHistory(newText));
+                Cursor oldCursor = searchView.getSuggestionsAdapter().swapCursor(dbHelper.loadHistory(newText));
+
+                new Thread(() -> {
+                    try {
+                        Thread.sleep(200);
+                        if (oldCursor != null) {
+                            oldCursor.close();
+                        }
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }).start();
+                Log.i(TAG, "searchView: " + searchView.getSuggestionsAdapter().getCursor());
                 return true;
             }
         });
+
         return true;
     }
 
@@ -218,7 +233,7 @@ public class MainActivity extends AppCompatActivity
         return super.onOptionsItemSelected(item);
     }
 
-    private void loadFavorites() {
+    private void loadFavorites(){
         setState(State.FAVORITES);
         drawItems(dbHelper.getFavoritesList());
         showPage(100);
@@ -398,11 +413,15 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onRefresh() {
-        if (state == State.MAIN) {
+        if(state == State.MAIN) {
             App.getFilters().page().clean();
             searchDeclarations();
-        } else {
+        }else {
             loadFavorites();
         }
+    }
+
+    private Context getContext() {
+        return this;
     }
 }

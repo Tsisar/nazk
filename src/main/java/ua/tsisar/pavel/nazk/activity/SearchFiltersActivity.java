@@ -169,8 +169,7 @@ public class SearchFiltersActivity extends AppCompatActivity {
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this, R.layout.item_spinner, strings);
         MaterialAutoCompleteTextView textViewDocumentType = findViewById(R.id.auto_complete_text_view_document_type);
         textViewDocumentType.setAdapter(adapter);
-        textViewDocumentType.setText(documentType ==
-                DocumentType.DOCUMENT_ALL ? null : strings[documentType], false);
+        textViewDocumentType.setText(documentType == DocumentType.DOCUMENT_ALL ? null : strings[documentType], false);
         textViewDocumentType.setOnItemClickListener((parent, view, position, id) -> {
             documentType = position;
             setEnableDeclarationTypeSpinner();
@@ -187,8 +186,7 @@ public class SearchFiltersActivity extends AppCompatActivity {
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this, R.layout.item_spinner, strings);
         textViewDeclarationType = findViewById(R.id.auto_complete_text_view_declaration_type);
         textViewDeclarationType.setAdapter(adapter);
-        textViewDeclarationType.setText(declarationType ==
-                DeclarationType.DECLARATION_ALL ? null : strings[declarationType], false);
+        textViewDeclarationType.setText(declarationType == DeclarationType.DECLARATION_ALL ? null : strings[declarationType], false);
         textViewDeclarationType.setOnItemClickListener((parent, view, position, id) -> declarationType = position);
     }
 
