@@ -40,13 +40,13 @@ public class Date {
         return this;
     }
 
-    public void clear() {
+    public void clean() {
         this.year = 0;
         this.month = 0;
         this.day = 0;
     }
 
-    public boolean isClear() {
+    public boolean isClean() {
         return year == 0 && month == 0 && day == 0;
     }
 
@@ -81,7 +81,7 @@ public class Date {
     }
 
     public Long toLong() {
-        if (isClear()) {
+        if (isClean()) {
             return null;
         }
         return toSeconds();

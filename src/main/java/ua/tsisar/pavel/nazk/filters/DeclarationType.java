@@ -5,7 +5,7 @@ import androidx.annotation.IntDef;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
-public class DeclarationType extends WrapperInteger {
+public class DeclarationType extends FilterInteger {
     @IntDef({DECLARATION_ALL, DECLARATION_ANNUAL, DECLARATION_BEFORE_DISMISSAL, DECLARATION_AFTER_DISMISSAL, DECLARATION_CANDIDATES})
     @Retention(RetentionPolicy.SOURCE)
     public @interface Declaration {

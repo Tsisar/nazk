@@ -5,7 +5,7 @@ import androidx.annotation.IntDef;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
-public class DocumentType extends WrapperInteger {
+public class DocumentType extends FilterInteger {
     @IntDef({DOCUMENT_ALL, DOCUMENT_DECLARATION, DOCUMENT_REPORT, DOCUMENT_NEW_DECLARATION, DOCUMENT_NEW_REPORT})
     @Retention(RetentionPolicy.SOURCE)
     public @interface Document {

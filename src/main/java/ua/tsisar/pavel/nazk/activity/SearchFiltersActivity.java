@@ -65,7 +65,7 @@ public class SearchFiltersActivity extends AppCompatActivity {
         initSpinnerDocumentType();
 
         textViewPeriod = findViewById(R.id.text_view_period);
-        if (!startDate.isClear() && !endDate.isClear()) {
+        if (!startDate.isClean() && !endDate.isClean()) {
             textViewPeriod.setText(String.format(getString(R.string.split_period),
                     startDate.toString(), endDate.toString()));
         }
@@ -74,7 +74,7 @@ public class SearchFiltersActivity extends AppCompatActivity {
     private void initEditTextQuery() {
         inputTextQuery = findViewById(R.id.input_text_query);
         editTextQuery = findViewById(R.id.edit_text_query);
-        if (!App.getFilters().query().isClean()) {
+        if (!App.getFilters().query().isClear()) {
             editTextQuery.setText(App.getFilters().query().get());
         }
         editTextQuery.setOnFocusChangeListener((view, hasFocus) -> {
@@ -110,7 +110,7 @@ public class SearchFiltersActivity extends AppCompatActivity {
     private void initEditTextYear() {
         inputTextYear = findViewById(R.id.input_text_year);
         editTextYear = findViewById(R.id.edit_text_year);
-        if (!App.getFilters().declarationYear().isClean()) {
+        if (!App.getFilters().declarationYear().isClear()) {
             editTextYear.setText(String.valueOf(App.getFilters().declarationYear().get()));
         }
         editTextYear.setFilters(new InputFilter[]{new InputFilter.LengthFilter(4)});
@@ -160,7 +160,7 @@ public class SearchFiltersActivity extends AppCompatActivity {
     }
 
     private void initSpinnerDocumentType() {
-        if (!App.getFilters().documentType().isClean()) {
+        if (!App.getFilters().documentType().isClear()) {
             documentType = App.getFilters().documentType().get();
         }
         setEnableDeclarationTypeSpinner();
@@ -178,7 +178,7 @@ public class SearchFiltersActivity extends AppCompatActivity {
     }
 
     private void initSpinnerDeclarationType() {
-        if (!App.getFilters().declarationType().isClean()) {
+        if (!App.getFilters().declarationType().isClear()) {
             declarationType = App.getFilters().declarationType().get();
         }
 
@@ -204,15 +204,15 @@ public class SearchFiltersActivity extends AppCompatActivity {
     }
 
     public void setStartDate(View view) {
-        Date date = startDate.isClear() ? new Date().now() : new Date().set(startDate);
+        Date date = startDate.isClean() ? new Date().now() : new Date().set(startDate);
 
         DatePickerDialog dialog = new DatePickerDialog(this, (datePicker, year, month, day) -> {
             startDate.set(year, month, day);
             setEndDate();
         }, date.getYear(), date.getMonth(), date.getDay());
         dialog.setOnCancelListener(dialog12 -> {
-            startDate.clear();
-            endDate.clear();
+            startDate.clean();
+            endDate.clean();
             textViewPeriod.setText(null);
         });
         dialog.getDatePicker().setMinDate(new Date().set(2016, 7, 1).toMillis());
@@ -222,7 +222,7 @@ public class SearchFiltersActivity extends AppCompatActivity {
     }
 
     private void setEndDate() {
-        Date date = endDate.isClear() ? new Date().now() : new Date().set(endDate);
+        Date date = endDate.isClean() ? new Date().now() : new Date().set(endDate);
 
         DatePickerDialog dialog = new DatePickerDialog(this, (datePicker, year, month, day) -> {
             endDate.set(year, month, day);
@@ -230,8 +230,8 @@ public class SearchFiltersActivity extends AppCompatActivity {
                     startDate.toString(), endDate.toString()));
         }, date.getYear(), date.getMonth(), date.getDay());
         dialog.setOnCancelListener(dialog12 -> {
-            startDate.clear();
-            endDate.clear();
+            startDate.clean();
+            endDate.clean();
             textViewPeriod.setText(null);
         });
         dialog.getDatePicker().setMinDate(startDate.toMillis());
@@ -243,7 +243,7 @@ public class SearchFiltersActivity extends AppCompatActivity {
     public void onFindClick(View view) {
         checkEditTextYear();
 
-        App.getFilters().page().clean();
+        App.getFilters().page().clear();
         App.getFilters().query().set(editTextQuery.getText() != null ? editTextQuery.getText().toString() : "");
         App.getFilters().declarationYear().set(tryParse(editTextYear.getText() != null ? editTextYear.getText().toString() : ""));
         App.getFilters().documentType().set(documentType);

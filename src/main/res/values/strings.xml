@@ -15,6 +15,7 @@
     <string name="dialog_title_start_date">Починаючи з дати</string>
     <string name="dialog_title_end_date">По дату</string>
     <string name="refresh_finished">Знайдено %1$d документів</string>
+    <string name="nothing_found">Нічого не знайдено, уточніть ваш запит.</string>
     <string name="split_period">%s - %s</string>
     <string name="favorites">Вибране</string>
 
@@ -43,9 +44,8 @@
         ЄДРД, та не представляє державний орган.\n\nУ додатку можливе
         використання схожої символіки та кольорової гами з символікою
         та кольоровою гамою, що використовується на сайті НАЗК.
-        \n\n© Павло Цісар\nua.pavlo.tsisar@gmail.com\nhttps://github.com/Tsisar/nazk
-    </string>
-    <string name="json_error">JsonError: </string>
+        \n\n© Павло Цісар\nua.pavlo.tsisar@gmail.com\nhttps://github.com/Tsisar/nazk</string>
+    <string name="json_error">JsonError: %d</string>
     <string name="page_format">Сторінка %d із %d</string>
     <string name="query_input_error">Введіть від 3 до 255 символів.</string>
     <string name="year_input_error">Введіть рік від 2015 до %d.</string>
@@ -55,4 +55,18 @@
     <string name="item_work_post">Посада: %s</string>
     <string name="item_date">Дата та час подання: %s</string>
     <string name="item_name">%s %s %s</string>
+    <string name="query_long_error">Пошуковий запит має містити мінимум 2 символи.</string>
+    <string name="user_declarant_id_error">Невідповідність заповнення значення поля
+        \"ID суб’єкта декларування\". Внесіть числове значення, від 1 до 10000000."</string>
+    <string name="document_type_error">Невідповідність заповнення поля \"Тип документа\".</string>
+    <string name="declaration_type_error">Невідповідність заповнення поля \"Тип декларації\".</string>
+    <string name="declaration_year_error">Невідповідність заповнення поля \"Рік декларації\".
+        Внесіть рік починаючи з 2015 до поточного року.</string>
+    <string name="start_date_error">Невідповідність заповнення поля \"Початок дати подання\".
+        Внесіть дату починаючи з (01.08.2016) до поточної дати.</string>
+    <string name="end_date_error">Невідповідність заповнення поля \"Кінець дати подання\".
+        Внесіть дату починаючи з (01.08.2016) до поточної дати.</string>
+    <string name="page_error">Невідповідність заповнення поля \"№ сторінки\".
+        Внесіть номер сторі в діапазоні від 1 до 100.</string>
+
 </resources>

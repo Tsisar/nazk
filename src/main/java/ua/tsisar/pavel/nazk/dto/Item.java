@@ -106,27 +106,5 @@ public class Item {
                 ", date='" + date + '\'' +
                 '}';
     }
-
-    //testing
-
-    public String getLastName() {
-        return data.getStep1().getData().getLastname();
-    }
-
-    public String getFirstName() {
-        return data.getStep1().getData().getFirstname();
-    }
-
-    public String getMiddleName() {
-        return data.getStep1().getData().getMiddlename();
-    }
-
-    public String getWorkPost() {
-        return data.getStep1().getData().getWorkPost();
-    }
-
-    public String getWorkPlace() {
-        return data.getStep1().getData().getWorkPlace();
-    }
 }
 

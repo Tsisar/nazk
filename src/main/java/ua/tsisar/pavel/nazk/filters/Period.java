@@ -14,13 +14,13 @@ public class Period {
         return endDate;
     }
 
-    public void clean() {
-        startDate.clear();
-        endDate.clear();
+    public void clear() {
+        startDate.clean();
+        endDate.clean();
     }
 
-    public boolean isClean() {
-        return startDate.isClear() && endDate.isClear();
+    public boolean isClear() {
+        return startDate.isClean() && endDate.isClean();
     }
 
 }

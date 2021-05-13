@@ -2,19 +2,19 @@ package ua.tsisar.pavel.nazk.filters;
 
 public class SearchFilters {
 
-    private final WrapperString query = new WrapperString();
-    private final WrapperInteger userDeclarantId = new WrapperInteger();
+    private final FilterString query = new FilterString();
+    private final FilterInteger userDeclarantId = new FilterInteger();
     private final DocumentType documentType = new DocumentType();
     private final DeclarationType declarationType = new DeclarationType();
-    private final WrapperInteger declarationYear = new WrapperInteger();
+    private final FilterInteger declarationYear = new FilterInteger();
     private final Period period = new Period();
-    private final WrapperInteger page = new WrapperInteger();
+    private final FilterInteger page = new FilterInteger();
 
-    public WrapperString query() {
+    public FilterString query() {
         return query;
     }
 
-    public WrapperInteger userDeclarantId() {
+    public FilterInteger userDeclarantId() {
         return userDeclarantId;
     }
 
@@ -26,7 +26,7 @@ public class SearchFilters {
         return declarationType;
     }
 
-    public WrapperInteger declarationYear() {
+    public FilterInteger declarationYear() {
         return declarationYear;
     }
 
@@ -34,27 +34,27 @@ public class SearchFilters {
         return period;
     }
 
-    public WrapperInteger page() {
+    public FilterInteger page() {
         return page;
     }
 
-    public void clean() {
-        query.clean();
-        userDeclarantId.clean();
-        documentType.clean();
-        declarationType.clean();
-        declarationYear.clean();
-        period.clean();
-        page.clean();
+    public void clear() {
+        query.clear();
+        userDeclarantId.clear();
+        documentType.clear();
+        declarationType.clear();
+        declarationYear.clear();
+        period.clear();
+        page.clear();
     }
 
-    public boolean isClean() {
-        return query.isClean() &&
-                userDeclarantId.isClean() &&
-                documentType.isClean() &&
-                declarationType.isClean() &&
-                declarationYear.isClean() &&
-                period.isClean() &&
-                page.isClean();
+    public boolean isClear() {
+        return query.isClear() &&
+                userDeclarantId.isClear() &&
+                documentType.isClear() &&
+                declarationType.isClear() &&
+                declarationYear.isClear() &&
+                period.isClear() &&
+                page.isClear();
     }
 }

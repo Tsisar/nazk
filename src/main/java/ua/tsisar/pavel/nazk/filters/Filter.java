@@ -1,6 +1,6 @@
 package ua.tsisar.pavel.nazk.filters;
 
-public class Wrapper<V>{
+public class Filter<V>{
     private V value;
 
     public V get() {
@@ -11,11 +11,11 @@ public class Wrapper<V>{
         this.value = value;
     }
 
-    public void clean() {
+    public void clear() {
         value = null;
     }
 
-    public boolean isClean() {
+    public boolean isClear() {
         return value == null;
     }
 

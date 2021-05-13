@@ -57,7 +57,7 @@ public class CursorExAdapter extends CursorAdapter {
 
     @Override
     public Object getItem(int position) {
-        if(super.getCursor() != null && !super.getCursor().isClosed()) {
+        if (super.getCursor() != null && !super.getCursor().isClosed()) {
             return super.getItem(position);
         } else {
             return null;
@@ -66,7 +66,7 @@ public class CursorExAdapter extends CursorAdapter {
 
     @Override
     public long getItemId(int position) {
-        if(super.getCursor() != null && !super.getCursor().isClosed()) {
+        if (super.getCursor() != null && !super.getCursor().isClosed()) {
             return super.getItemId(position);
         } else {
             return 0;
@@ -79,15 +79,16 @@ public class CursorExAdapter extends CursorAdapter {
             view = super.getView(position, convertView, parent);
         }
         Log.i(TAG, "getView: Cursor closed " + super.getCursor());
+        Log.i(TAG, "getView: view " + view);
         return view;
     }
 
     @Override
     public View getDropDownView(int position, View convertView, ViewGroup parent) {
-        if(super.getCursor() != null && !super.getCursor().isClosed()) {
+        if (super.getCursor() != null && !super.getCursor().isClosed()) {
             dropDownView = super.getDropDownView(position, convertView, parent);
         }
-        Log.i(TAG, "getDropDownView: Cursor closed");
+//        Log.i(TAG, "getDropDownView: Cursor closed");
         return dropDownView;
     }
 }

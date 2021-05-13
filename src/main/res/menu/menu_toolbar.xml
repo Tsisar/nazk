@@ -9,16 +9,16 @@
         android:id="@+id/search"
         android:icon="@drawable/ic_search"
         android:title="@string/search_title"
-        app:showAsAction="always|collapseActionView"
+        app:showAsAction="ifRoom|collapseActionView"
         app:actionViewClass="androidx.appcompat.widget.SearchView"/>
     <item
         android:id="@+id/favorites"
         android:icon="@drawable/ic_star_menu"
         android:title="@string/favorites"
-        app:showAsAction="always|collapseActionView" />
+        app:showAsAction="always" />
     <item
         android:id="@+id/filter"
         android:icon="@drawable/ic_filter"
         android:title="@string/filter_title"
-        app:showAsAction="always|collapseActionView" />
+        app:showAsAction="always" />
 </menu>

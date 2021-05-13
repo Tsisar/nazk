@@ -1,6 +1,6 @@
 package ua.tsisar.pavel.nazk.filters;
 
-public class WrapperString extends Wrapper<String> {
+public class FilterString extends Filter<String> {
 
     public void set(String s) {
         if(s.isEmpty())

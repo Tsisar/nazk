@@ -1,6 +1,6 @@
 package ua.tsisar.pavel.nazk.filters;
 
-public class WrapperInteger extends Wrapper<Integer> {
+public class FilterInteger extends Filter<Integer> {
 
     public void set(Integer i) {
         if(i == 0)

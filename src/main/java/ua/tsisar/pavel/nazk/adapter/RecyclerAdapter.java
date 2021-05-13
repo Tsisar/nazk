@@ -18,6 +18,7 @@ import java.util.Objects;
 
 import ua.tsisar.pavel.nazk.R;
 import ua.tsisar.pavel.nazk.dto.Item;
+import ua.tsisar.pavel.nazk.dto.WrapperItem;
 import ua.tsisar.pavel.nazk.util.DBHelper;
 
 
@@ -58,7 +59,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.itemVi
             return;
 
         Item item = items.get(position);
-        holder.setItem(context, item);
+        holder.setItem(context, new WrapperItem(item));
         if (listener != null) {
             holder.itemView.setOnClickListener(view -> listener.onItemClick(item));
         }
@@ -103,13 +104,14 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.itemVi
                 if (dbHelper.isSavedFavorites(item.getId())) {
                     dbHelper.deleteFavorites(item.getId());
                 } else {
-                    dbHelper.saveFavorites(item);
+                    dbHelper.saveFavorites(new WrapperItem(item));
                 }
             });
         }
 
-        void setItem(Context context, Item item) {
-            this.item = item;
+        void setItem(Context context, WrapperItem item) {
+            this.item = item.getItem();
+
             star.setSelected(dbHelper.isSavedFavorites(item.getId()));
 
             String documentType = context.getResources()

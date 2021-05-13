@@ -60,7 +60,6 @@ public class MainActivity extends AppCompatActivity
     private LinearLayout linearLayoutFilters;
     private LinearLayout linearLayoutPage;
     private RecyclerView recyclerView;
-
     private CollapsingToolbarLayout toolBarLayout;
     private SwipeRefreshLayout swipeRefreshLayout;
     private CoordinatorLayout coordinatorLayout;
@@ -145,7 +144,7 @@ public class MainActivity extends AppCompatActivity
     public void onBackPressed() {
         if (state == State.FAVORITES) {
             setState(State.MAIN);
-            searchDeclarations();
+            updateSearchFilters();
         } else {
             super.onBackPressed();
         }
@@ -153,9 +152,8 @@ public class MainActivity extends AppCompatActivity
 
     protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
-        if (App.getFilters().isClean()) {
+        if (App.getFilters().isClear()) {
             updateSearchFilters();
-            searchDeclarations();
         }
     }
 
@@ -179,22 +177,24 @@ public class MainActivity extends AppCompatActivity
 
         searchView = (SearchView) menu.findItem(R.id.search).getActionView();
         searchView.setSuggestionsAdapter(cursorAdapter);
-        searchView.setIconifiedByDefault(false); // Do not iconify the widget; expand it by default
+        searchView.setIconifiedByDefault(true); // Do not iconify the widget; expand it by default
         searchView.setQueryHint(getString(R.string.hint_query));
+        searchView.setOnSearchClickListener(v -> searchView.setQuery(App.getFilters().query().get(), false));
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
                 searchView.clearFocus();
+                App.getFilters().page().clear();
                 App.getFilters().query().set(query);
-                App.getFilters().page().clean();
-                searchDeclarations();
+                updateSearchFilters();
                 dbHelper.saveHistory(query);
+                menu.findItem(R.id.search).collapseActionView();
                 return true;
             }
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                App.getFilters().query().set(newText);
+                //App.getFilters().query().set(newText);
                 searchView.getSuggestionsAdapter().changeCursor(dbHelper.loadHistory(newText));
                 return true;
             }
@@ -208,8 +208,7 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
         switch (id) {
             case ID_FILTER:
-                startActivityForResult(new Intent(this, SearchFiltersActivity.class),
-                        REQUEST_CODE_FILTERS);
+                startActivityForResult(new Intent(this, SearchFiltersActivity.class), REQUEST_CODE_FILTERS);
                 return true;
             case ID_FAVORITES:
                 loadFavorites();
@@ -222,8 +221,7 @@ public class MainActivity extends AppCompatActivity
         setState(State.FAVORITES);
         drawItems(dbHelper.getFavoritesList());
         showPage(100);
-        //App.getFilters().clean();
-        searchView.setQuery(null, false);
+//        App.getFilters().clear();
         linearLayoutFilters.removeAllViews();
         swipeRefreshLayout.setRefreshing(false);
     }
@@ -233,11 +231,11 @@ public class MainActivity extends AppCompatActivity
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == RESULT_OK && requestCode == REQUEST_CODE_FILTERS) {
             setState(State.MAIN);
-            try {
-                searchView.post(() -> searchView.setQuery(App.getFilters().query().get(), false));
-            } catch (NullPointerException e) {
-                showMessage(e.getMessage());
-            }
+//            try {
+//                searchView.post(() -> searchView.setQuery(App.getFilters().query().get(), false));
+//            } catch (NullPointerException e) {
+//                showMessage(e.getMessage());
+//            }
             updateSearchFilters();
         }
     }
@@ -245,28 +243,29 @@ public class MainActivity extends AppCompatActivity
     private void onSearchDeclarationsSuccess(Answer answer) {
         try {
             swipeRefreshLayout.setRefreshing(false);
-            if (answer.getCount() == 0) {
-                showMessage(String.format(getString(R.string.refresh_finished), 0));
-            } else {
-                if (App.getFilters().page().isClean()) {
-                    if (answer.getNotice() != null) {
-                        showMessage(answer.getNotice());
-                    } else {
-                        showMessage(String.format(getString(R.string.refresh_finished), answer.getCount()));
+            drawItems(answer.getData());
+
+            if (App.getFilters().page().isClear()) {
+                if (answer.getNotice() != null) {
+                    showMessage(answer.getNotice());
+                } else {
+                    showMessage(String.format(getString(R.string.refresh_finished), answer.getCount()));
+                    if (answer.getCount() == 0) {
+                        textViewInfo.setVisibility(View.VISIBLE);
+                        textViewInfo.setText(getString(R.string.nothing_found));
                     }
                 }
             }
-            drawItems(answer.getData());
             showPage(answer.getCount());
         } catch (Exception e) {
             e.printStackTrace();
 //            showMessage(e.getMessage());
             if (JsonError.get(answer.getError()) != null) {
-                showMessage(JsonError.get(answer.getError()).getMessage());
-                Log.e(TAG, "JsonError: " + answer.getError());
+                showMessage(getString(JsonError.get(answer.getError()).getMessage()));
             } else {
-                showMessage(getString(R.string.json_error) + answer.getError());
+                showMessage(String.format(getString(R.string.json_error), answer.getError()));
             }
+            Log.e(TAG, "JsonError: " + answer.getError());
         }
     }
 
@@ -313,21 +312,21 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void removeView(SearchFiltersView view) {
-        App.getFilters().page().clean();
+        App.getFilters().page().clear();
         switch (view.getType()) {
-//            case QUERY:
-//                App.getFilters().query().clear();
-//                searchView.post(() -> searchView.setQuery(null, false));
-//                break;
+            case QUERY:
+                App.getFilters().query().clear();
+                searchView.post(() -> searchView.setQuery(null, false));
+                break;
             case DOCUMENT_TYPE:
-                App.getFilters().documentType().clean();
-                App.getFilters().declarationType().clean();
+                App.getFilters().documentType().clear();
+                App.getFilters().declarationType().clear();
                 break;
             case DECLARATION_YEAR:
-                App.getFilters().declarationYear().clean();
+                App.getFilters().declarationYear().clear();
                 break;
             case PERIOD:
-                App.getFilters().period().clean();
+                App.getFilters().period().clear();
                 break;
         }
         linearLayoutFilters.removeView(view);
@@ -336,24 +335,24 @@ public class MainActivity extends AppCompatActivity
 
     private void updateSearchFilters() {
         linearLayoutFilters.removeAllViews();
-//        if(!App.getFilters().query().isClear()){
-//            addView(App.getFilters().query().get(), Type.QUERY);
-//        }
-        if (!App.getFilters().documentType().isClean()) {
+        if (!App.getFilters().query().isClear()) {
+            addView(App.getFilters().query().get(), Type.QUERY);
+        }
+        if (!App.getFilters().documentType().isClear()) {
             addView(String.format(getString(R.string.filter_document_type), getResources().
                             getStringArray(R.array.array_document_type)
                             [App.getFilters().documentType().get()]) +
-                            (App.getFilters().declarationType().isClean() ? "" :
+                            (App.getFilters().declarationType().isClear() ? "" :
                                     String.format(getString(R.string.filter_declaration_type),
                                             getResources().getStringArray(R.array.array_declaration_type)
                                                     [App.getFilters().declarationType().get()])),
                     Type.DOCUMENT_TYPE);
         }
-        if (!App.getFilters().declarationYear().isClean()) {
+        if (!App.getFilters().declarationYear().isClear()) {
             addView(String.format(getString(R.string.filter_year),
                     App.getFilters().declarationYear().get().toString()), Type.DECLARATION_YEAR);
         }
-        if (!App.getFilters().period().isClean()) {
+        if (!App.getFilters().period().isClear()) {
             addView(String.format(getString(R.string.filter_period),
                     App.getFilters().period().startDate().toString(),
                     App.getFilters().period().endDate().toString()), Type.PERIOD);
@@ -365,14 +364,14 @@ public class MainActivity extends AppCompatActivity
         maxPage = (count - 1) / 100 + 1;
 
         if (count > 100) {
-            if (App.getFilters().page().isClean()) {
+            if (App.getFilters().page().isClear()) {
                 App.getFilters().page().set(1);
             }
             linearLayoutPage.setVisibility(View.VISIBLE);
             textViewPage.setText(String.format(getString(R.string.page_format), App.getFilters().page().get(), maxPage));
         } else {
             linearLayoutPage.setVisibility(View.GONE);
-            App.getFilters().page().clean();
+            App.getFilters().page().clear();
         }
     }
 
@@ -399,7 +398,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onRefresh() {
         if (state == State.MAIN) {
-            App.getFilters().page().clean();
+            App.getFilters().page().clear();
             searchDeclarations();
         } else {
             loadFavorites();

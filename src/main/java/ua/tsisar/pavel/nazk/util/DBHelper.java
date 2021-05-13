@@ -10,6 +10,7 @@ import java.util.ArrayList;
 
 import ua.tsisar.pavel.nazk.dto.Item;
 import ua.tsisar.pavel.nazk.dto.ItemData;
+import ua.tsisar.pavel.nazk.dto.WrapperItem;
 import ua.tsisar.pavel.nazk.dto.Step1;
 import ua.tsisar.pavel.nazk.dto.Step1Data;
 
@@ -111,7 +112,7 @@ public class DBHelper extends SQLiteOpenHelper {
         this.getWritableDatabase().execSQL("delete from " + FAVORITES + " where " + DOCUMENT_ID + " = \'" + id + "\';");
     }
 
-    public void saveFavorites(Item item) {
+    public void saveFavorites(WrapperItem item) {
         ContentValues cv = new ContentValues();
         SQLiteDatabase db = this.getWritableDatabase();
 
