@@ -1,6 +1,8 @@
 package ua.tsisar.pavel.nazk.activity;
 
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.MatrixCursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.util.Linkify;
@@ -52,7 +54,6 @@ public class MainActivity extends AppCompatActivity
     private static final int ID_FAVORITES = R.id.favorites;
 
     private SearchView searchView;
-
     private CompositeDisposable compositeDisposable;
 
     private TextView textViewInfo;
@@ -65,9 +66,7 @@ public class MainActivity extends AppCompatActivity
     private CoordinatorLayout coordinatorLayout;
 
     private int maxPage;
-
     private DBHelper dbHelper;
-
     private State state = State.MAIN;
 
     enum State {
@@ -84,12 +83,32 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    public MatrixCursor copyCursor(Cursor cursor) {
+        if (cursor != null) {
+            String[] columnNames = {"_id", "history_query"};
+            MatrixCursor matrixCursor = new MatrixCursor(columnNames);
+            int cols = cursor.getColumnCount();
+            if (cursor.moveToFirst()) {
+                do {
+                    Object[] row = new Object[cols];
+                    for (int col = 0; col < cols; col++) {
+                        row[col] = cursor.getString(col);
+                    }
+                    matrixCursor.addRow(row);
+                } while (cursor.moveToNext());
+            }
+            cursor.close();
+            return matrixCursor;
+        }
+        return null;
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        compositeDisposable = new CompositeDisposable();
 
+        compositeDisposable = new CompositeDisposable();
         dbHelper = new DBHelper(this);
 
         Toolbar toolbar = findViewById(R.id.toolbar);
@@ -171,13 +190,14 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onItemDelete(String query) {
                 dbHelper.deleteHistory(query);
-                searchView.getSuggestionsAdapter().changeCursor(dbHelper.loadHistory(App.getFilters().query().get()));
+                searchView.getSuggestionsAdapter().
+                        changeCursor(copyCursor(dbHelper.loadHistory(App.getFilters().query().get())));
             }
         });
 
         searchView = (SearchView) menu.findItem(R.id.search).getActionView();
         searchView.setSuggestionsAdapter(cursorAdapter);
-        searchView.setIconifiedByDefault(true); // Do not iconify the widget; expand it by default
+        searchView.setIconifiedByDefault(true);
         searchView.setQueryHint(getString(R.string.hint_query));
         searchView.setOnSearchClickListener(v -> searchView.setQuery(App.getFilters().query().get(), false));
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
@@ -194,8 +214,8 @@ public class MainActivity extends AppCompatActivity
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                //App.getFilters().query().set(newText);
-                searchView.getSuggestionsAdapter().changeCursor(dbHelper.loadHistory(newText));
+//                App.getFilters().query().set(newText);
+                searchView.getSuggestionsAdapter().changeCursor(copyCursor(dbHelper.loadHistory(newText)));
                 return true;
             }
         });
