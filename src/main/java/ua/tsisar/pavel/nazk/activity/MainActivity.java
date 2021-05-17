@@ -83,7 +83,7 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    public MatrixCursor copyCursor(Cursor cursor) {
+    private MatrixCursor copyCursor(Cursor cursor) {
         if (cursor != null) {
             String[] columnNames = {"_id", "history_query"};
             MatrixCursor matrixCursor = new MatrixCursor(columnNames);

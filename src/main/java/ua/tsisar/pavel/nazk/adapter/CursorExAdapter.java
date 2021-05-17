@@ -16,8 +16,8 @@ public class CursorExAdapter extends CursorAdapter {
 
     private static final String QUERY = "history_query";
     private onItemClickListener listener;
-    private View view;
-    private View dropDownView;
+//    private View view;
+//    private View dropDownView;
 
     public interface onItemClickListener {
         void onItemClick(String query);
@@ -90,4 +90,7 @@ public class CursorExAdapter extends CursorAdapter {
 ////        Log.i(TAG, "getDropDownView: Cursor closed");
 //        return dropDownView;
 //    }
+
+    protected void onContentChanged() {
+    }
 }
