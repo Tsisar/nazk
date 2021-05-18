@@ -1,5 +1,6 @@
 # Release folder
 release/
+release/output-metadata.json
 
 # Built application files
 *.apk
